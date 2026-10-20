@@ -1,0 +1,8 @@
+^web$
+^tools$
+^docs$
+^tmp$
+^\.claude$
+^\.vercel$
+^vercel\.json$
+^CHANGELOG\.md$

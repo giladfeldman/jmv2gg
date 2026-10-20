@@ -1,0 +1,24 @@
+{
+  "webR": "0.6.0",
+  "sources": {
+    "DESCRIPTION": "aaca6a404a396d1049b3872162de0f63be7dc5418ee3d9ffbe38d98a1497754b",
+    "LICENSE": "b372a87757468731e51fa95c57148b406c2eca27760a9db99f4b797af50cb3c1",
+    "NAMESPACE": "6fa5fa04d7e6fe61b595d3636e39297671ddf8f455f4f97de9b661972dcc692c",
+    "R/browser.R": "c7bf0c51d4bc294b22ac78acc93a0869f250bf5f85127db9f8ef4b9a1fa898aa",
+    "R/contracts.R": "74a5f704115968df9a29224e1192f2065f3a81adb454ed2ee46d1b55243f928c",
+    "R/generate.R": "63aff5db2039784aa2fae5a82bbdda549bbad8e95d348d5481cfd28703de69c0",
+    "R/optimize.R": "c07efeb7dd675cf9b70aa81dd6578f68b7685f7a0b44aa8a21dc7b92f033b38b",
+    "R/parser.R": "460cef943e84d39b163e0b000335e89e282d6b959aaf5032a8da8b21d813d405",
+    "R/rmd.R": "053a62e20d44420ba0878bc1cebd715bef81a42f72efa0228ae87e3d412fcd33",
+    "inst/examples/comparison.R": "1cb97768bc65c3b283be8178b184c149f18ba6bc3344b81ed54f8b1f2d315de6",
+    "inst/report/report.css": "4cc7e9880cbd507b08043a99c464f6dc6391108398f3b484b93fc5fd11649f04",
+    "man/browser_request.Rd": "50086a790f909a1cd94123dc805463776e06bb3d3a8e92ee77e1ce909eb2efc3",
+    "man/convert_code.Rd": "66169e80e8087ab10ffc80cd483776296373b191c18ac8eb13d842104aaba55f",
+    "man/convert_rmd.Rd": "ed2f8b4bfad01d5bc9839a5e0606e2dc674231e61f129dee91e585a94db6bc2c",
+    "man/optimize_png.Rd": "79f5e8c4ad71d56910722a1a1a3883a577a7a11bcdf546b1e598d40bee0d771c",
+    "man/render_report.Rd": "d600bec07de1abb9109df77c936fdeb16510ef7da66918d17b40fbb3fea6f2c4",
+    "man/runtime_capabilities.Rd": "97c598ab7369af234a470591aa13008d12611422e275f320c5fd0a3dc7581a1e"
+  },
+  "artifact": "bin/emscripten/contrib/4.6/jmv2gg_0.1.0.9000.tgz",
+  "sha256": "7a01817a0110ed2877a39a8d2e4d80a84274d972e5b7777d5f337df153a37c5b"
+}

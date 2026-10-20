@@ -1,0 +1,17 @@
+.Rhistory
+.RData
+.Rproj.user/
+*.Rcheck/
+*.tar.gz
+node_modules/
+web/dist/
+web/public/webr/
+web/public/r-packages/src/
+.vercel/
+tmp/
+.env*
+!.env.example
+.claude/
+Rplots.pdf
+*.Rout
+*.tsbuildinfo
