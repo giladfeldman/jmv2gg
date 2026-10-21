@@ -75,7 +75,7 @@ new_result <- function(text, analyses, diagnostics, engine, plots = list()) {
   status <- if (!converted) "failed" else if (errors || converted < length(analyses) || missing_engine) "partial" else "complete"
   structure(list(status = status, text = text, analyses = analyses,
     diagnostics = diagnostics, manifest = list(converter = "jmv2gg",
-      version = "0.1.0.9000", engine = engine, detected = length(analyses),
+      version = "0.1.0", engine = engine, detected = length(analyses),
       converted = converted, plots = plots)), class = "jmv2gg_result")
 }
 

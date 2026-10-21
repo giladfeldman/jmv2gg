@@ -3,16 +3,17 @@
 Convert jamovi analysis code into explicit, editable ggplot2 and BetterGG figures.
 Conversion runs in native R or in a browser using the same R package through WebR.
 
-This is a development release. Check the capability notes before using generated
+This is version 0.1.0. Check the capability notes before using generated
 figures in research. Unsupported analyses are preserved and reported; numerical
 equivalence is never inferred from a visually similar plot.
 
 ## Use in R
 
 ```r
-# Install from GitHub once a release is published:
-# install.packages("remotes")
-# remotes::install_github("giladfeldman/jmv2gg")
+install.packages("remotes")
+remotes::install_github("giladfeldman/jmv2gg@v0.1.0")
+# Required only when executing BetterGG output:
+remotes::install_github("giladfeldman/BetterGG@48dc7e47e19e70cea2ee9b9ed6ea35902693629b")
 
 result <- jmv2gg::convert_code(
   'jmv::ANOVA(data = study, dep = "score", factors = "condition")',
@@ -57,6 +58,10 @@ the native-R route.
 
 For example, `figures = list(dpi = 300, width = 3.5, height = 3)` selects a smaller
 single-column export. Compression is lossless; no color quantization is applied.
+For verified native lossless postprocessing, set
+`figures = list(optimize_png = TRUE)` with the `oxipng` executable on PATH.
+The optimizer retains the original unless decoded pixels, dimensions, and
+resolution match and the optimized file is no larger.
 
 ## Analysis coverage and statistical notes
 
@@ -69,6 +74,12 @@ Explicit model terms and logistic reference levels are preserved. Model-based
 ggplot2 figures use the fitted model and emmeans where relevant. Undefined
 Pearson cells for ordinary nominal factors remain undefined; numeric value
 mappings are handled explicitly.
+
+Descriptive frequency/histogram exports retain case weights. Weighted
+correlations are explicitly rejected. Additional BetterGG comparisons disclose
+when they are unweighted or pool source strata. Browser previews do not run
+Rmd setup or reconstruct case-weight attributes; use native R for weighted
+analyses and complete report execution.
 
 BetterGG may introduce additional tests. In particular, a one-way/grouped
 comparison does not reproduce a factorial interaction or covariate-adjusted
@@ -102,7 +113,7 @@ PowerShell:
 Rscript tools/check.R
 Rscript -e 'roxygen2::roxygenise()'
 R CMD build .
-R CMD check --no-manual jmv2gg_0.1.0.9000.tar.gz
+R CMD check --no-manual jmv2gg_0.1.0.tar.gz
 npm --prefix web ci
 npm --prefix web run build
 npm --prefix web run dev
@@ -116,3 +127,14 @@ official WebR 0.6.0 container; it documents the package-resolver workaround.
 Private acceptance fixtures are supplied only through environment variables to
 `tools/validation/private-report.R`. Never commit participant data or rendered
 research reports.
+
+A synthetic report for the Rmd input mode is in
+`web/public/examples/report.Rmd`. Browser ZIP exports include the exact browser
+dependency index and compiled converter checksums. Native rendering records the
+actual R session; retain that record and restore those package versions before
+reproducing a report.
+
+Production builds emit `/build-info.json` with the Git revision, build time,
+package/runtime versions and compiled converter checksum. Local builds disclose
+uncommitted changes. After deployment, compare the live revision and checksum
+with the release artifacts; an HTTP success alone does not identify the build.

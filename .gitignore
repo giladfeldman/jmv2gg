@@ -7,11 +7,15 @@ node_modules/
 web/dist/
 web/public/webr/
 web/public/r-packages/src/
-.vercel/
+.vercel/*
+!.vercel/project.json
+web/.vercel/*
+!web/.vercel/project.json
 tmp/
 .env*
 !.env.example
 .claude/
+communications/
 Rplots.pdf
 *.Rout
 *.tsbuildinfo

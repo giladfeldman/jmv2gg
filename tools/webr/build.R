@@ -20,6 +20,7 @@ files<-sort(c(list.files("/src/R",full.names=TRUE,recursive=TRUE),list.files("/s
   list.files("/src/inst",full.names=TRUE,recursive=TRUE),file.path("/src",c("DESCRIPTION","NAMESPACE","LICENSE"))))
 hash<-function(path)strsplit(system2("sha256sum",shQuote(path),stdout=TRUE)," ",fixed=TRUE)[[1]][1]
 sources<-stats::setNames(lapply(files,hash),substring(files,6L))
-artifact<-file.path(bin,"jmv2gg_0.1.0.9000.tgz")
+version <- read.dcf("/src/DESCRIPTION", fields="Version")[[1]]
+artifact<-file.path(bin,paste0("jmv2gg_",version,".tgz"))
 jsonlite::write_json(list(webR="0.6.0",sources=sources,artifact=substring(artifact,nchar(repo)+2L),sha256=hash(artifact)),
   file.path(repo,"build-manifest.json"),auto_unbox=TRUE,pretty=TRUE)

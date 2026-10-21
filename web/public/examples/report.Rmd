@@ -1,0 +1,23 @@
+---
+title: "Editable figures: a synthetic example"
+params:
+  participants: 60
+output: html_document
+---
+
+## Two groups
+
+This example uses deterministic simulated values, not participant data.
+
+```{r prepare}
+study <- data.frame(
+  condition = factor(rep(c("Group A", "Group B"), length.out = params$participants)),
+  score = sin(seq_len(params$participants)) +
+    rep(c(0, .5), length.out = params$participants)
+)
+```
+
+```{r group-comparison}
+comparison <- jmv::ANOVA(data = study, dep = "score", factors = "condition")
+comparison
+```

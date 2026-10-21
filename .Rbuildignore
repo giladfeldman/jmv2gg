@@ -1,8 +1,12 @@
 ^web$
+^\.github$
 ^tools$
 ^docs$
 ^tmp$
 ^\.claude$
 ^\.vercel$
+^\.env
 ^vercel\.json$
 ^CHANGELOG\.md$
+^LESSONS\.md$
+^THIRD_PARTY\.md$

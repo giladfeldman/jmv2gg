@@ -1,0 +1,43 @@
+name: Package and web checks
+on:
+  push:
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  web:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: web
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+      - run: npm ci
+      - run: npm test
+      - run: npm run build
+  native:
+    runs-on: ubuntu-latest
+    env:
+      GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: r-lib/actions/setup-r@v2
+        with:
+          use-public-rspm: true
+      - uses: r-lib/actions/setup-pandoc@v2
+      - name: Install test dependencies and public BetterGG
+        shell: Rscript {0}
+        run: |
+          install.packages(c("remotes", "rcmdcheck", "testthat", "withr", "jsonlite", "yaml",
+            "ggplot2", "emmeans", "car", "afex", "ragg", "png", "callr", "knitr",
+            "rmarkdown", "haven", "ggstatsplot"))
+          remotes::install_github("giladfeldman/BetterGG@48dc7e47e19e70cea2ee9b9ed6ea35902693629b", upgrade="never")
+      - run: Rscript tools/check.R
+      - name: Check package
+        shell: Rscript {0}
+        run: rcmdcheck::rcmdcheck(args="--no-manual", error_on="warning")

@@ -11,8 +11,12 @@ export class RWorkbench {
   constructor(progress: (message: string) => void) { this.progress = message => { if (!this.closed) progress(message); }; }
   async initialize() {
     if (this.ready) return this.ready;
-    this.ready = this.load();
-    try { await this.ready; } catch (error) { this.ready = undefined; throw error; }
+    let timeout: ReturnType<typeof setTimeout> | undefined;
+    this.ready = Promise.race([this.load(), new Promise<never>((_, reject) => {
+      timeout = setTimeout(() => reject(new Error('WebR could not start within three minutes. Check runtime downloads or use the native R package. Clear the workspace to retry.')), 180_000);
+    })]);
+    try { await this.ready; } catch (error) { this.close(); throw error; }
+    finally { clearTimeout(timeout); }
   }
   private async load() {
     this.progress('Starting WebR 0.6.0 on your device…');

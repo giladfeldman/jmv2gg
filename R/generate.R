@@ -11,9 +11,10 @@ generate_analysis <- function(a, engine, options) {
     paste0(d, " <- ", r_text(data_expr)),
     paste0("if (!is.data.frame(", d, ")) stop(\"The analysis data must be a data frame.\")"))
   w <- paste0(stem,"_weights")
+  mapped <- paste0(stem,"_mapped")
   head <- c(head,paste0(w," <- attr(",d,", \"jmv-weights\", exact = TRUE)"),
     paste0("if (is.null(",w,")) ",w," <- rep(1, nrow(",d,"))"),
-    paste0("if (!is.numeric(",w,")) { mapped <- attr(",w,", \"values\", exact = TRUE); if (is.null(mapped)) stop(\"Weights must be numeric or have an explicit numeric values mapping.\"); ",w," <- mapped[as.integer(",w,")] }"),
+    paste0("if (!is.numeric(",w,")) { ",mapped," <- attr(",w,", \"values\", exact = TRUE); if (is.null(",mapped,")) stop(\"Weights must be numeric or have an explicit numeric values mapping.\"); ",w," <- ",mapped,"[as.integer(",w,")] }"),
     paste0("if (length(",w,") != nrow(",d,") || any(",w," < 0, na.rm = TRUE)) stop(\"Invalid case weights.\")"))
   plots <- list(); bodies <- character(); diagnostics <- list(); mapping <- "visualization_only"
   publish <- function(code, suffix, engine_name, caption = NULL) {
@@ -26,7 +27,7 @@ generate_analysis <- function(a, engine, options) {
     output <- c(intro, if (!is.null(caption)) paste0("# ", caption),
       paste0(plot, " <- ", code),
       if (options$style$grayscale && engine_name == "ggplot2") paste0(plot, " <- ", plot, " + ggplot2::scale_fill_grey() + ggplot2::scale_colour_grey()"),
-      plot,
+      paste0("if (interactive() || isTRUE(getOption(\"knitr.in.progress\"))) print(",plot,")"),
       paste0("ggplot2::ggsave(filename = ", r_string(paste0("figures/", filename)), ", plot = ", plot, ","),
       '  device = if (grepl("emscripten", R.version$platform)) grDevices::png else ragg::agg_png,',
       paste0("  width = ", figure$width, ", height = ", figure$height,
@@ -52,9 +53,9 @@ generate_analysis <- function(a, engine, options) {
   }
   numeric_columns <- function(vars) {
     for(v in vars) head <<- c(head,paste0("if (!is.numeric(",d,"[[",q(v),"]])) {"),
-      paste0("  mapped <- attr(",d,"[[",q(v),"]], \"values\", exact = TRUE)"),
-      paste0("  if (is.null(mapped) || !is.numeric(mapped)) stop(",q(paste0("Numeric outcome/covariate '",v,"' requires numeric data or an explicit numeric values mapping.")),")"),
-      paste0("  ",d,"[[",q(v),"]] <- mapped[as.integer(",d,"[[",q(v),"]])]"),"}",
+      paste0("  ",mapped," <- attr(",d,"[[",q(v),"]], \"values\", exact = TRUE)"),
+      paste0("  if (is.null(",mapped,") || !is.numeric(",mapped,")) stop(",q(paste0("Numeric outcome/covariate '",v,"' requires numeric data or an explicit numeric values mapping.")),")"),
+      paste0("  ",d,"[[",q(v),"]] <- ",mapped,"[as.integer(",d,"[[",q(v),"]])]"),"}",
       paste0(d,"[[",q(v),"]] <- as.numeric(",d,"[[",q(v),"]])"))
   }
   theme <- "ggplot2::theme_classic(base_size = 12) + ggplot2::theme(plot.title.position = \"plot\", legend.position = \"bottom\")"
@@ -99,7 +100,7 @@ generate_analysis <- function(a, engine, options) {
     check_columns(c(dv, factors, covs)); numeric_columns(c(dv,covs)); factorize(factors)
     model <- paste0(stem, "_model"); emm <- paste0(stem, "_means")
     for (v in factors) head <- c(head, paste0("if (nlevels(", d, "[[", q(v), "]]) < 2L) stop(\"A factor has fewer than two observed levels.\")"),
-      paste0("contrasts(", d, "[[", q(v), "]]) <- stats::contr.sum(nlevels(", d, "[[", q(v), "]]))"))
+      paste0(d,"[[",q(v),"]] <- stats::`contrasts<-`(",d,"[[",q(v),"]], value = stats::contr.sum(nlevels(",d,"[[",q(v),"]])))"))
     formula <- paste(r_name(dv), "~", rhs)
     head <- c(head, paste0(model, " <- stats::lm(", formula, ", data = ", d, ", weights = ",w,", na.action = stats::na.omit)"))
     weights <- if (isTRUE(arg_value(a, "emmWeights", TRUE))) "equal" else "proportional"
@@ -121,6 +122,8 @@ generate_analysis <- function(a, engine, options) {
       msg <- note(if(length(factors) > 1 || length(covs))
         "BetterGG shows a separate one-way comparison. It does not test the original factorial interaction or adjust for covariates."
         else "BetterGG calculates its own comparison and pairwise tests; these are additional to the original jamovi results.")
+      msg <- paste(msg,"This additional BetterGG comparison does not apply case weights.")
+      diagnostics[[length(diagnostics)]]$message <- msg
       bd <- paste0(stem,"_bettergg_data")
       publish(paste0("{\n  ",bd," <- data.frame(group = ",d,"[[",q(x),"]], outcome = ",d,"[[",q(dv),"]])\n  ",
         "BetterGG::ggbetweenstats(data = ",bd,", x = group, y = outcome, xlab = ",q(x),", ylab = ",q(dv),
@@ -135,17 +138,24 @@ generate_analysis <- function(a, engine, options) {
     for (i in seq_along(vars)) {
       v <- vars[i]
       if ("ggplot2" %in% engines) {
-        numeric <- paste0("ggplot2::ggplot(", d, ", ggplot2::aes(x = .data[[", q(v), "]])) + ggplot2::geom_histogram(bins = 30, fill = \"#176b74\", colour = \"white\", na.rm = TRUE)")
-        categorical <- paste0("ggplot2::ggplot(", d, ", ggplot2::aes(x = factor(.data[[", q(v), "]]))) + ggplot2::geom_bar(fill = \"#176b74\", na.rm = TRUE) + ggplot2::labs(x = ", q(v), ", y = \"Count\")")
+        numeric <- paste0("ggplot2::ggplot(", d, ", ggplot2::aes(x = .data[[", q(v), "]], weight = ",w,")) + ggplot2::geom_histogram(bins = 30, fill = \"#176b74\", colour = \"white\", na.rm = TRUE)")
+        categorical <- paste0("ggplot2::ggplot(", d, ", ggplot2::aes(x = factor(.data[[", q(v), "]]), weight = ",w,")) + ggplot2::geom_bar(fill = \"#176b74\", na.rm = TRUE) + ggplot2::labs(x = ", q(v), ", y = \"Count\")")
         suffix <- if(length(split)) paste0(" + ggplot2::facet_wrap(~ ",paste(r_name(split),collapse=" + "),")") else ""
         publish(paste0("(if (is.numeric(",d,"[[",q(v),"]]) && !inherits(", d,"[[",q(v),"]], \"haven_labelled\")) {\n  ",numeric,"\n} else {\n  ",categorical,"\n}) + ",theme,suffix), paste0("variable-",i), "ggplot2")
       }
       if ("bettergg" %in% engines) {
-        msg <- note("The BetterGG descriptive plot may add a distribution/proportion test absent from the original descriptive analysis.")
+        msg <- note(paste("The BetterGG descriptive plot may add a distribution/proportion test absent from the original descriptive analysis. It does not apply case weights.",
+          if(length(split))"This additional plot pools the source splitBy strata; the ggplot2 figure preserves them." else ""))
         bd<-paste0(stem,"_bettergg_variable_",i)
+        pie<-paste0(bd,"_plot")
         publish(paste0("{\n",bd," <- data.frame(value = ",d,"[[",q(v),"]])\nif (is.numeric(",bd,"$value) && !inherits(",bd,"$value, \"haven_labelled\")) {\n",
           "  BetterGG::gghistostats(data = ",bd,", x = value, xlab = ",q(v),", bf.message = FALSE)\n} else {\n",
-          "  BetterGG::ggpiestats(data = ",bd,", x = value, title = ",q(v),", palette = \"palettesForR::Named\", bf.message = FALSE)\n}\n}"),paste0("variable-",i),"bettergg",msg)
+          "  ",pie," <- BetterGG::ggpiestats(data = ",bd,", x = value, title = ",q(v),", palette = if (nlevels(factor(",bd,"$value)) <= 8L) \"ggsci::default_nejm\" else \"palettesForR::Named\", bf.message = FALSE) +\n",
+          "    ggplot2::guides(fill = ggplot2::guide_legend(ncol = 4, byrow = TRUE)) +\n",
+          "    ggplot2::theme(legend.position = \"bottom\", legend.text = ggplot2::element_text(size = 6), legend.key.size = grid::unit(.12, \"in\"), plot.subtitle = ggplot2::element_text(size = 8))\n",
+          "  # Retain every category in the legend; omit overlapping slice labels above 12 categories.\n",
+          "  if (nlevels(factor(",bd,"$value)) > 12L) ",pie,"$layers <- Filter(function(layer) !inherits(layer$geom, c(\"GeomLabel\", \"GeomLabelRepel\")), ",pie,"$layers)\n",
+          "  ",pie,"\n}\n}"),paste0("variable-",i),"bettergg",msg)
       }
     }
   } else if (fn %in% c("contTables", "contTablesPaired", "propTest2", "propTestN", "ggbarstats", "ggpiestats")) {
@@ -172,7 +182,8 @@ generate_analysis <- function(a, engine, options) {
         diagnostics <- c(diagnostics,list(diag_record("warning","bettergg_mapping_unavailable",
           "No faithful BetterGG mapping is provided for weighted or paired categorical data. Keep the ggplot2 count plot and original inference.",a$id,a$line)))
       } else {
-        msg <- note("BetterGG runs its own categorical test; inspect its test choice and denominators against the original analysis.")
+        msg <- note(paste("BetterGG runs its own unweighted categorical test; inspect its test choice and denominators against the original analysis.",
+          if(length(layers))"This additional test pools the source layers; the ggplot2 figure preserves them." else ""))
         bd<-paste0(stem,"_bettergg_data")
         publish(paste0("{\n",bd," <- data.frame(category = ",d,"[[",q(rows),"]]",if(length(cols))paste0(", group = ",d,"[[",q(cols),"]]")else "",")\nBetterGG::",
           if(length(cols))"ggbarstats" else "ggpiestats","(data = ",bd,", x = category",if(length(cols))", y = group"else "",
@@ -193,6 +204,7 @@ generate_analysis <- function(a, engine, options) {
     check_columns(vars)
     method <- if(isTRUE(arg_value(a,"spearman",FALSE))) "spearman" else if(isTRUE(arg_value(a,"kendall",FALSE))) "kendall" else "pearson"
     cor_data <- paste0(stem,"_correlation_data")
+    head <- c(head,paste0("if (any(",w," != 1, na.rm = TRUE)) stop(\"Weighted correlation mapping is unavailable. Keep the original analysis rather than substituting an unweighted correlation.\")"))
     head <- c(head,"# Match jamovi's explicit numeric values mapping; ordinary nominal Pearson cells stay undefined.",
       paste0(cor_data," <- as.data.frame(lapply(",d,"[, ",r_text(vars),", drop = FALSE], function(x) {"),
       "  if (is.numeric(x)) return(x)",
@@ -323,7 +335,7 @@ generate_analysis <- function(a, engine, options) {
         publish(code,paste0("variable-",i),"ggplot2")
       }
       if("bettergg" %in% engines) {
-        msg <- note("BetterGG supplies an additional comparison. Review variance, direction, and multiplicity settings against the source t-test.")
+        msg <- note("BetterGG supplies an additional unweighted comparison. Review case weights, variance, direction, and multiplicity settings against the source t-test.")
         code <- if(length(group)) paste0("BetterGG::ggbetweenstats(data = ",d,", x = ",r_name(group),", y = ",r_name(v),", var.equal = ",if(isTRUE(arg_value(a,"welchs",FALSE)))"FALSE" else "TRUE",", bf.message = FALSE)") else
           paste0("BetterGG::gghistostats(data = ",d,", x = ",r_name(v),", test.value = ",arg_value(a,"testValue",0),", bf.message = FALSE)")
         publish(code,paste0("variable-",i),"bettergg",msg)

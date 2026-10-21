@@ -13,6 +13,7 @@ if ($PackageCheck) {
     $rExecutable = Join-Path (Split-Path $resolvedRscript) 'R.exe'
     & $rExecutable CMD build --no-build-vignettes .
     if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-    & $rExecutable CMD check --no-manual jmv2gg_0.1.0.9000.tar.gz
+    $packageVersion = (Select-String -Path DESCRIPTION -Pattern '^Version:\s*(\S+)').Matches[0].Groups[1].Value
+    & $rExecutable CMD check --no-manual "jmv2gg_$packageVersion.tar.gz"
     if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 }

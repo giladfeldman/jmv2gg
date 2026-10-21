@@ -4,6 +4,9 @@ output <- Sys.getenv("JMV2GG_PRIVATE_OUTPUT")
 if (!nzchar(fixture) || !file.exists(fixture) || !nzchar(output)) stop("Set JMV2GG_PRIVATE_RMD and JMV2GG_PRIVATE_OUTPUT.")
 library(jmv2gg)
 dir.create(output,recursive=TRUE,showWarnings=FALSE)
+warning_file<-file.path(output,"validation-warnings.txt")
+writeLines(character(),warning_file)
+globalCallingHandlers(warning=function(w)cat(conditionMessage(w),"\n",file=warning_file,append=TRUE))
 data_parameter <- rmarkdown::yaml_front_matter(fixture)$params$data
 if(is.list(data_parameter)) data_parameter <- data_parameter$value
 data <- file.path(dirname(fixture),data_parameter)
@@ -17,9 +20,10 @@ baseline <- rmarkdown::render(fixture,output_format="html_document",output_file=
   envir=new.env(parent=globalenv()),quiet=TRUE)
 cat("Original baseline render complete\n")
 engines <- strsplit(Sys.getenv("JMV2GG_TEST_ENGINES","ggplot2"),",",fixed=TRUE)[[1]]
+original_output<-Sys.getenv("JMV2GG_ORIGINAL_OUTPUT","include")
 for(engine in engines) {
-  dir <- file.path(output,engine); dir.create(dir,recursive=TRUE,showWarnings=FALSE)
-  converted <- convert_rmd(source,engine=engine)
+  dir <- file.path(output,paste0(engine,if(original_output=="hide")"-hidden"else"")); dir.create(dir,recursive=TRUE,showWarnings=FALSE)
+  converted <- convert_rmd(source,engine=engine,original_output=original_output)
   stopifnot(converted$manifest$detected==37L,converted$manifest$converted==37L)
   path <- file.path(dir,"converted.Rmd"); writeLines(converted$text,path,useBytes=TRUE)
   params$results_json <- file.path(dir,"original-results.json")
@@ -27,6 +31,9 @@ for(engine in engines) {
   render_env<-new.env(parent=globalenv())
   rmarkdown::render(path,output_format="html_document",output_dir=dir,intermediates_dir=dir,
     knit_root_dir=dir,params=params,envir=render_env,quiet=TRUE)
+  html<-paste(readLines(file.path(dir,"converted.html"),warn=FALSE),collapse="\n")
+  embedded<-gregexpr("data:image/png",html,fixed=TRUE)[[1]]
+  stopifnot(sum(embedded>0L)>=length(converted$manifest$plots),grepl("code-folding",html,fixed=TRUE),grepl("tocify",html,fixed=TRUE))
   reference <- jsonlite::read_json(file.path(output,"original-results.json"),simplifyVector=FALSE)
   actual <- jsonlite::read_json(params$results_json,simplifyVector=FALSE)
   comparison <- all.equal(reference,actual,tolerance=1e-10)
@@ -58,6 +65,12 @@ for(engine in engines) {
   stopifnot(verified_models==9L)
   files <- list.files(file.path(dir,"figures"),pattern="[.]png$",full.names=TRUE)
   stopifnot(length(files)==length(converted$manifest$plots),all(file.info(files)$size>1000))
+  packages<-c("jmv2gg","jmv","ggplot2","emmeans","BetterGG","ggstatsplot","rmarkdown")
+  versions<-stats::setNames(lapply(packages,function(p)as.character(utils::packageVersion(p))),packages)
+  jsonlite::write_json(list(engine=engine,original_output=original_output,
+    analyses=converted$manifest$detected,figures=length(files),models_verified=verified_models,
+    original_records_identical=TRUE,embedded_pngs=sum(embedded>0L),
+    source_and_data_hashes=as.list(before),versions=versions),file.path(dir,"validation.json"),auto_unbox=TRUE,pretty=TRUE)
   cat("Converted render and numerical preservation PASS:",engine,length(files),"figures;",verified_models,"generated models match original inference\n")
 }
 stopifnot(identical(unname(before),unname(tools::md5sum(c(fixture,data)))))
