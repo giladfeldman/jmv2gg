@@ -18,7 +18,7 @@ const buildResponse = await get('/build-info.json');
 assert.equal(buildResponse.status, 200);
 const build = await buildResponse.json();
 assert.equal(build.revision, revision, 'Live revision must match the release commit.');
-assert.equal(build.workingTreeDirty, false, 'Release checkout must be clean.');
+assert.equal(build.sourceTreeDirty, false, 'Released source must be clean; provider metadata changes are disclosed separately.');
 assert.equal(build.converterVersion, '0.1.0');
 assert.equal(build.webRVersion, '0.6.0');
 assert.equal(build.converterArtifactSha256, manifest.sha256);

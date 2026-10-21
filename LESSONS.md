@@ -39,3 +39,5 @@
   and resolution before replacing an export, and retain the smaller file.
 
 - Release packaging must explicitly exclude .env files even when Git ignores them. Inspect source archive members after linking hosting tools; Git ignore and R build ignore have different boundaries.
+
+- Vercel modifies .vercel/project.json and creates an untracked root vercel.json during hosted builds (observed in production logs). Preserve the raw dirty flag, disclose these exact provider changes, and verify sourceTreeDirty separately; unexpected or local changes must still fail.

@@ -10,7 +10,8 @@
     "build": "tsc -b && vite build",
     "postbuild": "node tools/write-build-info.mjs",
     "preview": "vite preview --host 127.0.0.1",
-    "test": "vitest run",
+    "test": "vitest run && npm run test:build-info",
+    "test:build-info": "node tests/check-build-info.mjs",
     "typecheck": "tsc -b"
   },
   "dependencies": {

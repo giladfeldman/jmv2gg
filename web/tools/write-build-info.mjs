@@ -8,9 +8,11 @@ const root = new URL('../../', import.meta.url);
 const git = args => execFileSync('git', args, { cwd: root, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }).trim();
 let localRevision = null;
 let workingTreeDirty = null;
+let workspaceChanges = null;
 try {
   localRevision = git(['rev-parse', 'HEAD']);
   const changes = git(['status', '--porcelain']);
+  workspaceChanges = changes ? changes.split('\n').map(line => line.trim()) : [];
   workingTreeDirty = changes.length > 0;
   if (workingTreeDirty) console.log(`Build workspace changes (paths only):\n${changes}`);
 } catch { /* Provider builds may not contain Git metadata; do not claim a clean tree. */ }
@@ -19,10 +21,16 @@ if (providerRevision && !/^[a-f0-9]{40}$/i.test(providerRevision)) throw new Err
 if (providerRevision && localRevision && providerRevision !== localRevision) throw new Error('Provider and checkout revisions differ.');
 const revision = providerRevision || localRevision;
 if (!revision) throw new Error('Build identity requires a Git checkout or VERCEL_GIT_COMMIT_SHA.');
+// Vercel rewrites its link metadata and creates a root vercel.json during the
+// build. Keep the raw dirty flag truthful and disclose these exact exceptions.
+// Unknown changes still fail the source-cleanliness probe.
+const managedChanges = providerRevision ? ['M .vercel/project.json', '?? vercel.json'] : [];
+const providerManagedChanges = workspaceChanges?.filter(change => managedChanges.includes(change)) || [];
+const sourceTreeDirty = workspaceChanges === null ? null : workspaceChanges.some(change => !managedChanges.includes(change));
 const converterVersion = description.match(/^Version:\s*(\S+)/m)?.[1];
 if (!converterVersion) throw new Error('R package version is missing.');
 const info = {
-  revision, workingTreeDirty, builtAt: new Date().toISOString(),
+  revision, workingTreeDirty, sourceTreeDirty, providerManagedChanges, builtAt: new Date().toISOString(),
   frontendVersion: pkg.version, converterVersion,
   webRVersion: pkg.dependencies.webr, converterArtifactSha256: converter.sha256,
 };
