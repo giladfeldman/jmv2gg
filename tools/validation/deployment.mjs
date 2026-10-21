@@ -25,6 +25,7 @@ assert.equal(build.converterArtifactSha256, manifest.sha256);
 assert.ok(Number.isFinite(Date.parse(build.builtAt)));
 const binary = await get(`/r-packages/${manifest.artifact}`);
 assert.equal(binary.status, 200);
+assert.match(binary.headers.get('cache-control') || '', /immutable/);
 assert.equal(createHash('sha256').update(new Uint8Array(await binary.arrayBuffer())).digest('hex'), manifest.sha256);
 const lock = await get('/locks/packages.dcf');
 assert.equal(lock.status, 200);

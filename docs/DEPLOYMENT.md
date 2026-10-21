@@ -32,8 +32,13 @@ $env:JMV2GG_APP_URL = 'https://jmv2gg.vercel.app'
 node tools/validation/deployment.mjs
 ```
 
-This checks live revision/clean tree, versions, artifact hash, exact dependency
+This checks live revision/clean source, versions, artifact hash, exact dependency
 index, headers, and scanner/crawler denies. HTTP probes do not enforce CSP/CORS.
+`workingTreeDirty` reports raw Git status. `sourceTreeDirty` separately excludes
+the two observed hosted-build changes: `.vercel/project.json` and untracked root
+`vercel.json`; both appear in `providerManagedChanges`. Unexpected changes still
+fail, and local builds receive no provider exception. Hashed frontend assets and
+versioned converter binaries are immutable; manifests and indexes can revalidate.
 Also test in a real browser:
 
 1. Convert the default R example; inspect actual generated code for all engines.

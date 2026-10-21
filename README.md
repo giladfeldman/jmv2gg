@@ -3,6 +3,8 @@
 Convert jamovi analysis code into explicit, editable ggplot2 and BetterGG figures.
 Conversion runs in native R or in a browser using the same R package through WebR.
 
+Use the [browser workbench](https://jmv2gg.vercel.app/) without installing R.
+
 This is version 0.1.0. Check the capability notes before using generated
 figures in research. Unsupported analyses are preserved and reported; numerical
 equivalence is never inferred from a visually similar plot.
