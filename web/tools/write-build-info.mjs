@@ -10,7 +10,9 @@ let localRevision = null;
 let workingTreeDirty = null;
 try {
   localRevision = git(['rev-parse', 'HEAD']);
-  workingTreeDirty = git(['status', '--porcelain']).length > 0;
+  const changes = git(['status', '--porcelain']);
+  workingTreeDirty = changes.length > 0;
+  if (workingTreeDirty) console.log(`Build workspace changes (paths only):\n${changes}`);
 } catch { /* Provider builds may not contain Git metadata; do not claim a clean tree. */ }
 const providerRevision = process.env.VERCEL_GIT_COMMIT_SHA || null;
 if (providerRevision && !/^[a-f0-9]{40}$/i.test(providerRevision)) throw new Error('Invalid provider Git revision.');
