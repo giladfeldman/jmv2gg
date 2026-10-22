@@ -74,6 +74,25 @@ t-tests, repeated measures and reliability.
   origin) and contains no script, event handler, `javascript:` link or outside image
   address (outside `src`/`srcset` are now removed in R as a second layer).
 
+## Live deployment checks (https://jmv2gg.vercel.app, revision 5194849, 2026-10-23)
+
+- `tools/validation/deployment.mjs` against the live site: passed (revision, clean source,
+  versions 0.2.0, artifact checksum, package index, headers, crawler denies).
+- Real browser (Chromium in the Claude desktop app): the complex R Markdown example
+  converted (11 of 11 analyses, 26 requested figures, about 1.5 minutes including R
+  start and installs); the pre-render check found nothing to review; the full browser
+  render with the bundled synthetic data finished all 21 chunks with 27 embedded figures
+  in about 3 minutes, with per-chunk progress and estimates. The contingency table printed
+  chi-squared 5.611, df 2, p .060, N 234 (same as native jmv), and the preview note states
+  that 'websocket' is the labelled placeholder. The output frame has `sandbox=""`.
+- A `fetch` to an outside host from the live page was refused by the
+  Content-Security-Policy (`connect-src 'self' https://webr.r-wasm.org
+  https://repo.r-wasm.org`).
+- The first production build of 0.2.0 (623ba8e, tag v0.2.0) stopped at the stale-package
+  guard: a CRLF working copy of the example CSV had been hashed. Rebuilt from LF sources
+  (5194849); `web/tests/build-sources.test.ts` now checks this. The v0.2.0 tag was kept;
+  the R sources at the tag are unchanged; only the browser binaries were rebuilt.
+
 ## Private corpus render and figure review (counts only; files stay private)
 
 - 21 published projects (owner's CV list): native renders of the converted reports
