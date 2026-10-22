@@ -19,7 +19,9 @@ assert.equal(buildResponse.status, 200);
 const build = await buildResponse.json();
 assert.equal(build.revision, revision, 'Live revision must match the release commit.');
 assert.equal(build.sourceTreeDirty, false, 'Released source must be clean; provider metadata changes are disclosed separately.');
-assert.equal(build.converterVersion, '0.1.0');
+// The released version comes from DESCRIPTION (a literal here went stale at 0.2.0).
+const version = (await readFile('DESCRIPTION', 'utf8')).match(/^Version:\s*(\S+)/m)[1];
+assert.equal(build.converterVersion, version);
 assert.equal(build.webRVersion, '0.6.0');
 assert.equal(build.converterArtifactSha256, manifest.sha256);
 assert.ok(Number.isFinite(Date.parse(build.builtAt)));
