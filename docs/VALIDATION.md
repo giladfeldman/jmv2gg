@@ -29,7 +29,7 @@ t-tests, repeated measures and reliability.
 
 ## Recorded release checks (0.2.0)
 
-- Native Windows R 4.6.1: 496+ assertions at the final BetterGG pin (see the release
+- Native Windows R 4.6.1: 514 assertions at the final BetterGG pin (see the release
   commit's tools/check.R run), zero failures/errors/skips (oxipng on PATH); earlier run 477,
   including 68 figure-statistic comparisons with jmv 2.7.7, 7 regression tests from a
   second-model review (Sonnet, 2026-10-22, tier 2), an argument-form matrix with code
