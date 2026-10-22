@@ -28,7 +28,7 @@
     "inst/examples/comparison.R": "1cb97768bc65c3b283be8178b184c149f18ba6bc3344b81ed54f8b1f2d315de6",
     "inst/examples/replication-report.Rmd": "28b4d0c5aaf367e85fd82b0f89bf1e578a1c1aefaff264a565742b58094c1366",
     "inst/examples/replication-study.R": "e5c4db1588573a1b3d7994140de4a4377e2c80782806896d832bf03c6c891d43",
-    "inst/examples/replication-study.csv": "83cec4de08b93d075f6dc1d8a6ee56226c4a952119b93962d730a60966c9c376",
+    "inst/examples/replication-study.csv": "feaaa2107a0c3fa4ed1ffb3708db095f56ad26131e5304f1757c50d7f6de492a",
     "inst/report/preview.css": "d850942a04881b8cdae97b3f860625f67cf9dd23a4939bc9ed77126068763883",
     "inst/report/report.css": "4cc7e9880cbd507b08043a99c464f6dc6391108398f3b484b93fc5fd11649f04",
     "man/browser_request.Rd": "50086a790f909a1cd94123dc805463776e06bb3d3a8e92ee77e1ce909eb2efc3",
@@ -41,12 +41,12 @@
     "man/scan_rmd_risks.Rd": "75fb55023996f89cb25329dbf3b2eb46ba91092ba8192cb806572a855d61aa91"
   },
   "artifact": "bin/emscripten/contrib/4.6/jmv2gg_0.2.0.tgz",
-  "sha256": "97a14c16c8392c1b319361267145eeec864f22b1bc3bcb6171aa480002cbf98e",
+  "sha256": "2c83b69b6c1b4a850a6e6ce87247642be9205e20e9b7a146b47069b6add8480b",
   "dependencies": {
     "BetterGG": {
       "version": "0.2.0",
       "artifact": "bin/emscripten/contrib/4.6/BetterGG_0.2.0.tgz",
-      "sha256": "dec952c4adaeb180d4df6789c5e6ba9d0bd341074ff212a379c1d4323507fd93",
+      "sha256": "f6fb8948a5f4de95c6de9c1a24a386ba5896d21593ec051500e1d02b011498de",
       "commit": "d9db9cf62178a22eb0d2bd031fb6ffa1a53618f3"
     }
   },
@@ -54,7 +54,7 @@
     "websocket": {
       "version": "1.2.0.9000",
       "artifact": "bin/emscripten/contrib/4.6/websocket_1.2.0.9000.tgz",
-      "sha256": "a4662d2303a97ae40ab7cef3072c59a328a6a396f0e589181471e5a7afc7b2fa"
+      "sha256": "ee5ad02ed60b39d0f4b213cf4ac297e7f902ccc2d03b511ae3bb63864965b00e"
     }
   }
 }
