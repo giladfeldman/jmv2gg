@@ -5,6 +5,12 @@
 browser_request <- function(request_json) {
   request <- jsonlite::fromJSON(request_json,simplifyVector=FALSE)
   source <- request$source %||% ""
+  if(identical(request$action,"scan")) {
+    # The risk scan before an in-browser render; nothing is executed.
+    scan <- scan_rmd_risks(source)
+    scan$packages <- rmd_packages(source)
+    return(jsonlite::toJSON(scan,auto_unbox=TRUE,null="null"))
+  }
   engine <- request$engine %||% "both"
   options <- list(style=request$style %||% list(),figures=request$figures %||% list())
   result <- if(identical(request$mode,"rmd")) convert_rmd(source,engine,

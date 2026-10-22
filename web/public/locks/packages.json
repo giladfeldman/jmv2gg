@@ -2,7 +2,106 @@
   "webR": "0.6.0",
   "r": "4.6",
   "repository": "https://repo.r-wasm.org/bin/emscripten/contrib/4.6",
+  "missing": [
+    {
+      "name": "Rmpfr",
+      "reason": "needed by PMCMRplus for ggstatsplot parametric/nonparametric pairwise tests"
+    },
+    {
+      "name": "deSolve",
+      "reason": "imported by hypergeo (via BayesFactor); not used by jmv2gg figures"
+    },
+    {
+      "name": "websocket",
+      "reason": "imported by chromote (via webshot2 and gt); screenshots are not used"
+    }
+  ],
   "packages": [
+    {
+      "name": "BWStest",
+      "version": "0.2.3",
+      "file": "BWStest_0.2.3.tgz"
+    },
+    {
+      "name": "BayesFactor",
+      "version": "0.9.12-4.8",
+      "file": "BayesFactor_0.9.12-4.8.tgz"
+    },
+    {
+      "name": "Deriv",
+      "version": "4.3.5",
+      "file": "Deriv_4.3.5.tgz"
+    },
+    {
+      "name": "Formula",
+      "version": "1.2-6",
+      "file": "Formula_1.2-6.tgz"
+    },
+    {
+      "name": "GGally",
+      "version": "2.4.0",
+      "file": "GGally_2.4.0.tgz"
+    },
+    {
+      "name": "GPArotation",
+      "version": "2026.8-2",
+      "file": "GPArotation_2026.8-2.tgz"
+    },
+    {
+      "name": "Hmisc",
+      "version": "5.3-0",
+      "file": "Hmisc_5.3-0.tgz"
+    },
+    {
+      "name": "KernSmooth",
+      "version": "2.23-27",
+      "file": "KernSmooth_2.23-27.tgz"
+    },
+    {
+      "name": "MASS",
+      "version": "7.3-66",
+      "file": "MASS_7.3-66.tgz"
+    },
+    {
+      "name": "Matrix",
+      "version": "1.7-6",
+      "file": "Matrix_1.7-6.tgz"
+    },
+    {
+      "name": "MatrixModels",
+      "version": "0.5-4",
+      "file": "MatrixModels_0.5-4.tgz"
+    },
+    {
+      "name": "PMCMRplus",
+      "version": "1.9.12",
+      "file": "PMCMRplus_1.9.12.tgz"
+    },
+    {
+      "name": "QuickJSR",
+      "version": "1.11.0",
+      "file": "QuickJSR_1.11.0.tgz"
+    },
+    {
+      "name": "R.cache",
+      "version": "0.17.0",
+      "file": "R.cache_0.17.0.tgz"
+    },
+    {
+      "name": "R.methodsS3",
+      "version": "1.8.2",
+      "file": "R.methodsS3_1.8.2.tgz"
+    },
+    {
+      "name": "R.oo",
+      "version": "1.27.1",
+      "file": "R.oo_1.27.1.tgz"
+    },
+    {
+      "name": "R.utils",
+      "version": "2.13.0",
+      "file": "R.utils_2.13.0.tgz"
+    },
     {
       "name": "R6",
       "version": "2.6.1",
@@ -14,9 +113,94 @@
       "file": "RColorBrewer_1.1-3.tgz"
     },
     {
+      "name": "ROCR",
+      "version": "1.0-12",
+      "file": "ROCR_1.0-12.tgz"
+    },
+    {
+      "name": "Rcpp",
+      "version": "1.1.2",
+      "file": "Rcpp_1.1.2.tgz"
+    },
+    {
+      "name": "RcppArmadillo",
+      "version": "15.6.0-1",
+      "file": "RcppArmadillo_15.6.0-1.tgz"
+    },
+    {
+      "name": "RcppEigen",
+      "version": "0.3.4.0.2",
+      "file": "RcppEigen_0.3.4.0.2.tgz"
+    },
+    {
+      "name": "RcppParallel",
+      "version": "5.1.11-2",
+      "file": "RcppParallel_5.1.11-2.tgz"
+    },
+    {
+      "name": "Rdpack",
+      "version": "2.6.6",
+      "file": "Rdpack_2.6.6.tgz"
+    },
+    {
       "name": "S7",
       "version": "0.2.2",
       "file": "S7_0.2.2.tgz"
+    },
+    {
+      "name": "SparseM",
+      "version": "1.84-2",
+      "file": "SparseM_1.84-2.tgz"
+    },
+    {
+      "name": "SuppDists",
+      "version": "1.1-9.9",
+      "file": "SuppDists_1.1-9.9.tgz"
+    },
+    {
+      "name": "TH.data",
+      "version": "1.1-5",
+      "file": "TH.data_1.1-5.tgz"
+    },
+    {
+      "name": "WRS2",
+      "version": "1.1-7",
+      "file": "WRS2_1.1-7.tgz"
+    },
+    {
+      "name": "abind",
+      "version": "1.4-8",
+      "file": "abind_1.4-8.tgz"
+    },
+    {
+      "name": "afex",
+      "version": "1.5-1",
+      "file": "afex_1.5-1.tgz"
+    },
+    {
+      "name": "backports",
+      "version": "1.5.1",
+      "file": "backports_1.5.1.tgz"
+    },
+    {
+      "name": "base64enc",
+      "version": "0.1-6",
+      "file": "base64enc_0.1-6.tgz"
+    },
+    {
+      "name": "bayestestR",
+      "version": "0.19.0",
+      "file": "bayestestR_0.19.0.tgz"
+    },
+    {
+      "name": "beeswarm",
+      "version": "0.4.0",
+      "file": "beeswarm_0.4.0.tgz"
+    },
+    {
+      "name": "bigD",
+      "version": "0.3.1",
+      "file": "bigD_0.3.1.tgz"
     },
     {
       "name": "bit",
@@ -29,6 +213,66 @@
       "file": "bit64_4.8.6.tgz"
     },
     {
+      "name": "bitops",
+      "version": "1.1-0",
+      "file": "bitops_1.1-0.tgz"
+    },
+    {
+      "name": "boot",
+      "version": "1.3-32",
+      "file": "boot_1.3-32.tgz"
+    },
+    {
+      "name": "broom",
+      "version": "1.0.13",
+      "file": "broom_1.0.13.tgz"
+    },
+    {
+      "name": "bslib",
+      "version": "0.12.0",
+      "file": "bslib_0.12.0.tgz"
+    },
+    {
+      "name": "ca",
+      "version": "0.72",
+      "file": "ca_0.72.tgz"
+    },
+    {
+      "name": "caTools",
+      "version": "1.18.4",
+      "file": "caTools_1.18.4.tgz"
+    },
+    {
+      "name": "cachem",
+      "version": "1.1.0",
+      "file": "cachem_1.1.0.tgz"
+    },
+    {
+      "name": "callr",
+      "version": "3.8.0",
+      "file": "callr_3.8.0.tgz"
+    },
+    {
+      "name": "car",
+      "version": "3.1-5",
+      "file": "car_3.1-5.tgz"
+    },
+    {
+      "name": "carData",
+      "version": "3.0-6",
+      "file": "carData_3.0-6.tgz"
+    },
+    {
+      "name": "checkmate",
+      "version": "2.3.4",
+      "file": "checkmate_2.3.4.tgz"
+    },
+    {
+      "name": "chromote",
+      "version": "0.5.1",
+      "file": "chromote_0.5.1.tgz"
+    },
+    {
       "name": "cli",
       "version": "3.6.6",
       "file": "cli_3.6.6.tgz"
@@ -37,6 +281,46 @@
       "name": "clipr",
       "version": "0.8.1",
       "file": "clipr_0.8.1.tgz"
+    },
+    {
+      "name": "cluster",
+      "version": "2.1.8.3",
+      "file": "cluster_2.1.8.3.tgz"
+    },
+    {
+      "name": "coda",
+      "version": "0.19-4.1",
+      "file": "coda_0.19-4.1.tgz"
+    },
+    {
+      "name": "codetools",
+      "version": "0.2-20",
+      "file": "codetools_0.2-20.tgz"
+    },
+    {
+      "name": "colorspace",
+      "version": "2.1-4",
+      "file": "colorspace_2.1-4.tgz"
+    },
+    {
+      "name": "commonmark",
+      "version": "2.0.0",
+      "file": "commonmark_2.0.0.tgz"
+    },
+    {
+      "name": "contfrac",
+      "version": "1.1-12",
+      "file": "contfrac_1.1-12.tgz"
+    },
+    {
+      "name": "correlation",
+      "version": "0.8.8",
+      "file": "correlation_0.8.8.tgz"
+    },
+    {
+      "name": "cowplot",
+      "version": "1.2.0",
+      "file": "cowplot_1.2.0.tgz"
     },
     {
       "name": "cpp11",
@@ -49,6 +333,56 @@
       "file": "crayon_1.5.3.tgz"
     },
     {
+      "name": "curl",
+      "version": "8.0.0",
+      "file": "curl_8.0.0.tgz"
+    },
+    {
+      "name": "data.table",
+      "version": "1.18.6.1",
+      "file": "data.table_1.18.6.1.tgz"
+    },
+    {
+      "name": "datawizard",
+      "version": "1.4.0",
+      "file": "datawizard_1.4.0.tgz"
+    },
+    {
+      "name": "desc",
+      "version": "1.4.3",
+      "file": "desc_1.4.3.tgz"
+    },
+    {
+      "name": "digest",
+      "version": "0.6.39",
+      "file": "digest_0.6.39.tgz"
+    },
+    {
+      "name": "distributional",
+      "version": "0.9.0",
+      "file": "distributional_0.9.0.tgz"
+    },
+    {
+      "name": "doBy",
+      "version": "4.7.2",
+      "file": "doBy_4.7.2.tgz"
+    },
+    {
+      "name": "dplyr",
+      "version": "1.2.1",
+      "file": "dplyr_1.2.1.tgz"
+    },
+    {
+      "name": "effectsize",
+      "version": "1.0.3",
+      "file": "effectsize_1.0.3.tgz"
+    },
+    {
+      "name": "elliptic",
+      "version": "1.5-1",
+      "file": "elliptic_1.5-1.tgz"
+    },
+    {
       "name": "emmeans",
       "version": "2.0.4",
       "file": "emmeans_2.0.4.tgz"
@@ -59,9 +393,24 @@
       "file": "estimability_2.0.0.tgz"
     },
     {
+      "name": "evaluate",
+      "version": "1.0.5",
+      "file": "evaluate_1.0.5.tgz"
+    },
+    {
       "name": "farver",
       "version": "2.1.2",
       "file": "farver_2.1.2.tgz"
+    },
+    {
+      "name": "fastmap",
+      "version": "1.2.0",
+      "file": "fastmap_1.2.0.tgz"
+    },
+    {
+      "name": "fontawesome",
+      "version": "0.5.3",
+      "file": "fontawesome_0.5.3.tgz"
     },
     {
       "name": "forcats",
@@ -69,9 +418,74 @@
       "file": "forcats_1.0.1.tgz"
     },
     {
+      "name": "forecast",
+      "version": "9.0.2",
+      "file": "forecast_9.0.2.tgz"
+    },
+    {
+      "name": "foreign",
+      "version": "0.8-91",
+      "file": "foreign_0.8-91.tgz"
+    },
+    {
+      "name": "fracdiff",
+      "version": "1.5-4",
+      "file": "fracdiff_1.5-4.tgz"
+    },
+    {
+      "name": "fs",
+      "version": "2.1.0",
+      "file": "fs_2.1.0.tgz"
+    },
+    {
+      "name": "generics",
+      "version": "0.1.4",
+      "file": "generics_0.1.4.tgz"
+    },
+    {
+      "name": "ggcorrplot",
+      "version": "0.3.0",
+      "file": "ggcorrplot_0.3.0.tgz"
+    },
+    {
+      "name": "ggdist",
+      "version": "3.3.3",
+      "file": "ggdist_3.3.3.tgz"
+    },
+    {
       "name": "ggplot2",
       "version": "4.0.3",
       "file": "ggplot2_4.0.3.tgz"
+    },
+    {
+      "name": "ggrepel",
+      "version": "0.9.8",
+      "file": "ggrepel_0.9.8.tgz"
+    },
+    {
+      "name": "ggridges",
+      "version": "0.5.7",
+      "file": "ggridges_0.5.7.tgz"
+    },
+    {
+      "name": "ggside",
+      "version": "0.4.1",
+      "file": "ggside_0.4.1.tgz"
+    },
+    {
+      "name": "ggsignif",
+      "version": "0.6.4",
+      "file": "ggsignif_0.6.4.tgz"
+    },
+    {
+      "name": "ggstats",
+      "version": "0.14.0",
+      "file": "ggstats_0.14.0.tgz"
+    },
+    {
+      "name": "ggstatsplot",
+      "version": "1.1.2",
+      "file": "ggstatsplot_1.1.2.tgz"
     },
     {
       "name": "glue",
@@ -79,9 +493,39 @@
       "file": "glue_1.8.1.tgz"
     },
     {
+      "name": "gmp",
+      "version": "0.7-5.1",
+      "file": "gmp_0.7-5.1.tgz"
+    },
+    {
+      "name": "gnm",
+      "version": "1.1-5",
+      "file": "gnm_1.1-5.tgz"
+    },
+    {
+      "name": "gplots",
+      "version": "3.3.0",
+      "file": "gplots_3.3.0.tgz"
+    },
+    {
+      "name": "gridExtra",
+      "version": "2.3.1",
+      "file": "gridExtra_2.3.1.tgz"
+    },
+    {
+      "name": "gt",
+      "version": "0.11.1",
+      "file": "gt_0.11.1.tgz"
+    },
+    {
       "name": "gtable",
       "version": "0.3.6",
       "file": "gtable_0.3.6.tgz"
+    },
+    {
+      "name": "gtools",
+      "version": "3.9.5",
+      "file": "gtools_3.9.5.tgz"
     },
     {
       "name": "haven",
@@ -89,9 +533,44 @@
       "file": "haven_2.5.5.tgz"
     },
     {
+      "name": "highr",
+      "version": "0.12",
+      "file": "highr_0.12.tgz"
+    },
+    {
       "name": "hms",
       "version": "1.1.4",
       "file": "hms_1.1.4.tgz"
+    },
+    {
+      "name": "htmlTable",
+      "version": "2.5.0",
+      "file": "htmlTable_2.5.0.tgz"
+    },
+    {
+      "name": "htmltools",
+      "version": "0.5.9",
+      "file": "htmltools_0.5.9.tgz"
+    },
+    {
+      "name": "htmlwidgets",
+      "version": "1.6.4",
+      "file": "htmlwidgets_1.6.4.tgz"
+    },
+    {
+      "name": "hypergeo",
+      "version": "1.2-15",
+      "file": "hypergeo_1.2-15.tgz"
+    },
+    {
+      "name": "igraph",
+      "version": "2.3.1",
+      "file": "igraph_2.3.1.tgz"
+    },
+    {
+      "name": "insight",
+      "version": "1.5.4",
+      "file": "insight_1.5.4.tgz"
     },
     {
       "name": "isoband",
@@ -99,9 +578,34 @@
       "file": "isoband_0.3.0.tgz"
     },
     {
+      "name": "jmv",
+      "version": "2.8.0",
+      "file": "jmv_2.8.0.tgz"
+    },
+    {
+      "name": "jmvcore",
+      "version": "28.3",
+      "file": "jmvcore_28.3.tgz"
+    },
+    {
+      "name": "jquerylib",
+      "version": "0.1.4",
+      "file": "jquerylib_0.1.4.tgz"
+    },
+    {
       "name": "jsonlite",
       "version": "2.0.0",
       "file": "jsonlite_2.0.0.tgz"
+    },
+    {
+      "name": "kSamples",
+      "version": "1.2-12",
+      "file": "kSamples_1.2-12.tgz"
+    },
+    {
+      "name": "knitr",
+      "version": "1.52",
+      "file": "knitr_1.52.tgz"
     },
     {
       "name": "labeling",
@@ -109,9 +613,44 @@
       "file": "labeling_0.4.3.tgz"
     },
     {
+      "name": "later",
+      "version": "1.4.2.9000",
+      "file": "later_1.4.2.9000.tgz"
+    },
+    {
+      "name": "lattice",
+      "version": "0.23-1",
+      "file": "lattice_0.23-1.tgz"
+    },
+    {
+      "name": "lavaan",
+      "version": "0.7-3",
+      "file": "lavaan_0.7-3.tgz"
+    },
+    {
       "name": "lifecycle",
       "version": "1.0.5",
       "file": "lifecycle_1.0.5.tgz"
+    },
+    {
+      "name": "litedown",
+      "version": "0.11",
+      "file": "litedown_0.11.tgz"
+    },
+    {
+      "name": "lme4",
+      "version": "2.0-6",
+      "file": "lme4_2.0-6.tgz"
+    },
+    {
+      "name": "lmerTest",
+      "version": "3.2-1",
+      "file": "lmerTest_3.2-1.tgz"
+    },
+    {
+      "name": "lmtest",
+      "version": "0.9-40",
+      "file": "lmtest_0.9-40.tgz"
     },
     {
       "name": "magrittr",
@@ -119,14 +658,124 @@
       "file": "magrittr_2.0.5.tgz"
     },
     {
+      "name": "markdown",
+      "version": "2.0",
+      "file": "markdown_2.0.tgz"
+    },
+    {
+      "name": "matrixStats",
+      "version": "1.5.0",
+      "file": "matrixStats_1.5.0.tgz"
+    },
+    {
+      "name": "memoise",
+      "version": "2.0.1",
+      "file": "memoise_2.0.1.tgz"
+    },
+    {
+      "name": "mgcv",
+      "version": "1.9-4",
+      "file": "mgcv_1.9-4.tgz"
+    },
+    {
+      "name": "mime",
+      "version": "0.13",
+      "file": "mime_0.13.tgz"
+    },
+    {
+      "name": "minqa",
+      "version": "1.2.8",
+      "file": "minqa_1.2.8.tgz"
+    },
+    {
+      "name": "mnormt",
+      "version": "2.1.1",
+      "file": "mnormt_2.1.1.tgz"
+    },
+    {
+      "name": "modelr",
+      "version": "0.1.11",
+      "file": "modelr_0.1.11.tgz"
+    },
+    {
+      "name": "multcomp",
+      "version": "1.4-32",
+      "file": "multcomp_1.4-32.tgz"
+    },
+    {
+      "name": "multcompView",
+      "version": "0.1-12",
+      "file": "multcompView_0.1-12.tgz"
+    },
+    {
+      "name": "mvnormtest",
+      "version": "0.1-9-3",
+      "file": "mvnormtest_0.1-9-3.tgz"
+    },
+    {
       "name": "mvtnorm",
       "version": "1.2-4",
       "file": "mvtnorm_1.2-4.tgz"
     },
     {
+      "name": "nlme",
+      "version": "3.1-171",
+      "file": "nlme_3.1-171.tgz"
+    },
+    {
+      "name": "nloptr",
+      "version": "2.2.1.9000",
+      "file": "nloptr_2.2.1.9000.tgz"
+    },
+    {
+      "name": "nnet",
+      "version": "7.3-21",
+      "file": "nnet_7.3-21.tgz"
+    },
+    {
       "name": "numDeriv",
       "version": "2016.8-1.1",
       "file": "numDeriv_2016.8-1.1.tgz"
+    },
+    {
+      "name": "otel",
+      "version": "0.2.0",
+      "file": "otel_0.2.0.tgz"
+    },
+    {
+      "name": "paletteer",
+      "version": "1.7.0",
+      "file": "paletteer_1.7.0.tgz"
+    },
+    {
+      "name": "parameters",
+      "version": "0.29.3",
+      "file": "parameters_0.29.3.tgz"
+    },
+    {
+      "name": "patchwork",
+      "version": "1.3.2",
+      "file": "patchwork_1.3.2.tgz"
+    },
+    {
+      "name": "pbapply",
+      "version": "1.7-5",
+      "file": "pbapply_1.7-5.tgz"
+    },
+    {
+      "name": "pbivnorm",
+      "version": "0.6.0",
+      "file": "pbivnorm_0.6.0.tgz"
+    },
+    {
+      "name": "pbkrtest",
+      "version": "0.5.5",
+      "file": "pbkrtest_0.5.5.tgz"
+    },
+    {
+      "name": "performance",
+      "version": "0.18.2",
+      "file": "performance_0.18.2.tgz"
     },
     {
       "name": "pillar",
@@ -139,9 +788,24 @@
       "file": "pkgconfig_2.0.3.tgz"
     },
     {
+      "name": "plyr",
+      "version": "1.8.9",
+      "file": "plyr_1.8.9.tgz"
+    },
+    {
       "name": "prettyunits",
       "version": "1.2.0",
       "file": "prettyunits_1.2.0.tgz"
+    },
+    {
+      "name": "prismatic",
+      "version": "1.1.2",
+      "file": "prismatic_1.1.2.tgz"
+    },
+    {
+      "name": "processx",
+      "version": "3.9.0",
+      "file": "processx_3.9.0.tgz"
     },
     {
       "name": "progress",
@@ -149,9 +813,94 @@
       "file": "progress_1.2.3.tgz"
     },
     {
+      "name": "promises",
+      "version": "1.5.0",
+      "file": "promises_1.5.0.tgz"
+    },
+    {
+      "name": "ps",
+      "version": "1.9.3",
+      "file": "ps_1.9.3.tgz"
+    },
+    {
+      "name": "psych",
+      "version": "2.6.9",
+      "file": "psych_2.6.9.tgz"
+    },
+    {
+      "name": "purrr",
+      "version": "1.2.2",
+      "file": "purrr_1.2.2.tgz"
+    },
+    {
+      "name": "quadprog",
+      "version": "1.5-8",
+      "file": "quadprog_1.5-8.tgz"
+    },
+    {
+      "name": "quantreg",
+      "version": "6.1",
+      "file": "quantreg_6.1.tgz"
+    },
+    {
+      "name": "qvcalc",
+      "version": "1.0.4",
+      "file": "qvcalc_1.0.4.tgz"
+    },
+    {
+      "name": "ragg",
+      "version": "1.5.2",
+      "file": "ragg_1.5.2.tgz"
+    },
+    {
+      "name": "rappdirs",
+      "version": "0.3.4",
+      "file": "rappdirs_0.3.4.tgz"
+    },
+    {
+      "name": "rbibutils",
+      "version": "2.4.1",
+      "file": "rbibutils_2.4.1.tgz"
+    },
+    {
+      "name": "reactR",
+      "version": "0.6.1",
+      "file": "reactR_0.6.1.tgz"
+    },
+    {
+      "name": "reactable",
+      "version": "0.4.5",
+      "file": "reactable_0.4.5.tgz"
+    },
+    {
       "name": "readr",
       "version": "2.2.0",
       "file": "readr_2.2.0.tgz"
+    },
+    {
+      "name": "reformulas",
+      "version": "0.4.4",
+      "file": "reformulas_0.4.4.tgz"
+    },
+    {
+      "name": "relimp",
+      "version": "1.0-5",
+      "file": "relimp_1.0-5.tgz"
+    },
+    {
+      "name": "rematch2",
+      "version": "2.1.2",
+      "file": "rematch2_2.1.2.tgz"
+    },
+    {
+      "name": "reshape",
+      "version": "0.8.10",
+      "file": "reshape_0.8.10.tgz"
+    },
+    {
+      "name": "reshape2",
+      "version": "1.4.5",
+      "file": "reshape2_1.4.5.tgz"
     },
     {
       "name": "rlang",
@@ -159,9 +908,79 @@
       "file": "rlang_1.3.0.tgz"
     },
     {
+      "name": "rmarkdown",
+      "version": "2.32",
+      "file": "rmarkdown_2.32.tgz"
+    },
+    {
+      "name": "rpart",
+      "version": "4.1.27",
+      "file": "rpart_4.1.27.tgz"
+    },
+    {
+      "name": "rprojroot",
+      "version": "2.1.1",
+      "file": "rprojroot_2.1.1.tgz"
+    },
+    {
+      "name": "rstantools",
+      "version": "2.7.1",
+      "file": "rstantools_2.7.1.tgz"
+    },
+    {
+      "name": "rstudioapi",
+      "version": "0.19.0",
+      "file": "rstudioapi_0.19.0.tgz"
+    },
+    {
+      "name": "sandwich",
+      "version": "3.1-3",
+      "file": "sandwich_3.1-3.tgz"
+    },
+    {
+      "name": "sass",
+      "version": "0.4.10.9000",
+      "file": "sass_0.4.10.9000.tgz"
+    },
+    {
       "name": "scales",
       "version": "1.4.0",
       "file": "scales_1.4.0.tgz"
+    },
+    {
+      "name": "statsExpressions",
+      "version": "2.1.2",
+      "file": "statsExpressions_2.1.2.tgz"
+    },
+    {
+      "name": "stringi",
+      "version": "1.8.9",
+      "file": "stringi_1.8.9.tgz"
+    },
+    {
+      "name": "stringr",
+      "version": "1.6.0",
+      "file": "stringr_1.6.0.tgz"
+    },
+    {
+      "name": "styler",
+      "version": "1.11.0",
+      "file": "styler_1.11.0.tgz"
+    },
+    {
+      "name": "survival",
+      "version": "3.8-12",
+      "file": "survival_3.8-12.tgz"
+    },
+    {
+      "name": "systemfonts",
+      "version": "1.3.2",
+      "file": "systemfonts_1.3.2.tgz"
+    },
+    {
+      "name": "textshaping",
+      "version": "1.0.5",
+      "file": "textshaping_1.0.5.tgz"
     },
     {
       "name": "tibble",
@@ -169,9 +988,24 @@
       "file": "tibble_3.3.1.tgz"
     },
     {
+      "name": "tidyr",
+      "version": "1.3.2",
+      "file": "tidyr_1.3.2.tgz"
+    },
+    {
       "name": "tidyselect",
       "version": "1.2.1",
       "file": "tidyselect_1.2.1.tgz"
+    },
+    {
+      "name": "timeDate",
+      "version": "4052.112",
+      "file": "timeDate_4052.112.tgz"
+    },
+    {
+      "name": "tinytex",
+      "version": "0.61",
+      "file": "tinytex_0.61.tgz"
     },
     {
       "name": "tzdb",
@@ -179,9 +1013,24 @@
       "file": "tzdb_0.5.0.tgz"
     },
     {
+      "name": "urca",
+      "version": "1.3-4",
+      "file": "urca_1.3-4.tgz"
+    },
+    {
       "name": "utf8",
       "version": "1.2.6",
       "file": "utf8_1.2.6.tgz"
+    },
+    {
+      "name": "vcd",
+      "version": "1.4-14",
+      "file": "vcd_1.4-14.tgz"
+    },
+    {
+      "name": "vcdExtra",
+      "version": "0.9.8",
+      "file": "vcdExtra_0.9.8.tgz"
     },
     {
       "name": "vctrs",
@@ -199,14 +1048,39 @@
       "file": "vroom_1.7.1.9000.tgz"
     },
     {
+      "name": "webshot2",
+      "version": "0.1.2",
+      "file": "webshot2_0.1.2.tgz"
+    },
+    {
       "name": "withr",
       "version": "3.0.3",
       "file": "withr_3.0.3.tgz"
     },
     {
+      "name": "xfun",
+      "version": "0.61",
+      "file": "xfun_0.61.tgz"
+    },
+    {
+      "name": "xml2",
+      "version": "1.6.0",
+      "file": "xml2_1.6.0.tgz"
+    },
+    {
       "name": "yaml",
       "version": "2.3.12",
       "file": "yaml_2.3.12.tgz"
+    },
+    {
+      "name": "zip",
+      "version": "3.0.2",
+      "file": "zip_3.0.2.tgz"
+    },
+    {
+      "name": "zoo",
+      "version": "1.9-1",
+      "file": "zoo_1.9-1.tgz"
     }
   ]
 }

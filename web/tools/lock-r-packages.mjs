@@ -16,9 +16,19 @@ for (const block of blocks) {
 }
 const base = new Set(['R','base','compiler','datasets','graphics','grDevices','grid','methods','parallel','splines','stats','stats4','tcltk','tools','utils']);
 const wanted = new Set();
+// Dependencies the WebR repository does not have. Each is listed here only after
+// testing which features need it; everything else missing is an error.
+const knownMissing = new Map([
+  ['Rmpfr', 'needed by PMCMRplus for ggstatsplot parametric/nonparametric pairwise tests'],
+  ['deSolve', 'imported by hypergeo (via BayesFactor); not used by jmv2gg figures'],
+  ['websocket', 'imported by chromote (via webshot2 and gt); screenshots are not used'],
+]);
+const missing = new Set();
 function visit(name) {
-  if (base.has(name) || wanted.has(name)) return;
-  const entry = entries.get(name); if (!entry) throw new Error(`Missing mandatory dependency: ${name}`);
+  if (base.has(name) || wanted.has(name) || missing.has(name)) return;
+  const entry = entries.get(name);
+  if (!entry && knownMissing.has(name)) { missing.add(name); return; }
+  if (!entry) throw new Error(`Missing mandatory dependency: ${name}`);
   wanted.add(name);
   for (const key of ['Depends','Imports','LinkingTo']) {
     for (const dependency of (entry.fields[key] ?? '').split(',')) {
@@ -26,11 +36,17 @@ function visit(name) {
     }
   }
 }
-for (const name of ['jsonlite','yaml','ggplot2','emmeans','haven']) visit(name);
+// Conversion (jsonlite, yaml, rlang for BetterGG's recipes, styler), figure previews
+// (ggplot2 + the recipe packages), SAV files (haven) and in-browser rendering
+// (knitr, markdown, jmv, and ggstatsplot for BetterGG figures).
+for (const name of ['jsonlite', 'yaml', 'rlang', 'styler', 'ggplot2', 'emmeans', 'haven', 'ggdist', 'ggrepel',
+  'ggside', 'ggsignif', 'statsExpressions', 'patchwork', 'afex', 'knitr', 'markdown', 'jmv', 'ggstatsplot',
+  'paletteer', 'beeswarm', 'dplyr', 'systemfonts', 'ragg', 'viridisLite', 'psych']) visit(name);
 const names = [...wanted].sort();
 const dcf = names.map(name => `${entries.get(name).block}\nRepository: ${repository}`).join('\n\n') + '\n';
 await mkdir('public/locks', { recursive: true });
 await writeFile('public/locks/packages.dcf', dcf);
 await writeFile('public/locks/packages.json', JSON.stringify({ webR:'0.6.0', r:'4.6', repository,
+  missing: [...missing].sort().map(name => ({ name, reason: knownMissing.get(name) })),
   packages:names.map(name => ({name, version:entries.get(name).fields.Version, file:entries.get(name).fields.File ?? `${name}_${entries.get(name).fields.Version}.tgz`})) }, null, 2) + '\n');
 console.log(`Locked ${names.length} mandatory packages. No binary packages were redistributed.`);

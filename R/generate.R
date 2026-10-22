@@ -144,7 +144,7 @@ assemble_block <- function(ctx) {
     analysis_id = a$id, name = name, engine = f$engine,
     filename = paste0("figures/", f$stem, ".png"),
     files = paste0("figures/", f$stem, ".", formats),
-    caption = f$caption, object = f$object,
+    caption = f$caption, object = f$object, packages = unique(ctx$packages),
     preview = if (f$engine == "bettergg") "local_only" else "requires_runtime_test",
     statistical_note = f$note))
   list(code = code, plots = plots, diagnostics = ctx$diagnostics, mapping = ctx$mapping,

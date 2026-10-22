@@ -11,5 +11,10 @@ for (const [path, expected] of Object.entries(manifest.sources)) {
 }
 const binary = await readFile(resolve('public/r-packages', manifest.artifact));
 if (createHash('sha256').update(binary).digest('hex') !== manifest.sha256) throw new Error('Browser package checksum differs from its build manifest.');
+// Bundled dependencies (BetterGG) are built from their own repository; their binary must match the manifest.
+for (const [name, dependency] of Object.entries(manifest.dependencies ?? {})) {
+  const bytes = await readFile(resolve('public/r-packages', dependency.artifact));
+  if (createHash('sha256').update(bytes).digest('hex') !== dependency.sha256) throw new Error(`${name} browser binary checksum differs from its build manifest.`);
+}
 await access(resolve('public/locks/packages.dcf'));
 console.log('Verified browser package source hashes, binary checksum, and dependency lock.');

@@ -306,6 +306,7 @@ map_within <- function(ctx) {
   if (anyDuplicated(measures)) stop("Repeated measure columns are duplicated.")
   if (length(rm_names) + length(bs) > 3L) stop("Figures cover designs with up to three factors.")
   value <- if ("value" %in% c(rm_names, bs, covs)) ".value" else "value"
+  value_label <- as.character(arg_value(a, "depLabel", "value"))
   subject <- if ("subject" %in% c(rm_names, bs, covs)) ".subject" else "subject"
   prep_input(ctx)
   prep_columns(ctx, c(measures, bs, covs))
@@ -380,14 +381,14 @@ map_within <- function(ctx) {
   if (wants(ctx, "ggplot2")) {
     if (one_factor) {
       code <- recipe("recipe_withinrain", data = long, x = rm_names, y = value, subject = subject, name = name,
-        stats = stats_ok, conf.level = ctx$level, xlab = rm_names, ylab = "value")
+        stats = stats_ok, conf.level = ctx$level, xlab = rm_names, ylab = value_label)
       add_figure(ctx, "ggplot2", code, paste0(name, "_plot"), caption,
         packages = c("ggdist", "ggrepel", if (stats_ok) c("statsExpressions", "ggsignif")))
     } else {
       code <- recipe("recipe_factorialrain", data = long, x = factors[1], y = value,
         colour = if (length(factors) > 1L) factors[2], facet = if (length(factors) > 2L) factors[3],
         covariates = if (length(covs)) covs, name = name, means = paste0(name, "_means"), conf.level = ctx$level,
-        ylab = "value")
+        ylab = value_label)
       add_figure(ctx, "ggplot2", code, paste0(name, "_plot"), caption, packages = c("ggdist", "afex", "emmeans"))
     }
   }

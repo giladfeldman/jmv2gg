@@ -1,4 +1,6 @@
-# Run inside the official pinned WebR build container with the package at /src.
+# Run inside the official pinned WebR build container with the package at
+# /src and the BetterGG source at /bettergg (read-only mounts are fine for
+# BetterGG). Builds both browser binaries into the app's own repository.
 library(rwasm)
 # The v0.6.0 image's pak resolver fails with duplicate current metadata rows.
 # Use the very same pinned rwasm compiler, bypassing only remote resolution.
@@ -10,17 +12,25 @@ dir.create(src, recursive=TRUE, showWarnings=FALSE)
 dir.create(bin, recursive=TRUE, showWarnings=FALSE)
 old <- setwd(src)
 on.exit(setwd(old))
-status <- system2(file.path(R.home("bin"),"R"), c("CMD","build","--no-build-vignettes","--no-manual","/src"))
-if(status != 0L) stop("Source package build failed.")
-archive <- list.files(src,pattern="^jmv2gg_.*[.]tar[.]gz$",full.names=TRUE)
-if(length(archive) != 1L) stop("Expected exactly one source archive.")
-getFromNamespace("wasm_build","rwasm")("jmv2gg",archive,bin,TRUE)
+hash<-function(path)strsplit(system2("sha256sum",shQuote(path),stdout=TRUE)," ",fixed=TRUE)[[1]][1]
+build_one <- function(package, path) {
+  status <- system2(file.path(R.home("bin"),"R"), c("CMD","build","--no-build-vignettes","--no-manual",path))
+  if(status != 0L) stop("Source package build failed: ", package)
+  version <- read.dcf(file.path(path, "DESCRIPTION"), fields="Version")[[1]]
+  archive <- file.path(src, paste0(package, "_", version, ".tar.gz"))
+  if(!file.exists(archive)) stop("Expected the source archive ", archive)
+  getFromNamespace("wasm_build","rwasm")(package,archive,bin,TRUE)
+  artifact <- file.path(bin,paste0(package,"_",version,".tgz"))
+  list(version=version, artifact=substring(artifact,nchar(repo)+2L), sha256=hash(artifact))
+}
+if(!dir.exists("/bettergg")) stop("Mount the BetterGG source at /bettergg.")
+bettergg <- build_one("BetterGG", "/bettergg")
+jmv2gg <- build_one("jmv2gg", "/src")
 rwasm::write_packages(repo)
 files<-sort(c(list.files("/src/R",full.names=TRUE,recursive=TRUE),list.files("/src/man",full.names=TRUE,recursive=TRUE),
   list.files("/src/inst",full.names=TRUE,recursive=TRUE),file.path("/src",c("DESCRIPTION","NAMESPACE","LICENSE"))))
-hash<-function(path)strsplit(system2("sha256sum",shQuote(path),stdout=TRUE)," ",fixed=TRUE)[[1]][1]
 sources<-stats::setNames(lapply(files,hash),substring(files,6L))
-version <- read.dcf("/src/DESCRIPTION", fields="Version")[[1]]
-artifact<-file.path(bin,paste0("jmv2gg_",version,".tgz"))
-jsonlite::write_json(list(webR="0.6.0",sources=sources,artifact=substring(artifact,nchar(repo)+2L),sha256=hash(artifact)),
+commit <- tryCatch(system2("git", c("-C", "/bettergg", "rev-parse", "HEAD"), stdout=TRUE), error=function(e) NA_character_)
+jsonlite::write_json(list(webR="0.6.0",sources=sources,artifact=jmv2gg$artifact,sha256=jmv2gg$sha256,
+  dependencies=list(BetterGG=c(bettergg, list(commit=commit[1])))),
   file.path(repo,"build-manifest.json"),auto_unbox=TRUE,pretty=TRUE)

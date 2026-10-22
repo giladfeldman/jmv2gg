@@ -102,10 +102,11 @@ new_result <- function(text, analyses, diagnostics, engine, plots = list()) {
     "warning", "no_analyses", "No supported analyses found. The source is preserved.")))
   missing_engine <- any(vapply(diagnostics,function(d) identical(d$code,"bettergg_mapping_unavailable"),logical(1)))
   status <- if (!converted) "failed" else if (errors || converted < length(analyses) || missing_engine) "partial" else "complete"
+  packages <- sort(unique(unlist(lapply(plots, function(p) p$packages))))
   structure(list(status = status, text = text, analyses = analyses,
     diagnostics = diagnostics, manifest = list(converter = "jmv2gg",
       version = jmv2gg_version, engine = engine, detected = length(analyses),
-      converted = converted, plots = plots)), class = "jmv2gg_result")
+      converted = converted, plots = plots, packages = packages)), class = "jmv2gg_result")
 }
 
 #' @export

@@ -1,0 +1,97 @@
+---
+title: "Replication and extension: framing, source and trust (synthetic example)"
+author: "jmv2gg example"
+params:
+  data: "replication-study.csv"
+  exclude_failed_checks: true
+output:
+  html_document:
+    toc: true # navigation for reviewers
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
+library(jmv)
+```
+
+All values in this report are simulated; they are not participant data.
+
+# Method
+
+## Data and exclusions
+
+```{r data}
+study <- read.csv(params$data)
+study$framing <- factor(study$framing, levels = c("gain", "loss"))
+study$source <- factor(study$source, levels = c("expert", "peer", "none"))
+study$education <- factor(study$education, levels = c("secondary", "bachelor", "postgraduate"))
+study$choice <- factor(study$choice, levels = c("reject", "accept"))
+n_before <- nrow(study)
+if (isTRUE(params$exclude_failed_checks)) study <- study[study$attention == "pass", ]
+```
+
+We excluded `r n_before - nrow(study)` participants who failed the attention check,
+leaving `r nrow(study)` participants.
+
+## Descriptives
+
+```{r descriptives}
+jmv::descriptives(data = study, vars = c("age", "trust", "education"), splitBy = "framing")
+```
+
+# Results
+
+## Confirmatory analysis: framing and source
+
+```{r confirmatory}
+confirmatory <- jmv::ANOVA(formula = trust ~ framing * source, data = study, emMeans = ~ framing:source)
+confirmatory
+```
+
+The model above is the preregistered test. Below, the same effect adjusted for age.
+
+```{r covariate}
+jmv::ancova(data = study, dep = "trust", factors = "framing", covs = "age")
+```
+
+## Change over time
+
+```{r repeated}
+jmv::anovaRM(
+  data = study,
+  rm = list(list(label = "time", levels = c("pre", "mid", "post"))),
+  rmCells = list(
+    list(measure = "pre", cell = "pre"),
+    list(measure = "mid", cell = "mid"),
+    list(measure = "post", cell = "post")
+  ),
+  bs = "framing"
+)
+jmv::ttestPS(data = study, pairs = list(list(i1 = "pre", i2 = "post")))
+```
+
+# Exploratory analyses
+
+## Satisfaction
+
+```{r satisfaction}
+jmv::ttestIS(data = study, vars = "satisfaction", group = "framing")
+jmv::linReg(
+  data = study, dep = "satisfaction", covs = c("trust", "age"), factors = "framing",
+  blocks = list(list("trust", "age"), list("framing"))
+)
+```
+
+## Choice
+
+```{r choice}
+jmv::logRegBin(data = study, dep = "choice", covs = "trust", factors = "framing", blocks = list(list("trust", "framing")))
+jmv::contTables(data = study, rows = "choice", cols = "source")
+```
+
+## Associations and the trust scale
+
+```{r associations}
+jmv::corrMatrix(data = study, vars = c("trust", "satisfaction", "age", "pre", "post"))
+jmv::reliability(data = study, vars = c("q1", "q2", "q3", "q4", "q5", "q6"), revItems = "q4")
+```

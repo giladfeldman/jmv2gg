@@ -343,7 +343,7 @@ map_regression <- function(ctx) {
   caption <- paste0(if (logistic) "Odds ratios" else "Coefficients", " predicting ", dv, ".")
   if (wants(ctx, "ggplot2")) {
     code <- recipe("recipe_coefstats", model = paste0(name, "_model"), name = name, ci = if (logistic) "wald" else "t",
-      conf.level = ctx$level, exponentiate = logistic, intercept = FALSE, stats = ctx$stats)
+      conf.level = ctx$level, exponentiate = logistic, intercept = FALSE, stats = ctx$stats, readable_terms = TRUE)
     add_figure(ctx, "ggplot2", code, paste0(name, "_plot"), caption, packages = if (ctx$stats) "ggrepel")
   }
   if (wants(ctx, "bettergg")) {
