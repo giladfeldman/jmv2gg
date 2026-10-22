@@ -12,7 +12,7 @@ Depends: R (>= 4.5.0)
 Imports: jsonlite, yaml, BetterGG (>= 0.2.0)
 Suggests: ggplot2, emmeans, car, afex, haven, ragg, ggdist, ggrepel, ggside, ggsignif, patchwork,
     statsExpressions, styler, jmv, psych, ggstatsplot,
-    rmarkdown, knitr, testthat (>= 3.0.0), withr, png, callr
+    rmarkdown, knitr, markdown, jmvcore, testthat (>= 3.0.0), withr, png, callr
 Config/testthat/edition: 3
 Roxygen: list(markdown = TRUE)
 URL: https://github.com/giladfeldman/jmv2gg

@@ -1,11 +1,11 @@
 {
   "webR": "0.6.0",
   "sources": {
-    "DESCRIPTION": "cd3d592402344ea307d0615afff145d9a8e0a5875af76a263a1b8777f10ce5df",
+    "DESCRIPTION": "3d393cc523aff45f75e9d9bb3cf709d29b3a14fc62d28c2bbacd1e6e0e8f94dc",
     "LICENSE": "b372a87757468731e51fa95c57148b406c2eca27760a9db99f4b797af50cb3c1",
     "NAMESPACE": "b8feb8194d938289bec873d0257a1242a53157359ff9622e88bf240065660c17",
     "R/browser.R": "ff050360bf125989430aeccc30d1ed202e3fef8a195c3ceb77059b5ee885c8e3",
-    "R/contracts.R": "88fa07cb9cf19336cb68d8840d8e1c7a45ce3c41bd8acc302d763ed44b2f2bcc",
+    "R/contracts.R": "21e278eb39f2e1a58af2afda8118f8418a9a726c005a9fcc2d81e18cc692f567",
     "R/generate.R": "17fb02e74459e09395e883359e57618185bbac31fda094178124c271c1bef3a3",
     "R/map-groups.R": "fc86dcd039362e03c418cfbb309b6d00b9da996cb2228f366b57f3e7b2c4a4bd",
     "R/map-other.R": "b0337ca726bea1a48b87ca4b30e8d478df9c5c9e44fb2b258a09cba9a7f51c94",
@@ -41,12 +41,12 @@
     "man/scan_rmd_risks.Rd": "75fb55023996f89cb25329dbf3b2eb46ba91092ba8192cb806572a855d61aa91"
   },
   "artifact": "bin/emscripten/contrib/4.6/jmv2gg_0.2.0.tgz",
-  "sha256": "3db7c949ec60ee6ac98c36c5b07ad8961ab22ce36dc2aefdd18b69214ec77e80",
+  "sha256": "bc956fe74d3701177d85cdf64e87eef1749f63af852691d5cdd5e45e3c0a011f",
   "dependencies": {
     "BetterGG": {
       "version": "0.2.0",
       "artifact": "bin/emscripten/contrib/4.6/BetterGG_0.2.0.tgz",
-      "sha256": "03124e4792464bd50a49e52e9f4416072fc2d84bd16c653dac0149f6fb227380",
+      "sha256": "f0ac2b32e55ba8af5d12460ce33e90c5794fbccf704b258f0174848a3b41c687",
       "commit": "d9db9cf62178a22eb0d2bd031fb6ffa1a53618f3"
     }
   },
@@ -54,7 +54,7 @@
     "websocket": {
       "version": "1.2.0.9000",
       "artifact": "bin/emscripten/contrib/4.6/websocket_1.2.0.9000.tgz",
-      "sha256": "327ab51fb438100ff7ee7dfa0d908f471b0b3148930ba3c1de72843f584231a8"
+      "sha256": "f23c2bc3763876fb3b85b2ad88abf2d05a894d66f4553c8d14ce3c6507d4b213"
     }
   }
 }

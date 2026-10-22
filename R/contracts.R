@@ -111,7 +111,7 @@ new_result <- function(text, analyses, diagnostics, engine, plots = list()) {
 
 #' @export
 print.jmv2gg_result <- function(x, ...) {
-  cat("jmv2gg:", x$status, "—", x$manifest$converted, "of", x$manifest$detected,
+  cat("jmv2gg:", x$status, "\u2014", x$manifest$converted, "of", x$manifest$detected,
       "analyses converted;", length(x$manifest$plots), "figures\n")
   invisible(x)
 }
