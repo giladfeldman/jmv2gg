@@ -235,6 +235,11 @@ sanitize_preview_html <- function(html) {
 # Wrap the knitted HTML: heading anchors, a table of contents (levels 1-3)
 # and folded code blocks, all without scripts. Scripts in the body are kept
 # out: the frame runs none, and they are removed here as a second layer.
+# The browser preview installs a stand-in 'websocket' (tools/webr/placeholders); say so when it was loaded.
+placeholder_loaded <- function() {
+  "websocket" %in% loadedNamespaces() && isTRUE(tryCatch(getExportedValue("websocket", "is_jmv2gg_placeholder")(), error = function(e) FALSE))
+}
+
 preview_page <- function(body, title) {
   body <- sanitize_preview_html(paste(body, collapse = "\n"))
   heads <- gregexpr("<h([1-3])(?: id=\"[^\"]*\")?>(.*?)</h\\1>", body, perl = TRUE)
@@ -254,7 +259,9 @@ preview_page <- function(body, title) {
   c("<!DOCTYPE html>", "<html lang=\"en\"><head><meta charset=\"utf-8\">",
     paste0("<title>", gsub("<", "&lt;", title, fixed = TRUE), "</title>"),
     "<style>", style, "</style></head><body>",
-    "<p class=\"preview-note\">Browser preview rendered with knitr and markdown in WebR. The reference report is rendered in native R.</p>",
+    "<p class=\"preview-note\">Browser preview rendered with knitr and markdown in WebR. The reference report is rendered in native R.",
+    if (placeholder_loaded()) " The 'websocket' package here is jmv2gg's labelled placeholder (it opens no connections), so session information lists it.",
+    "</p>",
     if (length(toc)) c("<nav class=\"toc\"><p>Contents</p><ul>", toc, "</ul></nav>"),
     "<main>", body, "</main></body></html>")
 }

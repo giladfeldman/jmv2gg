@@ -7,12 +7,12 @@
     "R/browser.R": "ff050360bf125989430aeccc30d1ed202e3fef8a195c3ceb77059b5ee885c8e3",
     "R/contracts.R": "21e278eb39f2e1a58af2afda8118f8418a9a726c005a9fcc2d81e18cc692f567",
     "R/generate.R": "17fb02e74459e09395e883359e57618185bbac31fda094178124c271c1bef3a3",
-    "R/map-groups.R": "fc86dcd039362e03c418cfbb309b6d00b9da996cb2228f366b57f3e7b2c4a4bd",
-    "R/map-other.R": "b0337ca726bea1a48b87ca4b30e8d478df9c5c9e44fb2b258a09cba9a7f51c94",
+    "R/map-groups.R": "016f775c8c2d499cb8513bbf393e05a240242239d622b7c100a80b0d392b63d2",
+    "R/map-other.R": "3eadc749d20f846cce4b9fc92cd928d1a4e4e9ea6b07a9aea3f6362b033f824f",
     "R/names.R": "4ab4d8ffe8c64204f720a2a3526e22d1caee3228177a83b778d0df1a955311aa",
     "R/optimize.R": "c07efeb7dd675cf9b70aa81dd6578f68b7685f7a0b44aa8a21dc7b92f033b38b",
     "R/parser.R": "0abf6f4410a5f083aa1305293f3eb88c443c98dd31000bcb56f8c10bbc38993f",
-    "R/render-browser.R": "1832e2e8e94f068ddcb6c5e1ff173dcff4ad6ef924b86cd980d225eb65ec88b9",
+    "R/render-browser.R": "23be20c049b676ed84b3ed1abb2c57b41f791be65caa1d3eabd365d5455b86f4",
     "R/rmd.R": "59500506fe66120dc87031ebdae1529d17e2d884dd3dc0970c091573d3cc4f35",
     "R/setup.R": "aba6d29867869ec0a16cade2ea7958af3e0a1cc4383fbfba09009e648256c04a",
     "inst/adversarial/benign.Rmd": "c5795d8d4806d72d5cb02e74b2d53ef67c4c7e4c4d71ba41b7ca0b92b764c5e6",
@@ -41,12 +41,12 @@
     "man/scan_rmd_risks.Rd": "75fb55023996f89cb25329dbf3b2eb46ba91092ba8192cb806572a855d61aa91"
   },
   "artifact": "bin/emscripten/contrib/4.6/jmv2gg_0.2.0.tgz",
-  "sha256": "bc956fe74d3701177d85cdf64e87eef1749f63af852691d5cdd5e45e3c0a011f",
+  "sha256": "97a14c16c8392c1b319361267145eeec864f22b1bc3bcb6171aa480002cbf98e",
   "dependencies": {
     "BetterGG": {
       "version": "0.2.0",
       "artifact": "bin/emscripten/contrib/4.6/BetterGG_0.2.0.tgz",
-      "sha256": "f0ac2b32e55ba8af5d12460ce33e90c5794fbccf704b258f0174848a3b41c687",
+      "sha256": "dec952c4adaeb180d4df6789c5e6ba9d0bd341074ff212a379c1d4323507fd93",
       "commit": "d9db9cf62178a22eb0d2bd031fb6ffa1a53618f3"
     }
   },
@@ -54,7 +54,7 @@
     "websocket": {
       "version": "1.2.0.9000",
       "artifact": "bin/emscripten/contrib/4.6/websocket_1.2.0.9000.tgz",
-      "sha256": "f23c2bc3763876fb3b85b2ad88abf2d05a894d66f4553c8d14ce3c6507d4b213"
+      "sha256": "a4662d2303a97ae40ab7cef3072c59a328a6a396f0e589181471e5a7afc7b2fa"
     }
   }
 }

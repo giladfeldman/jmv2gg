@@ -145,6 +145,8 @@ test_that("the browser preview's websocket placeholder opens no connection and e
   # chromote imports websocket (>= 1.2.0); the .9000 suffix marks it as no real release
   expect_true(package_version(description[, "Version"]) >= "1.2.0")
   expect_match(description[, "Version"], ".9000", fixed = TRUE)
+  # natively the real package (or none) is loaded, so the preview note does not mention a placeholder
+  expect_false(placeholder_loaded())
 })
 
 test_that("a render error names the chunk where it happened", {

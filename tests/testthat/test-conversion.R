@@ -66,8 +66,16 @@ test_that("figure notes disclose plot types and pairwise comparisons the figure 
   src <- 'ggstatsplot::ggbetweenstats(data = d, x = g, y = y, pairwise.display = "all")'
   expect_match(flat(convert_code(src, engine = "ggplot2")), "draws none because statistics on figures are off", fixed = TRUE)
   expect_match(flat(convert_code(src, engine = "ggplot2", style = list(stats = TRUE))), "showed all pairwise comparisons; the ggplot2 figure draws only the significant ones", fixed = TRUE)
-  none <- convert_code('ggstatsplot::ggbetweenstats(data = d, x = g, y = y, pairwise.comparisons = FALSE)', engine = "ggplot2")
-  expect_false(grepl("pairwise comparisons;", flat(none), fixed = TRUE))
+  # ggstatsplot 1.1.3, checked on drawn plots: "none" draws no comparisons, an unknown word such as "everything"
+  # draws all, and the retired pairwise.comparisons = FALSE is ignored (comparisons drawn; before 0.12.0 none).
+  style <- list(stats = TRUE)
+  expect_false(grepl("pairwise comparisons", flat(convert_code('ggstatsplot::ggbetweenstats(data = d, x = g, y = y, pairwise.display = "none")',
+    engine = "ggplot2")), fixed = TRUE))
+  expect_match(flat(convert_code('ggstatsplot::ggbetweenstats(data = d, x = g, y = y, pairwise.display = "everything")', engine = "ggplot2", style = style)),
+    "showed all pairwise comparisons", fixed = TRUE)
+  expect_false(grepl("pairwise comparisons", flat(convert_code(sub('"all"', '"significant"', src, fixed = TRUE), engine = "ggplot2", style = style)), fixed = TRUE))
+  retired <- flat(convert_code('ggstatsplot::ggbetweenstats(data = d, x = g, y = y, pairwise.comparisons = FALSE)', engine = "ggplot2", style = style))
+  expect_match(retired, "ggstatsplot before 0.12.0 then showed no pairwise comparisons, while 0.12.0 and later ignore it and show the significant ones; the ggplot2 figure draws only the significant ones.", fixed = TRUE)
   within <- convert_code('ggstatsplot::ggwithinstats(data = d, x = g, y = y, subject.id = id)', engine = "ggplot2")
   expect_match(flat(within), "showed the significant pairwise comparisons; the ggplot2 figure draws none", fixed = TRUE)
 })

@@ -131,8 +131,9 @@ map_descriptives <- function(ctx) {
     }
   }
   if (wants(ctx, "bettergg")) {
-    add_note(ctx, paste("The BetterGG descriptive plot does not apply case weights.",
-      if (length(split)) "It pools the splitBy groups; the ggplot2 figure keeps them." else ""))
+    # Case weights live on the data (jamovi's attribute), so conversion cannot know whether there are any.
+    add_note(ctx, paste(c("If the data carry jamovi case weights, the BetterGG descriptive plot does not apply them.",
+      if (length(split)) "It pools the splitBy groups; the ggplot2 figure keeps them."), collapse = " "))
   }
 }
 

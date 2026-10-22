@@ -4,17 +4,23 @@
 # the ggplot2 recipe draws the significant ones, and only with statistics on.
 pairwise_differs <- function(ctx) {
   a <- ctx$a
-  if (isFALSE(arg_value(a, "pairwise.comparisons", TRUE))) return(invisible())
-  display <- arg_value(a, "pairwise.display", "significant")
+  display <- as.character(arg_value(a, "pairwise.display", "significant"))[1]
+  if (is.na(display)) display <- "significant"
+  # ggstatsplot 1.1.3 draws no comparisons for exactly "none" (checked on a drawn plot);
+  # otherwise .pairwise_display_level(): "s..." significant, "n..." non-significant, anything else all.
   if (identical(display, "none")) return(invisible())
-  shown <- if (substr(display, 1, 1) == "a") "all" else if (substr(display, 1, 1) == "n") "the non-significant" else "the significant"
-  ctx$differs <- c(ctx$differs, if (!ctx$stats) {
-    paste0("with three or more groups the source plot showed ", shown,
-      " pairwise comparisons; the ggplot2 figure draws none because statistics on figures are off.")
-  } else if (shown != "the significant") {
-    paste0("with three or more groups the source plot showed ", shown,
-      " pairwise comparisons; the ggplot2 figure draws only the significant ones.")
-  })
+  shown <- if (startsWith(display, "s")) "the significant" else if (startsWith(display, "n")) "the non-significant" else "all"
+  figure <- if (!ctx$stats) "the ggplot2 figure draws none because statistics on figures are off."
+    else "the ggplot2 figure draws only the significant ones."
+  # pairwise.comparisons was retired in ggstatsplot 0.12.0 and is ignored since (the comparisons are drawn);
+  # before 0.12.0, FALSE drew none. Which version made the source plot is unknown, so say both.
+  if (isFALSE(arg_value(a, "pairwise.comparisons", TRUE))) {
+    ctx$differs <- c(ctx$differs, paste0("the source sets pairwise.comparisons = FALSE: ggstatsplot before 0.12.0 then showed no ",
+      "pairwise comparisons, while 0.12.0 and later ignore it and show ", shown, " ones; ", figure))
+    return(invisible())
+  }
+  if (ctx$stats && shown == "the significant") return(invisible())
+  ctx$differs <- c(ctx$differs, paste0("with three or more groups the source plot showed ", shown, " pairwise comparisons; ", figure))
 }
 
 bettergg_stats_args <- function(ctx) {
