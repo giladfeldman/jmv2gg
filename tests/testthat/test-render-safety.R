@@ -92,3 +92,99 @@ test_that("a benign report renders with a contents list, folded code and an embe
   expect_match(html, "<img src=\"data:image/png;base64,", fixed = TRUE)
   expect_match(html, "Browser preview rendered with knitr and markdown in WebR", fixed = TRUE)
 })
+
+test_that("rendering can report each chunk as knitr reaches it", {
+  skip_if_not_installed("knitr"); skip_if_not_installed("markdown")
+  work <- tempfile(); dir.create(work)
+  file.copy(adversarial("benign.Rmd"), work)
+  messages <- character()
+  withCallingHandlers(
+    render_browser_preview(file.path(work, "benign.Rmd"), file.path(work, "b.html"), progress = TRUE),
+    message = function(m) { messages <<- c(messages, conditionMessage(m)); invokeRestart("muffleMessage") }
+  )
+  progress <- grep("^jmv2gg-progress ", messages, value = TRUE)
+  expect_identical(trimws(progress), "jmv2gg-progress 1 1 unnamed-chunk-1")
+  expect_null(knitr::opts_hooks$get("eval"))
+})
+
+test_that("YAML params reach the document, as rmarkdown provides them", {
+  skip_if_not_installed("knitr"); skip_if_not_installed("markdown")
+  work <- tempfile(); dir.create(work)
+  writeLines(c("---", "title: Params", "params:", "  count: 3", "  label:", "    value: framed", "  twice: !r 2 * 21", "---", "",
+    "```{r}", "cat('n', params$count, params$label, params$twice)", "```"), file.path(work, "p.Rmd"))
+  expect_error(render_browser_preview(file.path(work, "p.Rmd"), file.path(work, "p.html")), "yaml_expression")
+  out <- render_browser_preview(file.path(work, "p.Rmd"), file.path(work, "p.html"), confirmed = "yaml_expression")
+  expect_match(paste(readLines(out, warn = FALSE), collapse = "\n"), "n 3 framed 42", fixed = TRUE)
+})
+
+test_that("the bundled complex example report renders in the browser previewer", {
+  skip_if_not_installed("knitr"); skip_if_not_installed("markdown")
+  examples <- system.file("examples", package = "jmv2gg")
+  if (!nzchar(examples)) examples <- file.path(testthat::test_path(), "..", "..", "inst", "examples")
+  source <- paste(readLines(file.path(examples, "replication-report.Rmd"), warn = FALSE, encoding = "UTF-8"), collapse = "\n")
+  converted <- convert_rmd(source, engine = "ggplot2", style = list(styler = FALSE))
+  for (p in converted$manifest$packages) skip_if_not_installed(p)
+  work <- tempfile(); dir.create(work)
+  file.copy(file.path(examples, "replication-study.csv"), work)
+  writeLines(converted$text, file.path(work, "report.Rmd"), useBytes = TRUE)
+  scan <- scan_rmd_risks(converted$text)
+  out <- render_browser_preview(file.path(work, "report.Rmd"), file.path(work, "report.html"), confirmed = codes(scan))
+  html <- paste(readLines(out, warn = FALSE), collapse = "\n")
+  expect_gte(length(gregexpr("<img src=\"data:image/png;base64,", html, fixed = TRUE)[[1]]), length(converted$manifest$plots))
+})
+
+test_that("the browser preview's websocket placeholder opens no connection and errors on use", {
+  root <- file.path(testthat::test_path(), "..", "..", "tools", "webr", "placeholders", "websocket")
+  skip_if(!dir.exists(root), "placeholder sources are not part of the installed package")
+  env <- new.env()
+  sys.source(file.path(root, "R", "websocket.R"), envir = env)
+  expect_error(env$WebSocket$new("wss://example.invalid/"), "not available in the jmv2gg browser preview")
+  expect_true(env$is_jmv2gg_placeholder())
+  description <- read.dcf(file.path(root, "DESCRIPTION"))
+  expect_match(description[, "Title"], "Not the 'websocket' Package", fixed = TRUE)
+  # chromote imports websocket (>= 1.2.0); the .9000 suffix marks it as no real release
+  expect_true(package_version(description[, "Version"]) >= "1.2.0")
+  expect_match(description[, "Version"], ".9000", fixed = TRUE)
+})
+
+test_that("a render error names the chunk where it happened", {
+  skip_if_not_installed("knitr"); skip_if_not_installed("markdown")
+  work <- tempfile(); dir.create(work)
+  writeLines(c("---", "title: Broken", "---", "", "```{r first}", "x <- 1", "```", "", "```{r second}",
+    "stop('boom')", "```"), file.path(work, "e.Rmd"))
+  expect_error(render_browser_preview(file.path(work, "e.Rmd"), file.path(work, "e.html")), "Chunk 2 of 2 [(]second[)]: .*boom")
+  expect_null(knitr::opts_hooks$get("eval"))
+})
+
+test_that("a jmv result whose knitr HTML printing fails is printed as text, not a failed preview", {
+  skip_if_not_installed("knitr")
+  knitr_ns <- asNamespace("knitr")
+  before <- utils::getS3method("knit_print", "ResultsElement", optional = TRUE, envir = knitr_ns)
+  failing <- function(x, ...) stop("invalid argument type")
+  registerS3method("knit_print", "ResultsElement", failing, envir = knitr_ns)
+  on.exit(if (is.null(before)) registerS3method("knit_print", "ResultsElement", function(x, ...) knitr::normal_print(x), envir = knitr_ns)
+    else registerS3method("knit_print", "ResultsElement", before, envir = knitr_ns), add = TRUE)
+  fake <- structure(list(), class = "ResultsElement")
+  expect_error(knitr::knit_print(fake), "invalid argument type")
+  restore <- guard_jmv_knit_print()
+  expect_no_error(knitr::knit_print(fake))
+  restore()
+  expect_error(knitr::knit_print(fake), "invalid argument type")
+})
+
+test_that("the example's contingency table (run through the websocket placeholder in the browser) keeps jmv's statistics", {
+  skip_if_not_installed("jmv")
+  # Browser preview 2026-10-22 (WebR, placeholder installed) printed chi2 5.611, df 2, p .060, N 234 for this
+  # table; these are the native values it must keep matching.
+  examples <- system.file("examples", package = "jmv2gg")
+  if (!nzchar(examples)) examples <- file.path(testthat::test_path(), "..", "..", "inst", "examples")
+  study <- utils::read.csv(file.path(examples, "replication-study.csv"))
+  study$source <- factor(study$source, levels = c("expert", "peer", "none"))
+  study$choice <- factor(study$choice, levels = c("reject", "accept"))
+  study <- study[study$attention == "pass", ]
+  chi <- jmv::contTables(data = study, rows = "choice", cols = "source")$chiSq$asDF
+  expect_equal(chi[["value[chiSq]"]], 5.611454, tolerance = 1e-6)
+  expect_identical(as.integer(chi[["df[chiSq]"]]), 2L)
+  expect_equal(chi[["p[chiSq]"]], 0.06046279, tolerance = 1e-6)
+  expect_identical(as.integer(chi[["value[N]"]]), 234L)
+})

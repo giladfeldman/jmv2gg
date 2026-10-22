@@ -1,0 +1,13 @@
+Package: websocket
+Title: Placeholder for the jmv2gg Browser Report Preview (Not the 'websocket' Package)
+Version: 1.2.0.9000
+Authors@R: person("Gilad", "Feldman", email = "giladfel@gmail.com", role = c("aut", "cre"))
+Description: NOT the CRAN 'websocket' package, which has no WebR build. jmv's
+    contingency tables call 'vcdExtra', whose imports reach 'chromote', which
+    imports 'websocket'; without it 'vcdExtra' cannot load in WebR. This
+    placeholder lets that chain load in the jmv2gg browser report preview only.
+    It opens no connections: WebSocket$new() stops with an explanatory error.
+    The version satisfies 'chromote' (websocket >= 1.2.0); '.9000' marks it as
+    not a release of the real package.
+License: MIT + file LICENSE
+Encoding: UTF-8

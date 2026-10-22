@@ -59,3 +59,10 @@ Rollback to the previous verified Vercel deployment and compare its build-info
 with the prior Git revision/artifact. The first release has no previous production
 target; withdraw its alias if necessary. Restore native package versions from
 exact tags/commits into a separate library to preserve existing analyses.
+
+## Developer references
+
+For change ownership and test scope read [architecture](ARCHITECTURE.md),
+[capabilities/validation](VALIDATION.md), and [contributor workflow](../CONTRIBUTING.md).
+Recorded release checks are not automatic proof that a later documentation or
+code change has been deployed. Keep the live Git revision explicit.

@@ -22,7 +22,8 @@ convert_rmd(
 
 \item{html_preset}{Enhanced HTML presentation or preserve existing settings.}
 
-\item{style}{Named style options, as in \code{\link[=convert_code]{convert_code()}}.}
+\item{style}{Named style options, as in \code{\link[=convert_code]{convert_code()}}; \code{headings = TRUE}
+adds a heading before each figure chunk, one level below the source's.}
 
 \item{figures}{Named publication figure options.}
 }
@@ -30,5 +31,7 @@ convert_rmd(
 A \code{jmv2gg_result} with preserved original source and generated chunks.
 }
 \description{
-Convert an R Markdown document without executing it
+Adds one figure setup chunk after the YAML header and, after each chunk
+with converted analyses, a figure chunk with a caption for every figure.
+The YAML header is edited in place, so its comments and layout are kept.
 }

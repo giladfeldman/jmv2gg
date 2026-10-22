@@ -100,9 +100,12 @@ rmd_packages <- function(text) {
 #' @param output Path of the HTML file to write.
 #' @param confirmed Codes of the findings the user has reviewed and accepted.
 #' @param time_limit Seconds the document may run.
+#' @param progress Write one message per chunk as knitr reaches it
+#'   ("jmv2gg-progress <done> <total> <label>"), so the browser can show how far
+#'   the render is.
 #' @return The path of the HTML file.
 #' @export
-render_browser_preview <- function(input, output, confirmed = character(), time_limit = 300) {
+render_browser_preview <- function(input, output, confirmed = character(), time_limit = 300, progress = FALSE) {
   for (p in c("knitr", "markdown")) if (!requireNamespace(p, quietly = TRUE)) stop("The ", p, " package is needed to render.")
   text <- paste(readLines(input, warn = FALSE, encoding = "UTF-8"), collapse = "\n")
   scan <- scan_rmd_risks(text)
@@ -122,12 +125,35 @@ render_browser_preview <- function(input, output, confirmed = character(), time_
   for (engine in setdiff(names(knitr::knit_engines$get()), c("R", "r"))) knitr::knit_engines$set(stats::setNames(list(refuse), engine))
   # A chunk error stops the preview, as in rmarkdown (knit() alone would print it and go on).
   knitr::opts_chunk$set(dev = "png", dpi = 96, fig.width = 7, fig.height = 5, error = FALSE)
+  total <- scan$chunks
+  done <- 0L
+  current <- NULL
+  # An option hook runs once before each chunk (every chunk has an `eval` option):
+  # it records the chunk for error messages and, if asked, reports progress.
+  knitr::opts_hooks$set(eval = function(options) {
+    done <<- done + 1L
+    current <<- options$label
+    if (isTRUE(progress)) message("jmv2gg-progress ", done, " ", total, " ", options$label)
+    options
+  })
+  on.exit(knitr::opts_hooks$delete("eval"), add = TRUE)
   # The markdown sits next to the document so its figure files resolve.
   md <- file.path(dirname(input), paste0(tools::file_path_sans_ext(basename(input)), ".preview.md"))
   on.exit(unlink(md), add = TRUE)
-  knitr::knit(input, output = md, quiet = TRUE, envir = new.env(parent = globalenv()))
-  if (file.size(md) > preview_size_limit) stop("The document's output is larger than 20 MB; render it in native R.")
+  restore <- guard_jmv_knit_print()
+  on.exit(restore(), add = TRUE)
   meta <- rmd_front_matter(text)
+  envir <- new.env(parent = globalenv())
+  # rmarkdown::render() would provide `params` from the YAML header; knit() alone does not.
+  if (!is.null(meta$params)) assign("params", preview_params(meta$params, envir), envir = envir)
+  tryCatch(knitr::knit(input, output = md, quiet = TRUE, envir = envir), error = function(e) {
+    where <- if (is.null(current)) "" else paste0("Chunk ", done, " of ", total, " (", current, "): ")
+    stop(where, conditionMessage(e), call. = FALSE)
+  })
+  if (file.size(md) > preview_size_limit) stop("The document's output is larger than 20 MB; render it in native R.")
+  # knit() keeps the YAML header; markdown would read its rmarkdown output
+  # options (for example `toc: true` under html_document) as its own and fail.
+  writeLines(drop_front_matter(readLines(md, warn = FALSE, encoding = "UTF-8")), md, useBytes = TRUE)
   body <- markdown::mark(md, format = "html", options = list(embed_resources = TRUE, toc = FALSE))
   html <- preview_page(body, meta$title %||% "Report preview")
   writeLines(html, output, useBytes = TRUE)
@@ -136,12 +162,50 @@ render_browser_preview <- function(input, output, confirmed = character(), time_
 
 preview_size_limit <- 20 * 1024^2
 
+# jmvcore prints its results in knitr as HTML (knit_print.ResultsElement ->
+# htmlify), which fails for some results (jmv 2.8.0 / jmvcore 28.3: reliability
+# gives "invalid argument type" in WebR). A failure there would stop the whole
+# preview, so such a result is printed as plain text instead, as in the R
+# console. Returns a function that restores the original method.
+guard_jmv_knit_print <- function() {
+  knitr_ns <- asNamespace("knitr")
+  # jmvcore registers its method when it loads, which a document does mid-render.
+  if (requireNamespace("jmvcore", quietly = TRUE)) loadNamespace("jmvcore")
+  original <- utils::getS3method("knit_print", "ResultsElement", optional = TRUE, envir = knitr_ns)
+  if (is.null(original)) return(function() invisible())
+  registerS3method("knit_print", "ResultsElement", envir = knitr_ns, function(x, ...) {
+    tryCatch(original(x, ...), error = function(e) knitr::normal_print(x))
+  })
+  function() registerS3method("knit_print", "ResultsElement", original, envir = knitr_ns)
+}
+
+drop_front_matter <- function(lines) {
+  if (!length(lines) || trimws(lines[1]) != "---") return(lines)
+  end <- which(seq_along(lines) > 1L & trimws(lines) %in% c("---", "..."))
+  if (!length(end)) lines else lines[-seq_len(end[1])]
+}
+
+# The `params` list rmarkdown builds from the YAML header: each entry is a value
+# or a list with `value`. Values written as !r / !expr are R code; they run only
+# after the user confirmed the "yaml_expression" finding (checked by the caller).
+preview_params <- function(params, envir) {
+  if (!is.list(params)) stop("The YAML `params` field must be a list of parameters.")
+  value_of <- function(x) {
+    if (is.list(x) && !inherits(x, "jmv2gg_r_expression") && "value" %in% names(x)) x <- x$value
+    if (inherits(x, "jmv2gg_r_expression")) x <- eval(parse(text = unclass(x)), envir = new.env(parent = envir))
+    x
+  }
+  structure(lapply(params, value_of), class = "knit_param_list")
+}
+
 rmd_front_matter <- function(text) {
   lines <- strsplit(text, "\n", fixed = TRUE)[[1]]
   if (!length(lines) || trimws(lines[1]) != "---") return(list())
   end <- which(seq_along(lines) > 1L & trimws(lines) %in% c("---", "..."))
   if (!length(end)) return(list())
-  meta <- tryCatch(yaml::yaml.load(paste(lines[2:(end[1] - 1L)], collapse = "\n"), eval.expr = FALSE), error = function(e) list())
+  as_expression <- function(x) structure(x, class = "jmv2gg_r_expression")
+  meta <- tryCatch(yaml::yaml.load(paste(lines[2:(end[1] - 1L)], collapse = "\n"), eval.expr = FALSE,
+    handlers = list(r = as_expression, expr = as_expression)), error = function(e) list())
   if (!is.list(meta)) list() else meta
 }
 
@@ -159,6 +223,10 @@ sanitize_preview_html <- function(html) {
     tag <- gsub("(?i)\\s+on[a-z]+\\s*=\\s*(\"[^\"]*\"|'[^']*'|[^\\s>]+)", "", tag, perl = TRUE)
     tag <- gsub("(?i)\\b(href|src|action|formaction|xlink:href)\\s*=\\s*([\"']?)\\s*(javascript|vbscript|data:text/html)[^\"'>\\s]*\\2",
       "\\1=\"#\"", tag, perl = TRUE)
+    # Outside addresses would let an image request carry data out; figures are embedded as data: URIs.
+    tag <- gsub("(?i)\\s+srcset\\s*=\\s*(\"[^\"]*\"|'[^']*'|[^\\s>]+)", "", tag, perl = TRUE)
+    tag <- gsub("(?i)\\s+(src|poster|background)\\s*=\\s*(\"\\s*(https?:|//)[^\"]*\"|'\\s*(https?:|//)[^']*'|(https?:|//)[^\\s>]*)",
+      "", tag, perl = TRUE)
     gsub("(?i)\\s+target\\s*=\\s*([\"']?)_(top|parent|blank)\\1", "", tag, perl = TRUE)
   })
   html

@@ -47,7 +47,9 @@ records <- lapply(seq_along(latest), function(i) {
   text <- read_text(path)
   if (is.null(text)) return(list(path = path, status = "unreadable"))
   started <- Sys.time()
-  out <- tryCatch(convert_rmd(text, engine = "both"), error = function(e) e)
+  if (i %% 25 == 0) message("converted ", i, " of ", length(latest))
+  # styler only reformats; a separate R process per file would dominate the run time
+  out <- tryCatch(convert_rmd(text, engine = "both", style = list(styler = FALSE)), error = function(e) e)
   if (inherits(out, "error")) return(list(path = path, status = "converter_error", error = conditionMessage(out)))
   list(path = path, status = out$status, detected = out$manifest$detected, converted = out$manifest$converted,
     figures = length(out$manifest$plots), seconds = as.numeric(difftime(Sys.time(), started, units = "secs")),
@@ -91,8 +93,10 @@ if (nzchar(render_list)) {
       renders[[length(renders) + 1L]] <- c(record, status = "skipped_folder_too_large")
       next
     }
-    work <- file.path(tempdir(), paste0("corpus-", length(renders) + 1L))
-    dir.create(work)
+    # Kept in the private output folder so the rendered figures can be reviewed afterwards
+    work <- file.path(output, "work", paste0("corpus-", length(renders) + 1L))
+    unlink(work, recursive = TRUE)
+    dir.create(work, recursive = TRUE)
     file.copy(list.files(folder, full.names = TRUE, all.files = FALSE, no.. = TRUE), work, recursive = TRUE)
     converted <- convert_rmd(text, engine = "both")
     target <- file.path(work, paste0(tools::file_path_sans_ext(basename(path)), "-jmv2gg.Rmd"))
@@ -105,7 +109,9 @@ if (nzchar(render_list)) {
         warning = function(w) { warnings <<- c(warnings, conditionMessage(w)); invokeRestart("muffleWarning") }
       )
       warnings
-    }, args = list(input = target), libpath = .libPaths(), timeout = limit), error = function(e) e)
+    # wd = work: documents that write figures relative to the working folder must not
+    # write into the repository (private corpus output landed there once).
+    }, args = list(input = target), libpath = .libPaths(), timeout = limit, wd = work), error = function(e) e)
     figures <- list.files(file.path(work, "figures"), pattern = "\\.png$")
     renders[[length(renders) + 1L]] <- c(record, list(
       status = if (inherits(result, "error")) "render_failed" else "rendered",

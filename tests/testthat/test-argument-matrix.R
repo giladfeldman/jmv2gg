@@ -150,7 +150,7 @@ test_that("(c) weights, labelled data, missing values and empty groups are handl
   w <- d
   attr(w, "jmv-weights") <- rep(c(1, 2), n / 2)
   env <- run_generated('jmv::ANOVA(data = w, dep = "y", factors = "g")', w)
-  expect_equal(unname(stats::weights(env$anova_1_model)), rep(c(1, 2), n / 2)[!is.na(d$y)])
+  expect_null(stats::weights(env$anova_1_model)) # jmv::ANOVA does not apply case weights
   lab <- d
   lab$g <- haven::labelled(as.integer(d$g), c(First = 1, Second = 2, Third = 3, Fourth = 4))
   env <- run_generated('jmv::ANOVA(data = lab, dep = "y", factors = "g")', lab)
@@ -177,4 +177,31 @@ test_that("(c) export formats and journal sizes are written", {
   expect_equal(dims[1], round(350 * 3 / 4))
   expect_identical(rawToChar(readBin(file.path(env$.work, "figures", "ttest_1-ggplot2.pdf"), "raw", 4)), "%PDF")
   expect_error(conversion_options(list(), list(formats = "gif")), "png, pdf, tiff")
+})
+
+test_that("jamovi syntax-mode forms found in the corpus convert and run", {
+  skip_if_not_installed("ragg")
+  forms <- list(
+    'jmv::descriptives(formula = y + x ~ g:h, data = d, freq = TRUE, box = TRUE, )' = "descriptives_1_1_plot",
+    'jmv::propTestN(formula = ~c2, data = d, ratio = c(1, 1, 1))' = "table_1_plot",
+    'jmv::contTables(formula = ~c1:c2, data = d, chiSqCorr = TRUE, )' = "table_1_plot",
+    'jmv::contTables(formula = ~c1:c2:h, data = d)' = "table_1_plot",
+    'jmv::ANOVA(formula = y ~ g + h + g:h, data = d, effectSize = "partEta", postHoc = ~g, )' = "anova_1_plot",
+    'jmv::ttestIS(formula = y + x ~ h, data = d, vars = vars("y", "x"), welchs = TRUE)' = "ttest_1_1_plot",
+    'ggstatsplot::ggbetweenstats(data = d, x = g, y = y, type = "Non-parametric")' = "betweenstats_1_plot",
+    'ggstatsplot::ggwithinstats(data = long, x = cond, y = score, point.path = FALSE)' = "withinstats_1_plot"
+  )
+  for (code in names(forms)) {
+    expect_identical(convert_code(code, engine = "ggplot2")$status, "complete", label = code)
+    data <- if (grepl("long", code)) long else d
+    env <- suppressMessages(run_generated(code, data))
+    expect_s3_class(env[[forms[[code]]]], "ggplot")
+  }
+  # descriptives formula: variables before ~, split after it
+  a <- inspect_code('jmv::descriptives(formula = y + x ~ g:h, data = d)')$analyses[[1]]
+  expect_match(generate_analysis(assign_analysis_names(list(a), character())[[1]], "ggplot2",
+    conversion_options(list(), list()))$code, "interaction", fixed = TRUE)
+  # "Non-parametric" is parametric in ggstatsplot (case-sensitive first-letter rule), and so here
+  env <- run_generated('ggstatsplot::ggbetweenstats(data = d, x = g, y = y, type = "Non-parametric")', d)
+  expect_match(env$betweenstats_1_summary$label[1], "mean", fixed = TRUE)
 })

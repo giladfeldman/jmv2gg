@@ -41,3 +41,40 @@
 - Release packaging must explicitly exclude .env files even when Git ignores them. Inspect source archive members after linking hosting tools; Git ignore and R build ignore have different boundaries.
 
 - Vercel modifies .vercel/project.json and creates an untracked root vercel.json during hosted builds (observed in production logs). Preserve the raw dirty flag, disclose these exact provider changes, and verify sourceTreeDirty separately; unexpected or local changes must still fail.
+
+## Documentation and maintenance handoff
+
+- Keep prototype assumptions out of current guidance. Explicit source terms must
+  survive even if a historical generator always expanded interactions.
+- Separate release evidence from current verification. Optional dependencies and
+  platforms change assertion/skip counts; disclose NOT RUN checks explicitly.
+- Explain the shared converter versus execution boundary: WebR runs the actual
+  R package; complete setup/HTML and BetterGG previews remain native-R paths.
+- Documentation edits are not a deployment. Record uncommitted files, immutable
+  release tags, deployed SHA and the next gate before publishing changes.
+- Public docs use synthetic examples and generic paths. Keep owner decisions,
+  private inputs, backups/history details and handoffs outside public source/archives.
+
+## 0.2.0: figures, statistics and the browser
+
+- Loading styler loads R.utils, whose `names()` method for "Options" objects breaks
+  jmv for the rest of the session ("options$.options does not exist"). Run styler in
+  a separate process (callr) or in a worker that never runs jmv. `skip_if_not_installed()`
+  loads the package it checks: test for styler with `system.file()` instead.
+- `emmeans::joint_tests()` stores F rounded to three decimals. Use `drop1(scope = ~.)`
+  on the sum-to-zero model for exact type III F (equal to `car::Anova(type = 3)`).
+- jmv applies case weights only in contTables, descriptives, linReg and logRegBin
+  (grep `jmv-weights` in the jmv classes). ANOVA and ANCOVA ignore them; check jmv's
+  own behaviour before weighting a model "to match".
+- statsExpressions reads `type` by its first letter, case-sensitively:
+  "Non-parametric" is parametric. Mirror the rule; do not "fix" the user's intent.
+- jamovi's syntax mode writes `..., )` (an empty trailing argument), formula forms
+  (`descriptives(formula = a + b ~ g:h)`, `contTables(formula = ~ r:c)`,
+  `propTestN(formula = ~ v)`) and `vars("a", "b")`. A real corpus finds these; a
+  synthetic one does not.
+- BetterGG's namespace loads with only rlang, so the browser conversion worker
+  installs BetterGG and jmv2gg without the ggstatsplot stack. Building BetterGG for
+  WebR needs its R dependencies inside the build container (Posit binaries).
+- Statistics on figures: compare every printed value with the jmv result object for
+  the same call; a second-model review found one-sided correlations, exact rank tests
+  and one-sample hypotheses that the first test set missed.

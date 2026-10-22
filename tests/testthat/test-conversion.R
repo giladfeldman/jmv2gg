@@ -37,3 +37,37 @@ test_that("styling the generated code never loads styler into the converting ses
   restyled <- callr::r(function(x) as.character(styler::style_text(x)), args = list(x = lines))
   expect_identical(restyled, lines)
 })
+
+test_that("T and F are read as TRUE and FALSE in literal arguments", {
+  out <- convert_code("ggstatsplot::ggbetweenstats(data = d, x = g, y = y, results.subtitle = F)", engine = "ggplot2")
+  expect_identical(out$status, "complete")
+  expect_identical(literal(quote(T)), TRUE)
+  expect_error(literal(quote(other)), "Dynamic argument")
+})
+
+test_that("the setup block reports pinned web-app versions for packages that are not installed", {
+  lock <- tempfile(fileext = ".dcf")
+  writeLines(c("Package: notapkgxyz", "Version: 1.2.3", "", "Package: ggplot2", "Version: 9.9.9"), lock)
+  versions <- locked_versions(lock)
+  expect_identical(unname(versions["notapkgxyz"]), "1.2.3")
+  expect_identical(package_version_text("notapkgxyz", versions), "notapkgxyz 1.2.3 (pinned version of the jmv2gg web app)")
+  expect_identical(package_version_text("notapkgxyz2", versions), "notapkgxyz2 (not installed where this was converted)")
+  # An installed package reports its own version, not the lock's
+  expect_identical(package_version_text("jsonlite", versions), paste("jsonlite", utils::packageVersion("jsonlite")))
+  expect_identical(locked_versions(tempfile()), character())
+})
+
+test_that("figure notes disclose plot types and pairwise comparisons the figure does not draw", {
+  flat <- function(out) gsub("[ \t]*\n#[ \t]*", " ", out$text)
+  out <- convert_code('jmv::descriptives(data = d, vars = "y", box = TRUE, violin = TRUE)', engine = "ggplot2")
+  expect_match(flat(out), "the source asked jamovi for box, violin plots", fixed = TRUE)
+  expect_match(flat(convert_code('jmv::descriptives(data = d, vars = "y")', engine = "ggplot2")),
+    "Differs from jamovi: nothing known.", fixed = TRUE)
+  src <- 'ggstatsplot::ggbetweenstats(data = d, x = g, y = y, pairwise.display = "all")'
+  expect_match(flat(convert_code(src, engine = "ggplot2")), "draws none because statistics on figures are off", fixed = TRUE)
+  expect_match(flat(convert_code(src, engine = "ggplot2", style = list(stats = TRUE))), "showed all pairwise comparisons; the ggplot2 figure draws only the significant ones", fixed = TRUE)
+  none <- convert_code('ggstatsplot::ggbetweenstats(data = d, x = g, y = y, pairwise.comparisons = FALSE)', engine = "ggplot2")
+  expect_false(grepl("pairwise comparisons;", flat(none), fixed = TRUE))
+  within <- convert_code('ggstatsplot::ggwithinstats(data = d, x = g, y = y, subject.id = id)', engine = "ggplot2")
+  expect_match(flat(within), "showed the significant pairwise comparisons; the ggplot2 figure draws none", fixed = TRUE)
+})

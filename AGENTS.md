@@ -14,3 +14,6 @@ sourcing loose R files in JavaScript is not a package-integration test.
 
 Read README.md for interfaces and current execution boundaries. Record checks
 that did not run as blocked or not run, never passed.
+
+Developer orientation: [CLAUDE.md](CLAUDE.md), [CONTRIBUTING.md](CONTRIBUTING.md),
+[architecture](docs/ARCHITECTURE.md), and [validation limits](docs/VALIDATION.md).

@@ -1,24 +1,60 @@
 {
   "webR": "0.6.0",
   "sources": {
-    "DESCRIPTION": "6f8909da6a140f9d7f15da535d7ece86b246f5f6225d244c7c0980b8c2f6d38e",
+    "DESCRIPTION": "cd3d592402344ea307d0615afff145d9a8e0a5875af76a263a1b8777f10ce5df",
     "LICENSE": "b372a87757468731e51fa95c57148b406c2eca27760a9db99f4b797af50cb3c1",
-    "NAMESPACE": "6fa5fa04d7e6fe61b595d3636e39297671ddf8f455f4f97de9b661972dcc692c",
-    "R/browser.R": "c7bf0c51d4bc294b22ac78acc93a0869f250bf5f85127db9f8ef4b9a1fa898aa",
-    "R/contracts.R": "6ec0cf667a54fb6cf337029ec2adb134e9e7209bef11044f2f94fe3eac67d85c",
-    "R/generate.R": "48d094a7ba49b4e453ec61c5cd5458f77151b56b279d83e2f5254dc2c37bb0ba",
+    "NAMESPACE": "b8feb8194d938289bec873d0257a1242a53157359ff9622e88bf240065660c17",
+    "R/browser.R": "ff050360bf125989430aeccc30d1ed202e3fef8a195c3ceb77059b5ee885c8e3",
+    "R/contracts.R": "88fa07cb9cf19336cb68d8840d8e1c7a45ce3c41bd8acc302d763ed44b2f2bcc",
+    "R/generate.R": "17fb02e74459e09395e883359e57618185bbac31fda094178124c271c1bef3a3",
+    "R/map-groups.R": "fc86dcd039362e03c418cfbb309b6d00b9da996cb2228f366b57f3e7b2c4a4bd",
+    "R/map-other.R": "b0337ca726bea1a48b87ca4b30e8d478df9c5c9e44fb2b258a09cba9a7f51c94",
+    "R/names.R": "4ab4d8ffe8c64204f720a2a3526e22d1caee3228177a83b778d0df1a955311aa",
     "R/optimize.R": "c07efeb7dd675cf9b70aa81dd6578f68b7685f7a0b44aa8a21dc7b92f033b38b",
-    "R/parser.R": "460cef943e84d39b163e0b000335e89e282d6b959aaf5032a8da8b21d813d405",
-    "R/rmd.R": "053a62e20d44420ba0878bc1cebd715bef81a42f72efa0228ae87e3d412fcd33",
+    "R/parser.R": "0abf6f4410a5f083aa1305293f3eb88c443c98dd31000bcb56f8c10bbc38993f",
+    "R/render-browser.R": "1832e2e8e94f068ddcb6c5e1ff173dcff4ad6ef924b86cd980d225eb65ec88b9",
+    "R/rmd.R": "59500506fe66120dc87031ebdae1529d17e2d884dd3dc0970c091573d3cc4f35",
+    "R/setup.R": "aba6d29867869ec0a16cade2ea7958af3e0a1cc4383fbfba09009e648256c04a",
+    "inst/adversarial/benign.Rmd": "c5795d8d4806d72d5cb02e74b2d53ef67c4c7e4c4d71ba41b7ca0b92b764c5e6",
+    "inst/adversarial/child.Rmd": "5e45096e773254aa41f60387305154c0dce8d193ee489c13d7dd56fea7bc8d35",
+    "inst/adversarial/cookies.Rmd": "4b4d385c69ca4374b2ef9071b71f4377b43275d1781c3f30f0a9787f6c627e58",
+    "inst/adversarial/dom-eval-js.Rmd": "daf28286de9f6bdfdc9e0ce9485324f9035067bb7b05262a7170ba40aa3b2cfe",
+    "inst/adversarial/huge-output.Rmd": "c3b41ab3ed9c2f8607bec40d0c3d020203d42216a57b6868032def689cd30dba",
+    "inst/adversarial/infinite-loop.Rmd": "fc0bce17c0e799949129df2709f4a94fbed1ec2e82e8ae28a64905f8ca6dd3f4",
+    "inst/adversarial/js-chunk.Rmd": "094c77f6376217a5605a046e06135d4b14deb2c0a19a3c4b9defbe015941103d",
+    "inst/adversarial/navigation.Rmd": "b62820329f6aa09d178b36ebcb45d05d7be9ee6716989525d2f2efc63203771d",
+    "inst/adversarial/network.Rmd": "eed8948325499c13742d13d394146d2cb9e1d7216226c0615fe20fbd5ead7237",
+    "inst/adversarial/other-engines.Rmd": "c4614537875f687184343a260d3564d25ef24fadff6c0e89feade709372a05b5",
     "inst/examples/comparison.R": "1cb97768bc65c3b283be8178b184c149f18ba6bc3344b81ed54f8b1f2d315de6",
+    "inst/examples/replication-report.Rmd": "28b4d0c5aaf367e85fd82b0f89bf1e578a1c1aefaff264a565742b58094c1366",
+    "inst/examples/replication-study.R": "e5c4db1588573a1b3d7994140de4a4377e2c80782806896d832bf03c6c891d43",
+    "inst/examples/replication-study.csv": "83cec4de08b93d075f6dc1d8a6ee56226c4a952119b93962d730a60966c9c376",
+    "inst/report/preview.css": "d850942a04881b8cdae97b3f860625f67cf9dd23a4939bc9ed77126068763883",
     "inst/report/report.css": "4cc7e9880cbd507b08043a99c464f6dc6391108398f3b484b93fc5fd11649f04",
     "man/browser_request.Rd": "50086a790f909a1cd94123dc805463776e06bb3d3a8e92ee77e1ce909eb2efc3",
-    "man/convert_code.Rd": "66169e80e8087ab10ffc80cd483776296373b191c18ac8eb13d842104aaba55f",
-    "man/convert_rmd.Rd": "ed2f8b4bfad01d5bc9839a5e0606e2dc674231e61f129dee91e585a94db6bc2c",
+    "man/convert_code.Rd": "a3b901382b440d4876e5bbe127bc38fd496c0f9c67354b4bba7e3c5e265ec3a8",
+    "man/convert_rmd.Rd": "4433dad0df7c4a286b3f2787ec127db86c7b867fd07de2d6b271e57f4df14e1c",
     "man/optimize_png.Rd": "79f5e8c4ad71d56910722a1a1a3883a577a7a11bcdf546b1e598d40bee0d771c",
+    "man/render_browser_preview.Rd": "296de0319d7a327bb7b45c4eefe9056d480531715693d3bc689a2d649b6db349",
     "man/render_report.Rd": "d600bec07de1abb9109df77c936fdeb16510ef7da66918d17b40fbb3fea6f2c4",
-    "man/runtime_capabilities.Rd": "97c598ab7369af234a470591aa13008d12611422e275f320c5fd0a3dc7581a1e"
+    "man/runtime_capabilities.Rd": "97c598ab7369af234a470591aa13008d12611422e275f320c5fd0a3dc7581a1e",
+    "man/scan_rmd_risks.Rd": "75fb55023996f89cb25329dbf3b2eb46ba91092ba8192cb806572a855d61aa91"
   },
-  "artifact": "bin/emscripten/contrib/4.6/jmv2gg_0.1.0.tgz",
-  "sha256": "b47576389abe487ec1ff8c5b2db3f547519a94ba60958b936b4185a1a7fa8c8b"
+  "artifact": "bin/emscripten/contrib/4.6/jmv2gg_0.2.0.tgz",
+  "sha256": "3db7c949ec60ee6ac98c36c5b07ad8961ab22ce36dc2aefdd18b69214ec77e80",
+  "dependencies": {
+    "BetterGG": {
+      "version": "0.2.0",
+      "artifact": "bin/emscripten/contrib/4.6/BetterGG_0.2.0.tgz",
+      "sha256": "03124e4792464bd50a49e52e9f4416072fc2d84bd16c653dac0149f6fb227380",
+      "commit": "d9db9cf62178a22eb0d2bd031fb6ffa1a53618f3"
+    }
+  },
+  "placeholders": {
+    "websocket": {
+      "version": "1.2.0.9000",
+      "artifact": "bin/emscripten/contrib/4.6/websocket_1.2.0.9000.tgz",
+      "sha256": "327ab51fb438100ff7ee7dfa0d908f471b0b3148930ba3c1de72843f584231a8"
+    }
+  }
 }

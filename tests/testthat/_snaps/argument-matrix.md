@@ -26,11 +26,7 @@
           }
           anova_1_input[[column]] <- as.numeric(values)
         }
-        # Case weights set in jamovi; without them every row counts once.
-        anova_1_weights <- attr(anova_1_input, "jmv-weights", exact = TRUE)
-        if (is.null(anova_1_weights)) anova_1_weights <- rep(1, nrow(anova_1_input))
-        if (!is.numeric(anova_1_weights)) anova_1_weights <- attr(anova_1_weights, "values", exact = TRUE)[as.integer(anova_1_weights)]
-        if (length(anova_1_weights) != nrow(anova_1_input) || anyNA(anova_1_weights) || any(anova_1_weights < 0)) stop("Invalid case weights.")
+        # Case weights are not applied: jamovi's ANOVA and ANCOVA do not use them.
         anova_1_factors <- "g"
         anova_1_covariates <- character(0)
         # Factors (SPSS value labels name the levels) with sum-to-zero contrasts, as in jamovi.
@@ -43,8 +39,8 @@
         for (column in anova_1_factors) {
           stats::contrasts(anova_1_model_data[[column]]) <- stats::contr.sum(nlevels(anova_1_model_data[[column]]))
         }
-        # Model: the jamovi-equivalent linear model y ~ g (with the case weights).
-        anova_1_model <- stats::lm(y ~ g, data = anova_1_model_data, weights = anova_1_weights, na.action = stats::na.omit)
+        # Model: the jamovi-equivalent linear model y ~ g.
+        anova_1_model <- stats::lm(y ~ g, data = anova_1_model_data, na.action = stats::na.omit)
         # Estimated marginal means and 95% confidence intervals (equal cell weights).
         anova_1_means <- as.data.frame(stats::confint(emmeans::emmeans(anova_1_model, specs = anova_1_factors, weights = "equal"), level = 0.95))
       })
@@ -104,9 +100,8 @@
       })
       
       # BetterGG figure: y: observations, their distribution and model-based means with 95% CIs.
-      # Note: BetterGG's ggbetweenrain() shows the observed group means and does
-      #       not apply case weights; the ggplot2 figure shows the jamovi model's
-      #       means.
+      # Note: BetterGG's ggbetweenrain() shows the observed group means; the
+      #       ggplot2 figure shows the jamovi model's means.
       if (anova_1_ready) figure_try("anova_1-bettergg", {
         anova_1_bettergg <- BetterGG::ggbetweenrain(
           data = anova_1_input, x = g, y = y, type = "parametric",
@@ -144,11 +139,7 @@
           }
           anova_1_input[[column]] <- as.numeric(values)
         }
-        # Case weights set in jamovi; without them every row counts once.
-        anova_1_weights <- attr(anova_1_input, "jmv-weights", exact = TRUE)
-        if (is.null(anova_1_weights)) anova_1_weights <- rep(1, nrow(anova_1_input))
-        if (!is.numeric(anova_1_weights)) anova_1_weights <- attr(anova_1_weights, "values", exact = TRUE)[as.integer(anova_1_weights)]
-        if (length(anova_1_weights) != nrow(anova_1_input) || anyNA(anova_1_weights) || any(anova_1_weights < 0)) stop("Invalid case weights.")
+        # Case weights are not applied: jamovi's ANOVA and ANCOVA do not use them.
         anova_1_factors <- c("g", "h")
         anova_1_covariates <- character(0)
         # Factors (SPSS value labels name the levels) with sum-to-zero contrasts, as in jamovi.
@@ -161,8 +152,8 @@
         for (column in anova_1_factors) {
           stats::contrasts(anova_1_model_data[[column]]) <- stats::contr.sum(nlevels(anova_1_model_data[[column]]))
         }
-        # Model: the jamovi-equivalent linear model y ~ g * h (with the case weights).
-        anova_1_model <- stats::lm(y ~ g * h, data = anova_1_model_data, weights = anova_1_weights, na.action = stats::na.omit)
+        # Model: the jamovi-equivalent linear model y ~ g * h.
+        anova_1_model <- stats::lm(y ~ g * h, data = anova_1_model_data, na.action = stats::na.omit)
         # Estimated marginal means and 95% confidence intervals (equal cell weights).
         anova_1_means <- as.data.frame(stats::confint(emmeans::emmeans(anova_1_model, specs = anova_1_factors, weights = "equal"), level = 0.95))
       })
@@ -224,8 +215,8 @@
       })
       
       # BetterGG figure: y: observations, their distribution and model-based means with 95% CIs.
-      # Note: BetterGG's ggfactorialrain() fits the full factorial model without
-      #       case weights; the ggplot2 figure uses the jamovi-equivalent model.
+      # Note: BetterGG's ggfactorialrain() fits the full factorial model; the
+      #       ggplot2 figure uses the jamovi-equivalent model.
       if (anova_1_ready) figure_try("anova_1-bettergg", {
         anova_1_bettergg <- BetterGG::ggfactorialrain(
           data = anova_1_input, x = "g", y = "y", colour = "h",
@@ -263,11 +254,7 @@
           }
           anova_1_input[[column]] <- as.numeric(values)
         }
-        # Case weights set in jamovi; without them every row counts once.
-        anova_1_weights <- attr(anova_1_input, "jmv-weights", exact = TRUE)
-        if (is.null(anova_1_weights)) anova_1_weights <- rep(1, nrow(anova_1_input))
-        if (!is.numeric(anova_1_weights)) anova_1_weights <- attr(anova_1_weights, "values", exact = TRUE)[as.integer(anova_1_weights)]
-        if (length(anova_1_weights) != nrow(anova_1_input) || anyNA(anova_1_weights) || any(anova_1_weights < 0)) stop("Invalid case weights.")
+        # Case weights are not applied: jamovi's ANOVA and ANCOVA do not use them.
         # jamovi's ANCOVA formula rule: numeric columns are covariates, the others factors.
         anova_1_predictors <- c("g", "h", "age")
         anova_1_is_numeric <- vapply(anova_1_input[anova_1_predictors], is.numeric, logical(1))
@@ -285,8 +272,8 @@
         for (column in anova_1_factors) {
           stats::contrasts(anova_1_model_data[[column]]) <- stats::contr.sum(nlevels(anova_1_model_data[[column]]))
         }
-        # Model: the jamovi-equivalent linear model y ~ g + h + age (with the case weights).
-        anova_1_model <- stats::lm(y ~ g + h + age, data = anova_1_model_data, weights = anova_1_weights, na.action = stats::na.omit)
+        # Model: the jamovi-equivalent linear model y ~ g + h + age.
+        anova_1_model <- stats::lm(y ~ g + h + age, data = anova_1_model_data, na.action = stats::na.omit)
         # Estimated marginal means and 95% confidence intervals (equal cell weights; covariates at their mean).
         anova_1_means <- as.data.frame(stats::confint(emmeans::emmeans(anova_1_model, specs = anova_1_factors, weights = "equal"), level = 0.95))
       })
@@ -441,15 +428,15 @@
             ggplot2::labs(x = anova_1_factors[1], y = "y", title = NULL, colour = anova_1_factors[2], fill = anova_1_factors[2], subtitle = NULL) +
             theme_figure() +
             ggplot2::theme(legend.position = "bottom", panel.grid.major.x = ggplot2::element_blank()) +
-            ggplot2::facet_wrap(ggplot2::vars(.data[[anova_1_factors[3]]]))
+            ggplot2::facet_wrap(ggplot2::vars(.data[[anova_1_factors[3]]]), labeller = ggplot2::label_wrap_gen(width = 30))
         }
         figure_show(anova_1_plot)
         figure_save(anova_1_plot, "figures/anova_1-ggplot2")
       })
       
       # BetterGG figure: y: observations, their distribution and model-based means with 95% CIs.
-      # Note: BetterGG fits its own unweighted model for this figure; the ggplot2
-      #       figure uses the jamovi-equivalent model.
+      # Note: BetterGG fits its own model for this figure; the ggplot2 figure uses
+      #       the jamovi-equivalent model.
       if (anova_1_ready) figure_try("anova_1-bettergg", {
         anova_1_bettergg <- BetterGG::ggfactorialrain(
           data = anova_1_input, x = anova_1_factors[1], y = "y",
@@ -862,7 +849,7 @@
               linewidth = 1, linetype = "dashed") +
             ggplot2::geom_label(data = descriptives_1_1_centres, ggplot2::aes(x = value, y = Inf, label = label),
               inherit.aes = FALSE, parse = TRUE, vjust = 1.2, size = 3, family = figure_font) +
-            ggplot2::facet_wrap(ggplot2::vars(.data[["h"]])) +
+            ggplot2::facet_wrap(ggplot2::vars(.data[["h"]]), labeller = ggplot2::label_wrap_gen(width = 30)) +
             ggplot2::labs(x = "y", y = "count", title = NULL, subtitle = NULL, caption = NULL) +
             theme_figure()
         } else {
@@ -962,7 +949,7 @@
               linewidth = 1, linetype = "dashed") +
             ggplot2::geom_label(data = descriptives_1_2_centres, ggplot2::aes(x = value, y = Inf, label = label),
               inherit.aes = FALSE, parse = TRUE, vjust = 1.2, size = 3, family = figure_font) +
-            ggplot2::facet_wrap(ggplot2::vars(.data[["h"]])) +
+            ggplot2::facet_wrap(ggplot2::vars(.data[["h"]]), labeller = ggplot2::label_wrap_gen(width = 30)) +
             ggplot2::labs(x = "c2", y = "count", title = NULL, subtitle = NULL, caption = NULL) +
             theme_figure()
         } else {
@@ -1093,7 +1080,7 @@
           ggplot2::theme(panel.grid.major.x = ggplot2::element_blank()) +
           ggplot2::guides(fill = ggplot2::guide_legend(title = "c1")) +
           ggplot2::scale_fill_manual(values = table_1_fills, name = "", drop = FALSE) +
-          ggplot2::facet_wrap(ggplot2::vars(h)) +
+          ggplot2::facet_wrap(ggplot2::vars(h), labeller = ggplot2::label_wrap_gen(width = 30)) +
           # group sizes under the bars
           ggplot2::geom_text(data = table_1_sizes, ggplot2::aes(x = c2, y = -0.05, label = N, fill = NULL),
             size = 4, family = figure_font) +
@@ -1269,6 +1256,13 @@
         logistic_1_table <- logistic_1_table[!grepl("(Intercept)", logistic_1_table$term, fixed = TRUE), , drop = FALSE]
         # Odds ratios: exponentiated estimates and interval limits.
         logistic_1_table[c("estimate", "conf.low", "conf.high")] <- exp(logistic_1_table[c("estimate", "conf.low", "conf.high")])
+        # Readable names for factor coefficients, e.g. "framing: loss vs gain".
+        for (factor_name in names(logistic_1_model$xlevels)) {
+          levels <- logistic_1_model$xlevels[[factor_name]]
+          coded <- logistic_1_table$term %in% paste0(factor_name, levels[-1])
+          logistic_1_table$term[coded] <- paste0(factor_name, ": ", substring(logistic_1_table$term[coded], nchar(factor_name) + 1L),
+            " vs ", levels[1])
+        }
         # Terms listed top to bottom in model order.
         logistic_1_table$term <- factor(logistic_1_table$term, levels = rev(unique(logistic_1_table$term)))
       
@@ -1416,7 +1410,9 @@
       #         subject.id = id)
       # Figure: each subject's values of score in each condition of cond, their
       #         distribution and the condition centres.
-      # Differs from jamovi: nothing known.
+      # Differs from jamovi: with three or more groups the source plot showed the
+      #                      significant pairwise comparisons; the ggplot2 figure
+      #                      draws none because statistics on figures are off.
       withinstats_1_ready <- figure_try("withinstats_1", {
         # Analysis data: a copy of long as it is at this point.
         withinstats_1_input <- long

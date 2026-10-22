@@ -35,8 +35,9 @@ jobs:
         run: |
           install.packages(c("remotes", "rcmdcheck", "testthat", "withr", "jsonlite", "yaml",
             "ggplot2", "emmeans", "car", "afex", "ragg", "png", "callr", "knitr",
-            "rmarkdown", "haven", "ggstatsplot"))
-          remotes::install_github("giladfeldman/BetterGG@48dc7e47e19e70cea2ee9b9ed6ea35902693629b", upgrade="never")
+            "rmarkdown", "haven", "ggstatsplot", "ggdist", "ggrepel", "ggside", "ggsignif", "patchwork",
+            "statsExpressions", "styler", "jmv", "psych", "markdown"))
+          remotes::install_github("giladfeldman/BetterGG@d9db9cf62178a22eb0d2bd031fb6ffa1a53618f3", upgrade="never")
       - run: Rscript tools/check.R
       - name: Check package
         shell: Rscript {0}

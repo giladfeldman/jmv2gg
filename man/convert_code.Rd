@@ -16,9 +16,14 @@ convert_code(
 
 \item{engine}{Plot output: both engines, ggplot2, or bettergg.}
 
-\item{style}{Named presentation options.}
+\item{style}{Named presentation options: \code{stats} (statistics on the
+figures, default \code{FALSE}), \code{palette} (\code{"nejm"}, \code{"okabe_ito"}, \code{"grey"},
+\code{"viridis"}), \code{grayscale}, \code{verbose} (full plain-language comments),
+\code{headings} (R Markdown only), \code{styler}.}
 
-\item{figures}{Named publication export options.}
+\item{figures}{Named publication export options: \code{size} (\code{"double"} 7.2 in,
+\code{"single"} 3.5 in, or \code{"custom"} with \code{width}/\code{height}), \code{dpi}, \code{formats}
+(any of \code{"png"}, \code{"pdf"}, \code{"tiff"}), \code{background}, \code{optimize_png}.}
 }
 \value{
 An object of class \code{jmv2gg_result} containing text, analysis records,
@@ -26,5 +31,7 @@ diagnostics, and an export manifest.
 }
 \description{
 Conversion parses input and never executes it. Unsupported analyses remain
-in the input and are recorded in the returned diagnostics.
+in the input and are recorded in the returned diagnostics. The output
+starts with one figure setup block (style, export settings, helpers), and
+each converted analysis is followed by a commented figure block.
 }

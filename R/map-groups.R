@@ -1,5 +1,22 @@
 # Group comparisons: ANOVA family, t-tests, repeated measures.
 
+# ggstatsplot draws pairwise comparisons (three or more groups) unless told not to;
+# the ggplot2 recipe draws the significant ones, and only with statistics on.
+pairwise_differs <- function(ctx) {
+  a <- ctx$a
+  if (isFALSE(arg_value(a, "pairwise.comparisons", TRUE))) return(invisible())
+  display <- arg_value(a, "pairwise.display", "significant")
+  if (identical(display, "none")) return(invisible())
+  shown <- if (substr(display, 1, 1) == "a") "all" else if (substr(display, 1, 1) == "n") "the non-significant" else "the significant"
+  ctx$differs <- c(ctx$differs, if (!ctx$stats) {
+    paste0("with three or more groups the source plot showed ", shown,
+      " pairwise comparisons; the ggplot2 figure draws none because statistics on figures are off.")
+  } else if (shown != "the significant") {
+    paste0("with three or more groups the source plot showed ", shown,
+      " pairwise comparisons; the ggplot2 figure draws only the significant ones.")
+  })
+}
+
 bettergg_stats_args <- function(ctx) {
   if (ctx$stats) "results.subtitle = TRUE, pairwise.display = \"significant\", bf.message = FALSE"
   else "results.subtitle = FALSE, pairwise.display = \"none\", bf.message = FALSE"
@@ -41,7 +58,8 @@ map_between <- function(ctx) {
   prep_input(ctx)
   prep_columns(ctx, c(dv, factors, covs))
   prep_numeric(ctx, c(dv, covs))
-  w <- prep_weights(ctx)
+  # jmv's ANOVA and ANCOVA do not apply case weights (tested against jmv), so neither does this model.
+  add_prep(ctx, "# Case weights are not applied: jamovi's ANOVA and ANCOVA do not use them.")
   fv <- paste0(name, "_factors")
   cv <- paste0(name, "_covariates")
   if (runtime_split) {
@@ -70,8 +88,8 @@ map_between <- function(ctx) {
   formula <- paste(r_sym(dv), "~", rhs)
   emm_weights <- if (isTRUE(arg_value(a, "emmWeights", TRUE))) "equal" else "proportional"
   add_prep(ctx,
-    paste0("# Model: the jamovi-equivalent linear model ", formula, " (with the case weights)."),
-    paste0(name, "_model <- stats::lm(", formula, ", data = ", name, "_model_data, weights = ", w, ", na.action = stats::na.omit)"),
+    paste0("# Model: the jamovi-equivalent linear model ", formula, "."),
+    paste0(name, "_model <- stats::lm(", formula, ", data = ", name, "_model_data, na.action = stats::na.omit)"),
     paste0("# Estimated marginal means and ", 100 * ctx$level, "% confidence intervals (", emm_weights,
       " cell weights", if (length(covs) || runtime_split) "; covariates at their mean" else "", ")."),
     paste0(name, "_means <- as.data.frame(stats::confint(emmeans::emmeans(", name, "_model, specs = ", fv,
@@ -98,8 +116,7 @@ map_between <- function(ctx) {
     if (one_way) {
       code <- recipe("recipe_betweenrain", data = input, x = factors, y = dv, name = name, means = paste0(name, "_means"),
         stats = stats_ok, var.equal = TRUE, conf.level = ctx$level)
-      add_figure(ctx, "ggplot2", code, paste0(name, "_plot"), caption, packages = pkgs,
-        note = if (stats_ok) "the subtitle is a Fisher (equal-variance) one-way ANOVA on the unweighted data; it equals jamovi's F when there are no case weights.")
+      add_figure(ctx, "ggplot2", code, paste0(name, "_plot"), caption, packages = pkgs)
     } else if (!runtime_split) {
       code <- recipe("recipe_factorialrain", data = input, x = factors[1], y = dv,
         colour = if (length(factors) > 1L) factors[2], facet = if (length(factors) > 2L) factors[3],
@@ -119,18 +136,18 @@ map_between <- function(ctx) {
     }
   }
   if (wants(ctx, "bettergg")) {
-    msg <- "BetterGG fits its own unweighted model for this figure; the ggplot2 figure uses the jamovi-equivalent model."
+    msg <- "BetterGG fits its own model for this figure; the ggplot2 figure uses the jamovi-equivalent model."
     if (one_way) {
       msg <- paste("BetterGG's ggbetweenrain() shows the observed group means",
         if (ctx$stats) "and Welch's ANOVA (ggstatsplot does not offer the equal-variance test)" else "",
-        "and does not apply case weights; the ggplot2 figure shows the jamovi model's means.")
+        "; the ggplot2 figure shows the jamovi model's means.")
       code <- c(paste0(name, "_bettergg <- BetterGG::ggbetweenrain("),
         paste0("  data = ", input, ", x = ", r_sym(factors), ", y = ", r_sym(dv), ", type = \"parametric\","),
         paste0("  conf.level = ", ctx$level, ", ", bettergg_stats_args(ctx)),
         ")")
     } else if (!runtime_split) {
       msg <- paste("BetterGG's ggfactorialrain() fits the full factorial model", if (length(covs)) "with the covariates" else "",
-        "without case weights", if (!is.null(arg_value(a, "modelTerms"))) "and without the source's custom model terms" else "",
+        if (!is.null(arg_value(a, "modelTerms"))) "without the source's custom model terms" else "",
         "; the ggplot2 figure uses the jamovi-equivalent model.")
       code <- c(paste0(name, "_bettergg <- BetterGG::ggfactorialrain("),
         paste0("  data = ", input, ", x = ", q(factors[1]), ", y = ", q(dv),
@@ -169,6 +186,7 @@ map_ggbetweenstats <- function(ctx) {
   if (isTRUE(arg_value(a, "var.equal", FALSE))) {
     ctx$differs <- c(ctx$differs, "ggstatsplot ignores var.equal; the figure keeps the Welch test the source plot showed.")
   }
+  pairwise_differs(ctx)
   if (wants(ctx, "ggplot2")) {
     code <- recipe("recipe_betweenrain", data = ctx$input, x = x, y = y, name = ctx$name, type = type,
       stats = ctx$stats, conf.level = ctx$level, p.adjust.method = arg_value(a, "p.adjust.method", "holm"),
@@ -203,7 +221,14 @@ map_oneway_family <- function(ctx) {
   prep_numeric(ctx, deps)
   prep_factor(ctx, group)
   np <- ctx$fn == "anovaNP"
-  welch <- isTRUE(arg_value(a, "welchs", TRUE)) || !isTRUE(arg_value(a, "fishers", FALSE))
+  welch <- isTRUE(arg_value(a, "welchs", TRUE))
+  if (!np && !welch && !isTRUE(arg_value(a, "fishers", FALSE)) && ctx$stats) {
+    add_note(ctx, "No statistics are drawn: the source requests neither Welch's nor Fisher's test.", code = "statistics_not_shown")
+    ctx$stats <- FALSE
+  }
+  if (!np && welch && isTRUE(arg_value(a, "fishers", FALSE)) && ctx$stats) {
+    ctx$differs <- c(ctx$differs, "the subtitle shows Welch's test; jamovi's table also lists Fisher's.")
+  }
   type <- if (np) "nonparametric" else "parametric"
   ctx$describe <- paste0("every observation and its distribution in each group of ", group,
     ", with the group ", if (np) "medians" else "means", ".")
@@ -457,13 +482,22 @@ map_ttest_paired <- function(ctx) {
 
 map_ggwithinstats <- function(ctx) {
   a <- ctx$a
-  subject <- arg_variable(a, "subject.id")
+  subject <- arg_variable(a, "subject.id", character())
   x <- arg_variable(a, "x")
   y <- arg_variable(a, "y")
-  if (length(subject) != 1L || length(x) != 1L || length(y) != 1L)
-    stop("Long-form paired data requires explicit subject.id, x and y names.")
+  if (length(subject) > 1L || length(x) != 1L || length(y) != 1L)
+    stop("Long-form paired data requires explicit x and y names (and at most one subject.id).")
   prep_input(ctx)
   prep_columns(ctx, c(subject, x, y))
+  if (!length(subject)) {
+    # ggstatsplot without subject.id pairs the rows by their order within each condition.
+    subject <- paste0(ctx$name, "_row")
+    add_prep(ctx, "# No subject.id: subjects are matched by row order within each condition, as ggstatsplot does.",
+      paste0(ctx$input, "[[", q(subject), "]] <- stats::ave(seq_len(nrow(", ctx$input, ")), ", ctx$input,
+        "[[", q(x), "]], FUN = seq_along)"))
+    ctx$differs <- c(ctx$differs, "subjects are matched by row order within each condition (the source gives no subject.id).")
+  }
+  pairwise_differs(ctx)
   type <- arg_value(a, "type", "parametric")
   ctx$describe <- paste0("each subject's values of ", y, " in each condition of ", x, ", their distribution and the condition centres.")
   if (wants(ctx, "ggplot2")) {

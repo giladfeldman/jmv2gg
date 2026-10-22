@@ -25,9 +25,7 @@ map_histogram <- function(ctx) {
   wilcoxon <- isTRUE(arg_value(a, "wilcoxon", FALSE))
   type <- if (!students && wilcoxon) "nonparametric" else "parametric"
   hypothesis <- arg_value(a, "hypothesis", "dt")
-  if (!identical(hypothesis, "dt") && ctx$stats) {
-    add_note(ctx, "The figure's one-sample test is two-sided; the source tests a one-sided hypothesis.", code = "statistics_not_shown")
-  }
+  alternative <- switch(hypothesis, gt = "greater", lt = "less", "two.sided")
   prep_input(ctx)
   prep_columns(ctx, vars)
   prep_refuse_weights(ctx, "one-sample t-test")
@@ -43,13 +41,14 @@ map_histogram <- function(ctx) {
     caption <- paste0("Distribution of ", v, " (test value ", test_value, ").")
     if (wants(ctx, "ggplot2")) {
       code <- recipe("recipe_histostats", data = ctx$input, x = v, name = fig, type = type,
-        stats = ctx$stats && identical(hypothesis, "dt"), test.value = test_value, conf.level = ctx$level)
+        stats = ctx$stats, test.value = test_value, alternative = alternative, conf.level = ctx$level)
       add_figure(ctx, "ggplot2", code, paste0(fig, "_plot"), caption, suffix = suffix,
         packages = if (ctx$stats) "statsExpressions")
     }
     if (wants(ctx, "bettergg")) {
       code <- c(paste0(fig, "_bettergg <- BetterGG::gghistostats("),
-        paste0("  data = ", ctx$input, ", x = ", r_sym(v), ", test.value = ", test_value, ", type = ", q(type), ","),
+        paste0("  data = ", ctx$input, ", x = ", r_sym(v), ", test.value = ", test_value, ", type = ", q(type),
+          ", alternative = ", q(alternative), ","),
         paste0("  conf.level = ", ctx$level, ", results.subtitle = ", if (ctx$stats) "TRUE" else "FALSE", ", bf.message = FALSE"), ")")
       add_figure(ctx, "bettergg", code, paste0(fig, "_bettergg"), caption, suffix = suffix, packages = "BetterGG")
     }
@@ -60,8 +59,18 @@ map_histogram <- function(ctx) {
 map_descriptives <- function(ctx) {
   a <- ctx$a
   vars <- arg_variable(a, "vars")
-  if (!length(vars)) stop("No descriptive variables supplied.")
   split <- arg_variable(a, "splitBy", character())
+  formula_expr <- a$args$formula
+  if (!is.null(formula_expr)) {
+    # jamovi syntax: formula = a + b ~ g:h (variables ~ split), or ~ a + b
+    validate_formula_syntax(formula_expr)
+    if (!is.call(formula_expr) || !identical(formula_expr[[1]], as.name("~"))) stop("Use a ~ formula.")
+    if (length(formula_expr) == 3L) {
+      vars <- all.vars(formula_expr[[2]])
+      split <- all.vars(formula_expr[[3]])
+    } else vars <- all.vars(formula_expr[[2]])
+  }
+  if (!length(vars)) stop("No descriptive variables supplied.")
   prep_input(ctx)
   prep_columns(ctx, c(vars, split))
   w <- prep_weights(ctx)
@@ -78,6 +87,13 @@ map_descriptives <- function(ctx) {
   }
   ctx$describe <- paste0("for each variable, a histogram (numeric) or pie chart (categories) of the ",
     "case-weighted counts", if (length(split)) paste0(", split by ", paste(split, collapse = " and ")) else "", ".")
+  # jamovi's other plot types are drawn as the histogram/pie of the closest BetterGG plot (decision 6).
+  other <- c(dens = "density", box = "box", violin = "violin", dot = "dot", qq = "Q-Q")
+  requested <- other[vapply(names(other), function(o) isTRUE(arg_value(a, o, FALSE)), logical(1))]
+  if (length(requested)) {
+    ctx$differs <- c(ctx$differs, paste0("the source asked jamovi for ", paste(requested, collapse = ", "),
+      " plots; jmv2gg draws the histogram (or pie/bar chart) of BetterGG's gghistostats style instead."))
+  }
   for (i in seq_along(vars)) {
     v <- vars[i]
     fig <- if (length(vars) > 1L) paste0(ctx$name, "_", i) else ctx$name
@@ -129,6 +145,21 @@ map_categorical <- function(ctx) {
   cols <- arg_variable(a, "cols", character())
   counts <- arg_variable(a, "counts", character())
   layers <- arg_variable(a, "layers", character())
+  formula_expr <- a$args$formula
+  if (!is.null(formula_expr)) {
+    # jamovi syntax: contTables(formula = [counts] ~ rows:cols[:layers]),
+    # propTestN(formula = ~ var), propTest2(formula = ~ a + b)
+    validate_formula_syntax(formula_expr)
+    if (!is.call(formula_expr) || !identical(formula_expr[[1]], as.name("~"))) stop("Use a ~ formula.")
+    rhs <- all.vars(formula_expr[[length(formula_expr)]])
+    if (length(formula_expr) == 3L) counts <- all.vars(formula_expr[[2]])
+    if (fn %in% c("contTables", "contTablesPaired")) {
+      rows <- rhs[1]
+      cols <- rhs[2]
+      layers <- rhs[-(1:2)]
+      if (anyNA(c(rows, cols))) stop("Use one rows and one cols variable per contingency table.")
+    } else rows <- rhs
+  }
   if (!length(rows)) stop("Categorical plot needs row variables.")
   if (fn %in% c("contTables", "contTablesPaired") && (length(rows) != 1L || length(cols) != 1L))
     stop("Use one rows and one cols variable per contingency table.")
@@ -143,13 +174,20 @@ map_categorical <- function(ctx) {
   paired <- fn == "contTablesPaired"
   stats_ok <- ctx$stats && !length(layers)
   if (ctx$stats && length(layers)) add_note(ctx, "Statistics are not drawn on layered tables.", code = "statistics_not_shown")
+  ratio <- arg_value(a, "ratio")
+  if (stats_ok && fn == "propTestN" && length(ratio) && length(unique(ratio)) > 1L) {
+    add_note(ctx, "No statistics are drawn: the source tests unequal expected proportions; see jamovi's table.",
+      code = "statistics_not_shown")
+    stats_ok <- FALSE
+  }
   if (ctx$stats && stats_ok) {
     ctx$differs <- c(ctx$differs, switch(fn,
       contTables = "the subtitle is Pearson's chi-squared test with Cramer's V (as jamovi's default).",
       contTablesPaired = "the subtitle is McNemar's test.",
       propTest2 = "the subtitle is a chi-squared goodness-of-fit test; jamovi's propTest2 uses a binomial test.",
-      propTestN = "the subtitle tests equal proportions; check the source's expected proportions."))
-    add_prep(ctx, paste0("if (", weighted_test, ") stop(\"Statistics on the figure need unweighted data; draw it with stats = FALSE.\")"))
+      propTestN = "the subtitle tests equal proportions, as the source does."))
+    add_note(ctx, "With case weights the figure shows weighted percentages and no statistics; see jamovi's table.",
+      code = "statistics_not_shown", severity = "info")
   }
   two_way <- length(cols) == 1L
   for (i in seq_along(rows)) {
@@ -158,13 +196,19 @@ map_categorical <- function(ctx) {
     suffix <- if (length(rows) > 1L) r
     caption <- if (two_way) paste0(r, " within each level of ", cols, ".") else paste0("Proportions of ", r, ".")
     if (wants(ctx, "ggplot2")) {
-      code <- if (two_way) {
-        recipe("recipe_barstats", data = ctx$input, x = r, y = cols, name = fig, counts = if (length(counts)) counts,
-          stats = stats_ok, paired = paired, weights = if (!stats_ok) weight_column, facet = if (length(layers)) layers)
-      } else {
-        recipe("recipe_piestats", data = ctx$input, x = r, name = fig, counts = if (length(counts)) counts,
-          stats = stats_ok, weights = if (!stats_ok) weight_column, max_labels = 12)
+      draw <- function(stats) {
+        if (two_way) {
+          recipe("recipe_barstats", data = ctx$input, x = r, y = cols, name = fig, counts = if (length(counts)) counts,
+            stats = stats, paired = paired, weights = if (!stats) weight_column, facet = if (length(layers)) layers)
+        } else {
+          recipe("recipe_piestats", data = ctx$input, x = r, name = fig, counts = if (length(counts)) counts,
+            stats = stats, weights = if (!stats) weight_column, max_labels = 12)
+        }
       }
+      # Statistics need unweighted data; weighted data still get their (weighted) figure.
+      code <- if (stats_ok) {
+        c(paste0("if (", weighted_test, ") {"), indent(draw(FALSE)), "} else {", indent(draw(TRUE)), "}")
+      } else draw(FALSE)
       add_figure(ctx, "ggplot2", code, paste0(fig, "_plot"), caption, suffix = suffix,
         packages = if (stats_ok) "statsExpressions")
     }
@@ -240,6 +284,7 @@ map_correlation <- function(ctx) {
   methods <- names(methods)[methods]
   if (!length(methods)) stop("No correlation method is selected.")
   if (length(controls) && "kendall" %in% methods) stop("Partial Kendall correlations are not drawn.")
+  alternative <- switch(as.character(arg_value(a, "hypothesis", "corr")), pos = "greater", neg = "less", "two.sided")
   prep_input(ctx)
   prep_columns(ctx, c(vars, controls))
   prep_refuse_weights(ctx, "correlation")
@@ -260,8 +305,9 @@ map_correlation <- function(ctx) {
     fig <- if (length(methods) > 1L) paste0(ctx$name, "_", m) else ctx$name
     suffix <- if (length(methods) > 1L) m
     if (wants(ctx, "ggplot2")) {
+      # cor.test's defaults (exact rank tests in small samples), as jmv uses them
       code <- recipe("recipe_corrmat", data = ctx$input, vars = vars, name = fig, method = m,
-        controls = if (length(controls)) controls, p.adjust.method = "none")
+        controls = if (length(controls)) controls, p.adjust.method = "none", alternative = alternative, exact = NULL)
       add_figure(ctx, "ggplot2", code, paste0(fig, "_plot"), paste0(tools::toTitleCase(m), " correlations."), suffix = suffix)
     }
     if (wants(ctx, "bettergg")) {

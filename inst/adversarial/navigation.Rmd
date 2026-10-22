@@ -11,4 +11,5 @@ cat("<iframe src=\"https://exfiltration.invalid/\"></iframe>")
 cat("<form action=\"https://exfiltration.invalid/\"><input name=\"q\"></form>")
 cat("<base href=\"https://exfiltration.invalid/\">")
 cat("<svg><script>alert(1)</script></svg>")
+cat("<img src=\"https://exfiltration.invalid/pixel.png\"><img srcset='//exfiltration.invalid/a.png 2x'>")
 ```

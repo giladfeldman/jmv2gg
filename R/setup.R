@@ -15,9 +15,20 @@ engine_packages <- function(engine, extra = character()) {
   unique(c(base, extra))
 }
 
-package_version_text <- function(package) {
+package_version_text <- function(package, lock = locked_versions()) {
   version <- tryCatch(as.character(utils::packageVersion(package)), error = function(e) NA_character_)
-  if (is.na(version)) paste(package, "(not installed where this was converted)") else paste(package, version)
+  if (!is.na(version)) return(paste(package, version))
+  if (!is.na(lock[package])) return(paste(package, lock[package], "(pinned version of the jmv2gg web app)"))
+  paste(package, "(not installed where this was converted)")
+}
+
+# The web app converts in WebR, where only the converter's own packages are
+# installed; the versions it pins for previews and reports are in this lock.
+locked_versions <- function(path = "/workspace/packages.dcf") {
+  if (!file.exists(path)) return(character())
+  lock <- tryCatch(read.dcf(path, fields = c("Package", "Version")), error = function(e) NULL)
+  if (is.null(lock) || !nrow(lock)) return(character())
+  stats::setNames(lock[, "Version"], lock[, "Package"])
 }
 
 # One setup block for the whole document: package check, the figure style
@@ -39,7 +50,7 @@ figure_setup_code <- function(options, packages) {
     paste0("# ---- Figure setup (jmv2gg ", jmv2gg_version, ") ", strrep("-", 40)),
     "# Runs without jmv2gg or BetterGG installed. Packages the figures use, with",
     "# the versions they were generated with:",
-    paste0("#   ", vapply(packages, package_version_text, character(1))),
+    paste0("#   ", vapply(packages, package_version_text, character(1), lock = locked_versions())),
     paste0("figure_packages <- ", r_text(packages)),
     "for (figure_package in figure_packages) {",
     "  if (!requireNamespace(figure_package, quietly = TRUE)) {",

@@ -1,6 +1,8 @@
 # Structural readers deliberately do not evaluate user expressions.
 literal <- function(x) {
   if (is.null(x) || is.atomic(x)) return(x)
+  # T and F, as commonly written for TRUE and FALSE
+  if (is.symbol(x) && as.character(x) %in% c("T", "F")) return(identical(as.character(x), "T"))
   if (is.call(x) && is.symbol(x[[1]]) && as.character(x[[1]]) %in% c("c", "list")) {
     values <- lapply(as.list(x)[-1], literal)
     if (identical(x[[1]], as.name("c"))) return(unlist(values, recursive = FALSE))
@@ -79,6 +81,9 @@ inspect_code <- function(code, prefix = "a", offset = 0L) {
     }
     id <- paste0(prefix, sprintf("%04d", offset + length(analyses) + 1L))
     args <- as.list(target$call)[-1]
+    # jamovi's syntax mode writes a trailing comma (`..., )`): an empty argument.
+    empty <- vapply(args, function(x) identical(x, quote(expr = )), logical(1))
+    args <- args[!empty]
     nm <- names(args) %||% rep("", length(args))
     signature <- supported_signatures()[[identity$name]] %||% character()
     for (j in seq_along(args)) if (!nzchar(nm[j])) {
@@ -115,7 +120,8 @@ arg_variable <- function(a, name, default = NULL) {
   if (is.symbol(x)) return(as.character(x))
   if(is.call(x) && identical(x[[1]],as.name("vars"))) {
     values <- as.list(x)[-1]
-    if(!all(vapply(values,is.symbol,logical(1)))) stop("vars() must contain only column names.")
+    ok <- vapply(values, function(v) is.symbol(v) || (is.character(v) && length(v) == 1L), logical(1))
+    if(!all(ok)) stop("vars() must contain only column names.")
     return(vapply(values,as.character,character(1)))
   }
   val <- literal(x)

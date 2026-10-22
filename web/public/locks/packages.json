@@ -13,7 +13,7 @@
     },
     {
       "name": "websocket",
-      "reason": "imported by chromote (via webshot2 and gt); screenshots are not used"
+      "reason": "imported by chromote (via webshot2 and gt; jmv::contTables needs vcdExtra, which imports webshot2); no WebR build exists, so report previews install the app repository's placeholder (tools/webr/placeholders/websocket), which opens no connections"
     }
   ],
   "packages": [
