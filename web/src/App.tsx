@@ -322,7 +322,7 @@ export function App() {
             <StatusNotice status={result.status}/>
             {shownView === 'code' && <CodeView mode={snapshot.mode} text={result.text} onCopy={copyCode}/>}
             {shownView === 'notes' && <NotesView result={result}/>}
-            {shownView === 'figures' && <FiguresView busy={busy} analyses={result.analyses} analysis={analysis}
+            {shownView === 'figures' && <FiguresView busy={busy || scanning || render.phase === 'rendering'} analyses={result.analyses} analysis={analysis}
               dataKind={dataKind} bundledAvailable={Boolean(snapshotExample?.bundledData)} simulationN={simulationN}
               categorical={categorical} previews={previews}
               onAnalysis={id => { setAnalysis(id); setPreviews([]); }}
