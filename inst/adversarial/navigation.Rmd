@@ -1,0 +1,14 @@
+---
+title: "Navigation and script injection"
+---
+
+```{r, results="asis"}
+cat("<script>top.location = \"https://exfiltration.invalid/\";</script>")
+cat("<meta http-equiv=\"refresh\" content=\"0;url=https://exfiltration.invalid/\">")
+cat("<a href=\"javascript:alert(1)\" target=\"_top\">link</a>")
+cat("<img src=\"x\" onerror=\"parent.document.title = 1\">")
+cat("<iframe src=\"https://exfiltration.invalid/\"></iframe>")
+cat("<form action=\"https://exfiltration.invalid/\"><input name=\"q\"></form>")
+cat("<base href=\"https://exfiltration.invalid/\">")
+cat("<svg><script>alert(1)</script></svg>")
+```

@@ -6,7 +6,7 @@ test_that("YAML parameters and original analyses survive conversion", {
   expect_match(out$text,"sample.sav",fixed=TRUE)
   expect_match(out$text,"toc_depth: 3",fixed=TRUE)
   expect_match(out$text,'res <- jmv::ANOVA',fixed=TRUE)
-  expect_match(out$text,'.jmv2gg_input_a0001 <- d',fixed=TRUE)
+  expect_match(out$text,'anova_1_input <- d # data for the jmv2gg figures of anova_1',fixed=TRUE)
   expect_identical(convert_rmd(out$text)$text,out$text)
 })
 

@@ -30,7 +30,13 @@ supported_signatures <- function() list(
   ggbetweenstats = c("data", "x", "y"), ggwithinstats = c("data", "x", "y"),
   ggscatterstats = c("data", "x", "y"), gghistostats = c("data", "x"),
   ggbarstats = c("data", "x", "y"), ggpiestats = c("data", "x", "y"),
-  ggcorrmat = c("data"), ggcoefstats = c("x")
+  ggcorrmat = c("data"), ggcoefstats = c("x"),
+  anovaOneW = c("data", "deps", "group"), anovaNP = c("data", "deps", "group"),
+  linReg = c("data", "dep", "covs", "factors"), reliability = c("data", "vars"),
+  grouped_ggbetweenstats = c("data", "x", "y"), grouped_ggwithinstats = c("data", "x", "y"),
+  grouped_ggscatterstats = c("data", "x", "y"), grouped_gghistostats = c("data", "x"),
+  grouped_ggbarstats = c("data", "x", "y"), grouped_ggpiestats = c("data", "x", "y"),
+  grouped_ggcorrmat = c("data")
 )
 
 analysis_target <- function(expr) {
@@ -92,7 +98,7 @@ inspect_code <- function(code, prefix = "a", offset = 0L) {
     }
     analyses[[length(analyses) + 1L]] <- list(id = id, line = line, end_line = end_line,
       expression_index = i, function_name = identity$name,
-      package = identity$package %||% if (startsWith(identity$name, "gg")) "ggstatsplot" else "jmv",
+      package = identity$package %||% if (grepl("^(grouped_)?gg", identity$name)) "ggstatsplot" else "jmv",
       original = r_text(target$call), binding = target$binding, args = args,
       status = if (target$supported) "pending" else "unsupported")
   }
@@ -118,9 +124,9 @@ arg_variable <- function(a, name, default = NULL) {
 }
 
 model_terms <- function(terms, fallback) {
-  if (is.null(terms)) return(paste(r_name(fallback), collapse = " + "))
+  if (is.null(terms)) return(paste(r_sym(fallback), collapse = " + "))
   if (!is.list(terms)) stop("Model terms must be a literal list.")
   terms <- Filter(function(x) length(x) > 0, terms)
   if (!length(terms)) stop("The source model contains no model terms.")
-  paste(vapply(terms, function(x) paste(r_name(as.character(x)), collapse = ":"), character(1)), collapse = " + ")
+  paste(vapply(terms, function(x) paste(r_sym(as.character(x)), collapse = ":"), character(1)), collapse = " + ")
 }

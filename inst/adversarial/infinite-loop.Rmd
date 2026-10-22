@@ -1,0 +1,9 @@
+---
+title: "Endless loop"
+---
+
+```{r}
+repeat {
+  x <- 1
+}
+```

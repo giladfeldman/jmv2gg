@@ -1,6 +1,6 @@
 test_that("alternative-analysis notes remain visible when code is folded", {
   out <- convert_rmd('```{r a}\njmv::ANOVA(data=d,dep="y",factors="x")\n```')
-  expect_match(out$text,"> **Conversion note:** BetterGG",fixed=TRUE)
+  expect_match(out$text,"> **Figure note:** BetterGG",fixed=TRUE)
 })
 
 test_that("original output choices do not duplicate chunk options", {
@@ -14,5 +14,5 @@ test_that("original output choices do not duplicate chunk options", {
 
 test_that("pasted-code generation occurs before later data reassignment", {
   out <- convert_code('jmv::descriptives(data=d,vars="y")\nd <- other',engine="ggplot2")
-  expect_true(regexpr('ggplot2::ggsave',out$text,fixed=TRUE)[[1]] < regexpr('d <- other',out$text,fixed=TRUE)[[1]])
+  expect_true(regexpr('figure_save(descriptives_1_plot',out$text,fixed=TRUE)[[1]] < regexpr('d <- other',out$text,fixed=TRUE)[[1]])
 })

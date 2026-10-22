@@ -16,7 +16,7 @@ test_that("generated plots restore random state even on failure", {
   set.seed(958); before <- .Random.seed
   run_generated('jmv::descriptives(data=d,vars="y")',data.frame(y=1:12))
   expect_identical(.Random.seed,before)
-  expect_error(run_generated('jmv::ANOVA(data=d,dep="y",factors="x")',data.frame(y=1:12,x="a")))
+  expect_warning(run_generated('jmv::ANOVA(data=d,dep="y",factors="x")',data.frame(y=1:12,x="a")),"fewer than two observed levels",fixed=TRUE)
   expect_identical(.Random.seed,before)
 })
 

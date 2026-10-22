@@ -30,11 +30,18 @@ browser_request <- function(request_json) {
       if(!v %in% names(data)) stop("Categorical override names a missing variable: ",v)
       data[[v]] <- factor(data[[v]])
     }
-    generated <- generate_analysis(a,"ggplot2",conversion_options(options$style,options$figures))
+    preview_options <- conversion_options(options$style,options$figures)
+    preview_options$figures$formats <- "png"
+    generated <- generate_analysis(a,"ggplot2",preview_options)
     env <- new.env(parent=baseenv())
     assign(as.character(a$args$data),data,envir=env)
-    # Only jmv2gg-generated and structurally validated code executes here.
-    eval(parse(text=generated$code),envir=env)
+    # Only jmv2gg-generated and structurally validated code executes here:
+    # the figure setup and this analysis's figure block.
+    # Generated blocks report an undrawn figure as a warning so reports keep knitting;
+    # a preview has nothing to show in that case, so it fails with the same message.
+    code <- c(figure_setup_code(preview_options, generated$packages), generated$code)
+    withCallingHandlers(eval(parse(text=code),envir=env),warning=function(w)
+      if(startsWith(conditionMessage(w),"jmv2gg: figure")) stop(conditionMessage(w),call.=FALSE))
     return(jsonlite::toJSON(list(kind="preview",simulated=identical(request$data_kind,"simulate"),
       files=lapply(generated$plots,function(p)list(path=p$filename,id=p$id))),auto_unbox=TRUE,null="null"))
   }
@@ -49,7 +56,8 @@ simulate_for_analysis <- function(a,n) {
   n <- as.integer(n)
   factors <- unique(c(arg_variable(a,"factors",character()),arg_variable(a,"group",character()),
     arg_variable(a,"rows",character()),arg_variable(a,"cols",character())))
-  numeric <- unique(c(arg_variable(a,"dep",character()),arg_variable(a,"vars",character()),arg_variable(a,"covs",character()),
+  factors <- unique(c(factors, arg_variable(a,"group",character())))
+  numeric <- unique(c(arg_variable(a,"dep",character()),arg_variable(a,"deps",character()),arg_variable(a,"vars",character()),arg_variable(a,"covs",character()),
     arg_variable(a,"x",character()),arg_variable(a,"y",character())))
   if(!is.null(a$args$formula)) {
     validate_formula_syntax(a$args$formula)

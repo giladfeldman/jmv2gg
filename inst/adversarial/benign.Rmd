@@ -1,0 +1,12 @@
+---
+title: "Benign control"
+---
+
+# Results
+
+## Descriptives
+
+```{r}
+summary(mtcars$mpg)
+plot(mtcars$wt, mtcars$mpg)
+```

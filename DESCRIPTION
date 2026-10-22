@@ -9,8 +9,9 @@ Description: Converts jamovi and ggstatsplot analysis code into explicit,
 License: MIT + file LICENSE
 Encoding: UTF-8
 Depends: R (>= 4.4.0)
-Imports: jsonlite, yaml
-Suggests: ggplot2, emmeans, car, afex, haven, ragg, BetterGG (>= 0.1.0), ggstatsplot,
+Imports: jsonlite, yaml, BetterGG (>= 0.1.0)
+Suggests: ggplot2, emmeans, car, afex, haven, ragg, ggdist, ggrepel, ggside, ggsignif, patchwork,
+    statsExpressions, styler, jmv, psych, ggstatsplot,
     rmarkdown, knitr, testthat (>= 3.0.0), withr, png, callr
 Config/testthat/edition: 3
 Roxygen: list(markdown = TRUE)

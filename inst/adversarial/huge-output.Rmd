@@ -1,0 +1,7 @@
+---
+title: "Huge output"
+---
+
+```{r}
+cat(strrep("x", 3e7))
+```
