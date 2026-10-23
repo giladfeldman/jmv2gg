@@ -3,7 +3,8 @@
 - The 0.2.1 fallback for jmvcore 28.3 was missing from converted reports whenever the
   generated code was formatted with styler (the default, including the web app): the
   formatter kept only the first part of a setup chunk built from several parts. It now
-  formats the whole piece, and the setup chunk is passed as one text. Tested with
+  formats the whole piece, and the setup chunk is passed as one text. (A report with
+  jamovi analyses and no figures kept only the block's first comment line.) Tested with
   styler on and off; no earlier generated code was affected (every other piece was
   already one text).
 

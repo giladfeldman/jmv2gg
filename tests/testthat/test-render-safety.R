@@ -195,12 +195,6 @@ test_that("converted reports with jamovi analyses carry the jmvcore print fallba
   rmd <- function(code) paste("---", "title: t", "---", "", "```{r}", code, "```", sep = "\n")
   with_jmv <- convert_rmd(rmd('jmv::descriptives(data = d, vars = "y")'), engine = "ggplot2", style = list(styler = FALSE))
   expect_match(with_jmv$text, "# ---- jamovi results in the knitted report ----", fixed = TRUE)
-  # styler is on by default: the formatted output must keep the block too (0.2.1 lost it there).
-  # Not skip_if_not_installed(): loading styler here loads R.utils, which breaks jmv's options (LESSONS.md).
-  skip_if(!nzchar(system.file(package = "styler")), "styler is not installed")
-  styled <- convert_rmd(rmd('jmv::descriptives(data = d, vars = "y")'), engine = "ggplot2")
-  expect_match(styled$text, "jmv_html_print <- utils::getS3method", fixed = TRUE)
-  expect_match(styled$text, "figure_save <- function", fixed = TRUE)
   without <- convert_rmd(rmd("ggstatsplot::ggbetweenstats(data = d, x = g, y = y)"), engine = "ggplot2", style = list(styler = FALSE))
   expect_false(grepl("jamovi results in the knitted report", without$text, fixed = TRUE))
   # Run the generated block against a failing HTML printer (as jmvcore 28.3's is for reliability).
@@ -222,4 +216,11 @@ test_that("converted reports with jamovi analyses carry the jmvcore print fallba
   eval(parse(text = jmv_print_fallback_code()), envir = same)
   eval(parse(text = jmv_print_fallback_code()), envir = same)
   expect_match(as.character(knitr::knit_print(fake)), "<b>ok</b>", fixed = TRUE)
+  # styler is on by default: the formatted output must keep the block too (0.2.1 lost it there).
+  # Last in the test so a missing styler skips only this part. Not skip_if_not_installed():
+  # loading styler here loads R.utils, which breaks jmv's options (LESSONS.md).
+  skip_if(!nzchar(system.file(package = "styler")), "styler is not installed")
+  styled <- convert_rmd(rmd('jmv::descriptives(data = d, vars = "y")'), engine = "ggplot2")
+  expect_match(styled$text, "jmv_html_print <- utils::getS3method", fixed = TRUE)
+  expect_match(styled$text, "figure_save <- function", fixed = TRUE)
 })
