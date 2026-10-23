@@ -1,6 +1,6 @@
 import { useEffect, useReducer, useRef, useState, type ChangeEvent } from 'react';
 import { RWorkbench, convertPhases, previewPhases, scanPhases } from './runtime';
-import { ReportRenderer, renderPhases } from './reportRuntime';
+import { ReportRenderer, renderPhases, suggestedRenderLimit } from './reportRuntime';
 import { ProgressPanel } from './components/ProgressPanel';
 import { ProgressTracker, type PhaseSpec, type ProgressSnapshot } from './lib/progress';
 import { Icon } from './components/Icon';
@@ -48,6 +48,8 @@ export function App() {
   const [scanning, setScanning] = useState(false);
   const [renderFiles, setRenderFiles] = useState<File[]>([]);
   const [useBundled, setUseBundled] = useState(false);
+  /** Minutes the render may take; null until chosen (then the suggestion for the report's size applies). */
+  const [renderLimit, setRenderLimit] = useState<number | null>(null);
   const [workspaceKey, setWorkspaceKey] = useState(0);
   const worker = useRef<RWorkbench | null>(null);
   const renderer = useRef<ReportRenderer | null>(null);
@@ -240,6 +242,7 @@ export function App() {
         rmd: result.text, files, confirmed: confirmedCodes(render.scan),
         packages: [...render.scan.packages, ...result.manifest.packages],
         needsBetterGG: result.manifest.plots.some(plot => plot.engine === 'bettergg'),
+        limitMinutes: renderLimit ?? suggestedRenderLimit(render.scan.chunks, result.manifest.plots.length),
       });
       ok = true;
       if (current === renderJob.current) dispatch({ type: 'succeed', html });
@@ -335,6 +338,7 @@ export function App() {
               busy={busy} dataFiles={renderFiles} bundledAvailable={Boolean(snapshotExample?.bundledData)}
               useBundled={useBundled} onScan={scanReport} onConfirm={value => dispatch({ type: 'confirm', value })}
               onDataFiles={setRenderFiles} onUseBundled={setUseBundled} onRender={startRender}
+              figures={result.manifest.plots.length} limitMinutes={renderLimit} onLimit={setRenderLimit}
               onCancel={() => stopRender('Rendering was cancelled. The separate R session was closed.')}
               onDownload={downloadReport}/>}
             <Downloads mode={snapshot.mode}

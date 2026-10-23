@@ -7,7 +7,7 @@
 export const timingPrefix = 'jmv2gg.timing.';
 const keep = 5;
 
-/** `optional`: a phase that may not run at all (styler off or skipped); it never blocks the whole-job estimate. */
+/** `optional`: a phase that may not run at all; it never blocks the whole-job estimate. */
 export interface PhaseSpec { id: string; label: string; optional?: boolean }
 export type PhaseStatus = 'done' | 'skipped' | 'current' | 'pending';
 
@@ -208,7 +208,7 @@ export class ProgressTracker {
     const remaining = countedRemainingMs(this.finishedItems, left);
     return remaining === undefined ? undefined : this.now() + remaining;
   }
-  /** Ends the job; optional phases that never ran (styler off or skipped) show as skipped. */
+  /** Ends the job; optional phases that never ran show as skipped. */
   finish() {
     if (!this.active) return;
     this.closePhase('done');

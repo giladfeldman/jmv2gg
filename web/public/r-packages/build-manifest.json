@@ -1,20 +1,20 @@
 {
   "webR": "0.6.0",
   "sources": {
-    "DESCRIPTION": "cb17a29ab7fabb1c55bb57f2c9ece6873349169108ff7bedbd66ff794fc1a230",
+    "DESCRIPTION": "a38e9082726025a587484aa25ef66df91e55dd5334eb5d1332540ab24d71d35e",
     "LICENSE": "b372a87757468731e51fa95c57148b406c2eca27760a9db99f4b797af50cb3c1",
     "NAMESPACE": "b8feb8194d938289bec873d0257a1242a53157359ff9622e88bf240065660c17",
-    "R/browser.R": "1199c29c5ef90722a242841e97e630f71a9a286e70a836d68180032d9ff676ab",
+    "R/browser.R": "66001dedf4813eed947bd8e9fbc6739ce8e73795a259b483b253f721920c7b85",
     "R/contracts.R": "6d6c5c2e266f3bcc65ac4dfc6094282baac84e0441525f9751534035d4cda442",
-    "R/generate.R": "ac6e30a1e4dce94f1c60ee57441b2763c6e03bd91e88897c7a5b740ec5b9ca5b",
-    "R/map-groups.R": "016f775c8c2d499cb8513bbf393e05a240242239d622b7c100a80b0d392b63d2",
-    "R/map-other.R": "3eadc749d20f846cce4b9fc92cd928d1a4e4e9ea6b07a9aea3f6362b033f824f",
+    "R/generate.R": "6ce8bf83cc2902137ce95a6bcc266e53ff585ff4aefd816bf4e6e045956db51c",
+    "R/map-groups.R": "ae3025bbd50f093667a612d2393ca2dc98f1bbb3d4515d61f2be74be3aee66b6",
+    "R/map-other.R": "072e09476ff46f917db6b39e3bde312d9e8aa1f1aee2e9233909b6439e098636",
     "R/names.R": "4ab4d8ffe8c64204f720a2a3526e22d1caee3228177a83b778d0df1a955311aa",
     "R/optimize.R": "c07efeb7dd675cf9b70aa81dd6578f68b7685f7a0b44aa8a21dc7b92f033b38b",
     "R/parser.R": "0abf6f4410a5f083aa1305293f3eb88c443c98dd31000bcb56f8c10bbc38993f",
-    "R/render-browser.R": "e37427895734408995b2e32f1745aee4c2f5dbdfbf8ba6744ab11b07b3bd3ded",
+    "R/render-browser.R": "b7882b0938b6a95f0f72d011f3a1ca4e83331d435749198897b059d7a1b862f6",
     "R/rmd.R": "5f3290553dc8e325b5af636c66e7925082caa68beb1e872378b7fe839236d3ad",
-    "R/setup.R": "bf0ef7c8aacb2bfaa47dc29d96c4512e77507fc6121008957edee456bfec3434",
+    "R/setup.R": "7f255794246f98016f3cb49fc3970c628aa69a410b806da9d2ea67d89f29ea05",
     "inst/adversarial/benign.Rmd": "c5795d8d4806d72d5cb02e74b2d53ef67c4c7e4c4d71ba41b7ca0b92b764c5e6",
     "inst/adversarial/child.Rmd": "5e45096e773254aa41f60387305154c0dce8d193ee489c13d7dd56fea7bc8d35",
     "inst/adversarial/cookies.Rmd": "4b4d385c69ca4374b2ef9071b71f4377b43275d1781c3f30f0a9787f6c627e58",
@@ -40,14 +40,14 @@
     "man/runtime_capabilities.Rd": "97c598ab7369af234a470591aa13008d12611422e275f320c5fd0a3dc7581a1e",
     "man/scan_rmd_risks.Rd": "75fb55023996f89cb25329dbf3b2eb46ba91092ba8192cb806572a855d61aa91"
   },
-  "artifact": "bin/emscripten/contrib/4.6/jmv2gg_0.2.3.tgz",
-  "sha256": "0fdb70c4ea354502562b9ef7c142c8b389d9f827d859471dcdff5aeb766e5cd7",
+  "artifact": "bin/emscripten/contrib/4.6/jmv2gg_0.2.4.tgz",
+  "sha256": "f4820f12f02f55f62da3a64c8cc47c49dd6c909d218f53fba2621bea0f08b866",
   "dependencies": {
     "BetterGG": {
-      "version": "0.2.0",
-      "artifact": "bin/emscripten/contrib/4.6/BetterGG_0.2.0.tgz",
-      "sha256": "f6fb8948a5f4de95c6de9c1a24a386ba5896d21593ec051500e1d02b011498de",
-      "commit": "d9db9cf62178a22eb0d2bd031fb6ffa1a53618f3"
+      "version": "0.2.1",
+      "artifact": "bin/emscripten/contrib/4.6/BetterGG_0.2.1.tgz",
+      "sha256": "b4f9233908ddb6334b07673513d1b8788bb9e67917ff8fd9d23fcca3e5693c2f",
+      "commit": "ad5f147e79197a5b206f7da2c7e3e49fd47fd0fc"
     }
   },
   "placeholders": {

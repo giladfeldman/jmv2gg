@@ -1,6 +1,6 @@
 Package: jmv2gg
 Title: Editable Publication Figures from Jamovi Analysis Code
-Version: 0.2.3
+Version: 0.2.4
 Authors@R: person("Gilad", "Feldman", email = "giladfel@gmail.com", role = c("aut", "cre"))
 Description: Converts jamovi and ggstatsplot analysis code into explicit,
     editable ggplot2 and BetterGG code. Preserves existing R Markdown analyses,
@@ -9,7 +9,7 @@ Description: Converts jamovi and ggstatsplot analysis code into explicit,
 License: MIT + file LICENSE
 Encoding: UTF-8
 Depends: R (>= 4.5.0)
-Imports: jsonlite, yaml, BetterGG (>= 0.2.0)
+Imports: jsonlite, yaml, BetterGG (>= 0.2.1)
 Suggests: ggplot2, emmeans, car, afex, haven, ragg, ggdist, ggrepel, ggside, ggsignif, patchwork,
     statsExpressions, styler, jmv, psych, ggstatsplot,
     rmarkdown, knitr, markdown, jmvcore, testthat (>= 3.0.0), withr, png, callr
@@ -18,4 +18,4 @@ Roxygen: list(markdown = TRUE)
 URL: https://github.com/giladfeldman/jmv2gg
 BugReports: https://github.com/giladfeldman/jmv2gg/issues
 Config/roxygen2/version: 8.1.1
-Remotes: giladfeldman/BetterGG@d9db9cf62178a22eb0d2bd031fb6ffa1a53618f3
+Remotes: giladfeldman/BetterGG@ad5f147e79197a5b206f7da2c7e3e49fd47fd0fc

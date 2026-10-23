@@ -35,10 +35,10 @@ vi.mock('webr', () => ({ WebR: class {
   close() { fake.closed++; }
 } }));
 import { RWorkbench } from './runtime';
-import { ReportRenderer } from './reportRuntime';
+import { ReportRenderer, isLargeReport, suggestedRenderLimit } from './reportRuntime';
 import { ProgressTracker } from './lib/progress';
 
-// A small lock: ggplot2 needs rlang and scales; scales needs rlang; styler needs purrr.
+// A small lock: ggplot2 needs rlang and scales; scales needs rlang.
 const lock = [
   'Package: rlang', '', 'Package: scales\nImports: rlang', '', 'Package: ggplot2\nImports: rlang, scales (>= 1.0)',
   '', 'Package: jsonlite', '', 'Package: yaml', '', 'Package: purrr\nImports: rlang',
@@ -72,26 +72,24 @@ describe('workbench transport', () => {
     expect(result.status).toBe('complete');
     expect(result.manifest.converted).toBe(1);
   });
-  it('streams conversion progress: document chunks, then styler parts', async () => {
+  it('streams conversion progress: document chunks', async () => {
     stubNetwork();
     fake.output.push({ type: 'stderr', data: 'jmv2gg-progress 1 3 chunk' },
-      { type: 'stderr', data: 'jmv2gg-progress 3 3 chunk' },
-      { type: 'stderr', data: 'jmv2gg-progress 2 38 format' });
+      { type: 'stderr', data: 'jmv2gg-progress 3 3 chunk' });
     const seen: ProgressSnapshot[] = [];
-    const tracker = new ProgressTracker('t', [{ id: 'convert', label: 'Convert' }, { id: 'style', label: 'Tidy' }],
+    const tracker = new ProgressTracker('t', [{ id: 'convert', label: 'Convert' }],
       snapshot => seen.push(snapshot), { store: null });
     const request = { source: 'x <- 1', mode: 'rmd', action: 'convert', engine: 'both' } as ConversionRequest;
     const result = await new RWorkbench(() => {}).convert(request, tracker);
     expect(result.manifest.converted).toBe(1);
     const messages = seen.map(item => item.message);
     expect(messages).toContain('Reading the document: chunk 3 of 3');
-    expect(messages).toContain('Tidying the generated code: part 2 of 38');
-    expect(seen.at(-1)!.phases.map(phase => phase.status)).toEqual(['done', 'current']);
+    expect(seen.at(-1)!.phases.map(phase => phase.status)).toEqual(['current']);
     // The request reaches R through a file, with progress switched on.
     expect(JSON.parse(fake.files['/workspace/request.json'])).toMatchObject({ source: 'x <- 1', progress: true });
     expect(fake.r.find(code => code.includes('browser_request'))).toContain('/workspace/request.json');
   });
-  it('estimates the whole conversion even when the optional styler phase never ran', () => {
+  it('estimates the whole job even when an optional phase never ran', () => {
     const data: Record<string, string> = { 'jmv2gg.timing.phase.convert': '[1000]' };
     const store = { getItem: (k: string) => data[k] ?? null, setItem: (k: string, v: string) => { data[k] = v; } };
     let last: ProgressSnapshot | undefined;
@@ -118,14 +116,15 @@ describe('workbench transport', () => {
     const steps: string[] = [];
     const tracker = new ProgressTracker('t', [], snapshot => steps.push(snapshot.message), { store: null });
     await new RWorkbench(() => {}).initialize(tracker);
-    // Dependency order from the lock; yaml was already installed; ggstatsplot (BetterGG Depends) is not pulled.
-    expect(installs()).toEqual(['rlang', 'scales', 'ggplot2', 'jsonlite', 'purrr', 'styler']);
+    // Dependency order from the lock; yaml was already installed; ggstatsplot (BetterGG Depends) is not
+    // pulled; styler is not installed (the browser keeps jmv2gg's own layout).
+    expect(installs()).toEqual(['rlang', 'scales', 'ggplot2', 'jsonlite']);
     expect(fake.r.every(code => !code.includes('webr::install(') || code.includes('info=.jmv2gg_locked'))).toBe(true);
     expect(fake.install).toEqual([
       [['BetterGG'], { repos: 'http://localhost/r-packages', quiet: true }],
       [['jmv2gg'], { repos: 'http://localhost/r-packages', quiet: true }],
     ]);
-    expect(steps).toContain('Installing R packages: 3 of 6 — ggplot2');
+    expect(steps).toContain('Installing R packages: 3 of 4 — ggplot2');
   });
   it('terminates the report WebR instance when rendering is cancelled', async () => {
     stubNetwork();
@@ -153,7 +152,8 @@ describe('workbench transport', () => {
     expect(seen.map(item => item.message)).toContain('Rendering: chunk 2 of 2 (confirmatory)');
     const knit = fake.r.find(code => code.includes('render_browser_preview'))!;
     expect(knit).toContain('progress = TRUE');
-    expect(knit).toContain('time_limit = 600');
+    // R's own limit is the chosen limit (15 minutes by default), not a shorter one of its own.
+    expect(knit).toContain('time_limit = 900');
     expect(knit).toContain('asis_output');
     // BetterGG figures need ggstatsplot in the render session.
     expect(installs()).toContain('ggstatsplot');
@@ -161,6 +161,18 @@ describe('workbench transport', () => {
     const placeholder = fake.install.find(args => JSON.stringify(args[0]) === '["websocket"]');
     expect(placeholder).toBeDefined();
     expect(String((placeholder![1] as { repos: string }).repos)).toMatch(/\/r-packages$/);
+  });
+  it('gives R the limit chosen for a long report', async () => {
+    stubNetwork();
+    const tracker = new ProgressTracker('t', [], () => {}, { store: null });
+    await new ReportRenderer(tracker).render({
+      rmd: '', files: [], packages: [], needsBetterGG: false, confirmed: [], limitMinutes: 60,
+    });
+    const knit = fake.r.filter(code => code.includes('render_browser_preview')).at(-1)!;
+    expect(knit).toContain('time_limit = 3600');
+    expect(suggestedRenderLimit(21, 26)).toBe(15);
+    expect(suggestedRenderLimit(85, 120)).toBe(60);
+    expect(isLargeReport(41, 0)).toBe(true);
   });
   it('rejects with the R error text when the document fails', async () => {
     stubNetwork();

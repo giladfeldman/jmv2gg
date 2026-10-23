@@ -1,4 +1,4 @@
-jmv2gg_version <- "0.2.3"
+jmv2gg_version <- "0.2.4"
 
 # Names the setup code defines. Source code that defines one of them would be
 # overwritten, so conversion refuses it.
@@ -107,6 +107,8 @@ figure_setup_code <- function(options, packages) {
     "# Save a figure in every chosen format: PNG and TIFF (LZW) at figure_dpi,",
     "# PDF as vector graphics with the fonts embedded.",
     "figure_save <- function(plot, file, width = figure_width, height = figure_height) {",
+    "  # The jmv2gg browser preview shows each figure in its page and writes no files.",
+    "  if (isTRUE(getOption(\"jmv2gg.preview\"))) return(invisible(file))",
     "  dir.create(dirname(file), showWarnings = FALSE, recursive = TRUE)",
     "  in_browser <- grepl(\"emscripten\", R.version$platform)",
     "  for (format in figure_formats) {",

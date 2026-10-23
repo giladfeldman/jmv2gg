@@ -5,7 +5,7 @@ Conversion runs in native R or in a browser using the same R package through Web
 
 Use the [browser workbench](https://jmv2gg.vercel.app/) without installing R.
 
-This is version 0.2.3. Check the capability notes before using generated
+This is version 0.2.4. Check the capability notes before using generated
 figures in research. Unsupported analyses are preserved and reported; numerical
 equivalence is never inferred from a visually similar plot.
 
@@ -14,7 +14,7 @@ equivalence is never inferred from a visually similar plot.
 ```r
 install.packages("remotes")
 remotes::install_github("giladfeldman/BetterGG@v0.2.0", upgrade = "never")
-remotes::install_github("giladfeldman/jmv2gg@v0.2.3", upgrade = "never")
+remotes::install_github("giladfeldman/jmv2gg@v0.2.4", upgrade = "never")
 
 result <- jmv2gg::convert_code(
   'jmv::ANOVA(data = study, dep = "score", factors = "condition")',
@@ -60,7 +60,9 @@ report is rendered in native R.
   jamovi-equivalent model, and one guarded step per figure. A figure that cannot
   be drawn becomes a visible warning; the rest still runs.
 - Code is formatted with styler (tidyverse style), in a separate R process,
-  because loading styler breaks jmv for the rest of an R session.
+  because loading styler breaks jmv for the rest of an R session. The web app keeps
+  jmv2gg's own layout (styler took about a minute per analysis in the browser), with a
+  note on how to tidy it.
 
 ## Figures per analysis
 
@@ -156,7 +158,7 @@ PowerShell:
 Rscript tools/check.R
 Rscript -e 'roxygen2::roxygenise()'
 R CMD build .
-R CMD check --no-manual jmv2gg_0.2.3.tar.gz
+R CMD check --no-manual jmv2gg_0.2.4.tar.gz
 npm --prefix web ci
 npm --prefix web run build
 npm --prefix web run dev

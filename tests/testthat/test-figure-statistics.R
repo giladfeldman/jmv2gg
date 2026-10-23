@@ -114,6 +114,23 @@ test_that("one-factor repeated-measures ANOVA equals jmv::anovaRM (Greenhouse-Ge
   expect_false(grepl("rm_anova_1_subtitle <-", out$text, fixed = TRUE))
 })
 
+test_that("within-subject levels with spaces keep their names and means (afex renames them)", {
+  wide <- data.frame(hd = d$pre, ld = d$post, hp = d$x, lp = d$z)
+  call <- paste0('jmv::anovaRM(data = wide, rm = list(list(label = "Seat", levels = c("Driver", "Passenger")), ',
+    'list(label = "Level of Control", levels = c("High Control", "Low Control"))), rmCells = list(',
+    'list(measure = "hd", cell = c("Driver", "High Control")), list(measure = "ld", cell = c("Driver", "Low Control")), ',
+    'list(measure = "hp", cell = c("Passenger", "High Control")), list(measure = "lp", cell = c("Passenger", "Low Control"))))')
+  env <- run_generated(call, wide)
+  means <- env$rm_anova_1_means
+  expect_false(anyNA(means[c("Seat", "Level of Control")]))
+  expect_identical(levels(means[["Level of Control"]]), c("High Control", "Low Control"))
+  expect_true(inherits(env$rm_anova_1_plot, "ggplot"))
+  # In a fully within-subject design the model means are the cell means.
+  cell <- function(seat, level) means$emmean[means$Seat == seat & means[["Level of Control"]] == level]
+  expect_equal(cell("Driver", "High Control"), mean(wide$hd), tolerance = tol)
+  expect_equal(cell("Passenger", "Low Control"), mean(wide$lp), tolerance = tol)
+})
+
 test_that("correlation cells and their crosses equal jmv::corrMatrix and jmv::corrPart", {
   res <- jmv::corrMatrix(d, vars = c("x", "y", "z"), kendall = TRUE)$matrix$asDF
   rownames(res) <- res[[".name[r]"]]
@@ -141,6 +158,10 @@ test_that("contingency-table and McNemar subtitles equal jmv", {
   env <- run_generated('jmv::contTables(data = d, rows = "c1", cols = "c2")', d, style = on)
   expect_equal(env$table_1_test$statistic, ref[["value[chiSq]"]][1], tolerance = tol)
   expect_equal(env$table_1_test$p.value, ref[["p[chiSq]"]][1], tolerance = tol)
+  # Cramer's V is jamovi's (uncorrected), not the bias-corrected V of ggbarstats.
+  v <- jmv::contTables(d, rows = "c1", cols = "c2", phiCra = TRUE)$nom$asDF[["v[cra]"]][1]
+  expect_equal(unname(env$table_1_v), v, tolerance = tol)
+  expect_match(paste(deparse(env$table_1_subtitle), collapse = " "), formatC(v, format = "f", digits = 2), fixed = TRUE)
   ref <- jmv::contTablesPaired(d, rows = "c1", cols = "h")$test$asDF
   env <- run_generated('jmv::contTablesPaired(data = d, rows = "c1", cols = "h")', d, style = on)
   expect_equal(env$table_1_test$statistic, ref[["value[mcn]"]][1], tolerance = tol)
@@ -179,4 +200,20 @@ test_that("reliability alpha and item-rest correlations equal jmv::reliability",
   env <- run_generated('jmv::reliability(data = items, vars = c("q1", "q2", "q3"), revItems = "q3")', items, style = on)
   expect_equal(env$reliability_1_alpha, res$scale$asDF$alpha, tolerance = tol)
   expect_equal(unname(env$reliability_1_rest), res$items$asDF$itemRestCor, tolerance = tol)
+})
+
+test_that("a measure mapped to an undeclared within-subject level is ignored, as jamovi does", {
+  set.seed(2)
+  wide <- data.frame(m1 = rnorm(60), m2 = rnorm(60) + 0.5, m3 = rnorm(60) + 1, g = factor(rep(c("Art", "Artifact"), 30)))
+  call <- paste0('jmv::anovaRM(data = wide, rm = list(list(label = "Dup", levels = c("Same", "Other"))), ',
+    'rmCells = list(list(measure = "m1", cell = "Same"), list(measure = "m2", cell = "Other"), list(measure = "m3", cell = "AI")), ',
+    'bs = "g", rmTerms = ~ Dup, bsTerms = ~ g)')
+  ref <- eval(parse(text = call))$rmTable$asDF
+  out <- convert_code(call, engine = "ggplot2", style = on)
+  expect_true("unused_measure" %in% vapply(out$diagnostics, function(x) x$code, character(1)))
+  env <- run_generated(call, wide, style = on)
+  tests <- as.data.frame(env$rm_anova_1_model$anova_table)
+  expect_equal(tests["Dup", "F"], ref[["F[none]"]][1], tolerance = tol)
+  expect_equal(tests["g:Dup", "Pr(>F)"], ref[["p[none]"]][2], tolerance = tol)
+  expect_false(anyNA(env$rm_anova_1_means$emmean))
 })

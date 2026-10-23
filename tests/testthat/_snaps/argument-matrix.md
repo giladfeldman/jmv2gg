@@ -722,6 +722,13 @@
         rm_anova_1_model <- afex::aov_car(value ~ (h) * (time) + Error(subject/(time)), data = rm_anova_1_long, factorize = FALSE)
         # Estimated marginal means and 95% confidence intervals (emmeans on the afex model).
         rm_anova_1_means <- as.data.frame(stats::confint(emmeans::emmeans(rm_anova_1_model, specs = c("time", "h")), level = 0.95))
+        # afex names within-subject levels as R names ("High Control" becomes "High.Control");
+        # the data's own level names are restored.
+        for (column in "time") {
+          rm_anova_1_levels <- levels(rm_anova_1_long[[column]])
+          if (anyDuplicated(make.names(rm_anova_1_levels))) stop("Levels of ", column, " become identical as R names: ", toString(rm_anova_1_levels))
+          rm_anova_1_means[[column]] <- factor(rm_anova_1_levels[match(as.character(rm_anova_1_means[[column]]), make.names(rm_anova_1_levels))], levels = rm_anova_1_levels)
+        }
       })
       
       # ggplot2 figure: Repeated measures by time, h.

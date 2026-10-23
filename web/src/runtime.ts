@@ -14,8 +14,7 @@ export const setupPhases: PhaseSpec[] = [
   { id: 'packages', label: 'Install R packages' },
   { id: 'converter', label: 'Install jmv2gg and BetterGG' },
 ];
-export const convertPhases: PhaseSpec[] = [...setupPhases, { id: 'convert', label: 'Convert your analysis' },
-  { id: 'style', label: 'Tidy the generated code', optional: true }];
+export const convertPhases: PhaseSpec[] = [...setupPhases, { id: 'convert', label: 'Convert your analysis' }];
 export const scanPhases: PhaseSpec[] = [...setupPhases, { id: 'scan', label: 'Check the report before rendering' }];
 export const previewPhases: PhaseSpec[] = [...setupPhases,
   { id: 'plot-packages', label: 'Install plotting packages' },
@@ -45,22 +44,17 @@ export async function startWebR(tracker: ProgressTracker, isClosed: () => boolea
 
 /**
  * Installs `roots` and their dependencies from the lock, ONE package at a time in dependency
- * order, so each step can be counted. Packages R already has are skipped. A failure of a package
- * listed in `optional` is ignored (with its dependents still tried later by R as needed).
+ * order, so each step can be counted. Packages R already has are skipped.
  */
 export async function installFromLock(session: Session, roots: string[], tracker: ProgressTracker,
-  label = 'Installing R packages', optional: string[] = []) {
+  label = 'Installing R packages') {
   const installed = await session.runtime.evalRRaw('rownames(installed.packages())', 'string[]');
   const { order } = installOrder(cleanPackages(roots, []), session.lock, installed);
   tracker.begin(order);
   for (let i = 0; i < order.length; i++) {
     tracker.step(`${label}: ${i + 1} of ${order.length} — ${order[i]}`);
     tracker.advance(i);
-    try {
-      await session.runtime.evalRVoid(`webr::install(${JSON.stringify(order[i])}, info=.jmv2gg_locked, quiet=TRUE)`);
-    } catch (error) {
-      if (!optional.includes(order[i])) throw error;
-    }
+    await session.runtime.evalRVoid(`webr::install(${JSON.stringify(order[i])}, info=.jmv2gg_locked, quiet=TRUE)`);
   }
   tracker.advance(order.length);
   return order;
@@ -127,20 +121,11 @@ export async function streamR(runtime: WebR, code: string, onLine: (line: string
   return result;
 }
 
-/**
- * Applies one line of R output during a conversion: chunks of the document as they are read,
- * then the parts of the generated code as styler tidies them (the slow step for long documents).
- */
+/** Applies one line of R output during a conversion: chunks of the document as they are read. */
 export function applyConvertOutput(line: string, tracker: ProgressTracker) {
   const progress = parseProgressLine(line);
   if (!progress) return false;
-  if (progress.label === 'format') {
-    tracker.phase('style', 'Tidying the generated code with styler…');
-    tracker.count(progress.done, progress.total, '',
-      `Tidying the generated code: part ${progress.done} of ${progress.total}`);
-  } else {
-    tracker.count(progress.done, progress.total, '', `Reading the document: chunk ${progress.done} of ${progress.total}`);
-  }
+  tracker.count(progress.done, progress.total, '', `Reading the document: chunk ${progress.done} of ${progress.total}`);
   return true;
 }
 
@@ -180,12 +165,8 @@ export class RWorkbench {
     this.tracker.phase('packages', 'Finding the R packages the converter needs…');
     this.status('Installing the R packages the converter needs…');
     const needed = ['jsonlite', 'yaml', 'rlang', ...await converterDependencies()];
-    // styler tidies the generated code. Without it R still converts and adds a note saying so,
-    // so styler and the packages only it needs may fail without stopping the setup.
-    // Never run jmv analyses in this worker: loading styler breaks jmv in the same session.
-    const required = installOrder(needed, session.lock).order;
-    const optional = installOrder(['styler'], session.lock).order.filter(name => !required.includes(name));
-    await installFromLock(session, [...needed, 'styler'], this.tracker, 'Installing R packages', optional);
+    // No styler: the browser keeps jmv2gg's own code layout (styler took about a minute per analysis in WebR).
+    await installFromLock(session, needed, this.tracker, 'Installing R packages');
     this.status('Loading the R conversion package…');
     await installConverter(session, this.tracker);
     await session.runtime.evalRVoid('setwd("/workspace"); options(webr.show_menu=FALSE)');

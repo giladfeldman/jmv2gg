@@ -55,6 +55,34 @@
 - Public docs use synthetic examples and generic paths. Keep owner decisions,
   private inputs, backups/history details and handoffs outside public source/archives.
 
+## 0.2.4: simulated data and NA statistics
+
+- A simulation that gives every factor the same pattern confounds them: every factorial term
+  became inestimable and the figure printed "F(0, 98) = NA". Simulated designs must cross
+  their factors, and a test that previews every bundled analysis on simulated data must
+  look for NA in the drawn text, not only for a drawn figure.
+- A preview that evaluates generated code in an environment whose parent is baseenv()
+  breaks model code that looks up stats functions through the formula's environment
+  (family(), na.pass). Run it with the standard packages visible, as a report does.
+- afex renames within-subject levels with make.names() ("High Control" -> "High.Control");
+  emmeans on an afex model returns those names. Map them back before matching the data.
+- Inf is a legitimate statistic (a one-sided confidence interval ends at Inf); only NA and
+  NaN mean "not computed".
+- statsExpressions' contingency_table() prints the bias-corrected Cramer's V
+  (effectsize adjust = TRUE) with a hat but no "adjusted" label; jamovi reports the
+  uncorrected V. Same name, different statistic: compare every effect size against the
+  jamovi table, not only the test statistic and p (a cross-model review of the rendered
+  figures found this; the jmv comparison tests had checked chi-squared and p only).
+- Timing on a shared laptop is noisy (the same native render took 174 s and 338 s); compare
+  before/after only in back-to-back runs, and report such numbers as rough.
+- A per-line cost measured on one kind of code does not carry over: styler took about
+  28 ms per line in WebR on the statistics-off example, but 36-57 s per ~100-line figure
+  block with statistics on, and a full conversion then failed ("A non-local transfer of
+  control"). Time the slow step per piece, on the settings users actually run, in the real
+  runtime (a Node WebR harness reproduces the browser without a page).
+- testthat's local_mocked_bindings() needs a package (pkgload or installed); tools/check.R
+  sources R/ instead, so swap a binding in environment(fn) by hand there.
+
 ## 0.2.3: long documents in the browser
 
 - Time a release on the largest real documents, not only the bundled examples. A

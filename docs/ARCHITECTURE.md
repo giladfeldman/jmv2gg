@@ -29,9 +29,10 @@ The ggplot2 figures are written by BetterGG's recipe functions (`BetterGG::recip
 data-independent code generators); jmv2gg supplies the jamovi-equivalent data
 preparation and model (means, intervals, coefficient tables). Statistics on figures
 (style stats = TRUE) are computed in the generated code and tested against jmv's
-result objects. styler formats the output in a separate R process (callr), or in
-the browser's conversion worker, because loading styler (R.utils) breaks jmv's
-option objects in the same session.
+result objects. styler formats the output in a separate R process (callr), because
+loading styler (R.utils) breaks jmv's option objects in the same session. The
+browser does not run styler (about a minute per analysis in WebR); it keeps
+jmv2gg's own layout and adds a note.
 
 Generated code: one setup block (packages, style, export settings, figure_try(),
 figure_show(), figure_save()); per analysis a header comment, a guarded
@@ -49,7 +50,7 @@ conversion.
 App.tsx wires state; components/ hold the editor, options, results, figures, render
 panel and the sandboxed report frame; lib/ holds request builders, file limits,
 the render state machine and the ZIP bundle. runtime.ts runs the conversion worker
-(pinned WebR, jsonlite/yaml/rlang/styler from the lock, BetterGG and jmv2gg from the
+(pinned WebR, jsonlite/yaml/rlang from the lock, BetterGG and jmv2gg from the
 app's own repository without the ggstatsplot stack) and figure previews.
 reportRuntime.ts runs each in-browser render in a fresh WebR instance.
 

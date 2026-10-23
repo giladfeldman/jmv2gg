@@ -1488,3 +1488,19 @@ footer {
     scroll-behavior: auto!important;
   }
 }
+
+.render-area > .notice {
+  margin: 0 0 16px;
+  border: 1px solid #eadcc2;
+  border-radius: 6px;
+}
+
+.render-limit {
+  display: block;
+  margin: 0 0 12px;
+  font-size: 13px;
+}
+
+.render-limit select {
+  margin-left: 4px;
+}

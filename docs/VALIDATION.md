@@ -27,6 +27,33 @@ applied in descriptives, contingency tables, linear and logistic regression; not
 by jmv's ANOVA and ANCOVA, hence not by these figures; refused for correlations,
 t-tests, repeated measures and reliability.
 
+## Recorded release checks (0.2.4, before release)
+
+- Owner report: the browser render of a private report took about 15 minutes and stopped;
+  previews on simulated data printed NA. Causes found and fixed: simulated factors had one
+  shared pattern (confounded, so F(0, df) = NA); the browser render also wrote every figure
+  file at 600 dpi and stopped at fixed limits; and styler, which tidied the generated code
+  in the browser, took 36-57 s per figure block with statistics on (WebR 0.6.0, Node
+  harness), after which the conversion of the complex example failed with "A non-local
+  transfer of control occurred during evaluation". The browser no longer runs styler.
+- Local production build, complex R Markdown example, statistics on: conversion of 11 of
+  11 analyses (26 figures) in under 40 s (it had failed after several minutes); the styler
+  note shown; a simulated contingency-table preview printed chi-squared(1) = 0.17,
+  p = .683, V = 0.04, n = 100; the report preview (limit selector, 15 minutes suggested for
+  21 chunks) rendered all 21 chunks in about 5 minutes with 27 figures, no NA or NaN in
+  any output, and the note that figure files are written only when knitting in R.
+- Every statistic printed on those figures equals jmv's result for the same call on the
+  bundled data (n = 234): ANOVA F = 32.33, 16.66, 0.75 (partial eta-squared .13, .13, .01);
+  ANCOVA F = 30.85 and 8.28; paired t(233) = -11.63; Student and Welch t = -1.64, p = .103;
+  linear regression b = 0.42, 0.01, -0.07 with t = 7.10, 2.76, -0.52; logistic OR = 1.98
+  and 1.18 (z = 4.89, 0.55); chi-squared(2) = 5.61, p = .060, Cramer's V = .15 (ggplot2;
+  BetterGG prints the bias-corrected .12, as its note says); alpha = .77; correlations.
+- Contingency figures: Cramer's V found bias-corrected (.00 against jamovi's .16) by a
+  cross-model review; the ggplot2 figure now prints jamovi's uncorrected V (tested equal to
+  jmv's v[cra]). A private corpus recheck of 61 flagged files: 908 analyses, 881 drawn
+  cleanly, no NA; the rest were informational messages. The sweep of the other 370 files
+  did not finish (all R jobs stopped together) and is logged as debt.
+
 ## Recorded release checks (0.2.3)
 
 - A private replication report (37 analyses, 158 KB; not in this repository) took

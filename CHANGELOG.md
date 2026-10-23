@@ -1,3 +1,47 @@
+# jmv2gg 0.2.4
+
+- Figure previews on simulated data printed "F(0, 98) = NA, p NA" for factorial designs:
+  every simulated factor had the same A/B pattern, so the factors were confounded. Simulated
+  factors are now fully crossed (every cell observed), scores share a common component (so
+  correlations, reliability and paired differences are neither zero nor perfect), repeated
+  and paired measures are simulated (they were refused), and so are split-by, layer and
+  grouping variables; a logistic outcome is random instead of determined by a factor, and
+  simulated factors and outcomes use the reference levels the source names ("'ref' must be
+  an existing level" before).
+- Simulated previews of logistic regressions and contingency tables always failed ("could
+  not find function family", "object 'na.pass' not found"): the preview ran the figure code
+  without R's standard packages attached. It now runs as a report does.
+- Figure statistics never show NA (BetterGG 0.2.1): a test that cannot be computed from the
+  data (an empty cell, a confounded term, no variation) reads "not estimable from these
+  data", with a warning that names it.
+- Repeated-measures figures with a within-subject level containing a space or other
+  non-name characters ("High Control") were not drawn: afex renames such levels
+  ("High.Control"), so the model means did not match the data. The data's own level names
+  are now restored.
+- The browser report preview no longer writes the figure export files (PNG/PDF/TIFF at the
+  chosen dpi), which nobody receives there; the page shows every figure, and the files are
+  written when the report is knitted in R.
+- The browser report preview stops after a limit chosen before rendering (15, 30, 60 or
+  120 minutes; 60 is suggested for reports with more than 40 chunks or figures, which are
+  named as large, with the native R command). R's own limit inside the render, a fixed
+  10 minutes, now equals the chosen limit.
+- Contingency-table figures printed the bias-corrected Cramer's V of ggbarstats (for
+  example .00 where jamovi reports .16). The ggplot2 figure now prints Cramer's V as jamovi
+  computes it, sqrt(chi-squared / (n (k - 1))) from the same test and without an interval
+  (jamovi gives none); the BetterGG figure keeps ggbarstats' bias-corrected V, and its note
+  says so.
+- Browser conversions and figure previews with statistics on could take many minutes and
+  then fail ("A non-local transfer of control occurred during evaluation"), leaving R busy:
+  styler, which tidied the generated code in the browser, took 36-57 s per figure block of
+  the bundled complex example in WebR. The browser no longer runs or installs styler; it
+  keeps jmv2gg's own code layout, with a note on how to tidy it (the R package still runs
+  styler).
+- A repeated-measures analysis that maps a measure to a cell that is not one of the declared
+  levels (left over after a level was removed) failed to draw. jamovi ignores such a measure
+  (checked against jmv::anovaRM); the figure now does too, with a note naming it.
+- The contingency-table note about case weights no longer reads as "statistics not shown"
+  for unweighted data: it applies only when the data carry jamovi case weights.
+
 # jmv2gg 0.2.3
 
 - Figure chunks with many figures were not run: their header (`fig.cap=c(...)`) was

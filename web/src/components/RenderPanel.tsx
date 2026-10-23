@@ -2,6 +2,7 @@ import { Icon } from './Icon';
 import { ReportFrame } from './ReportFrame';
 import { checkDataFiles } from '../lib/files';
 import { isConfirmed, canStart, type RenderState } from '../lib/renderState';
+import { isLargeReport, renderLimitChoices, suggestedRenderLimit } from '../reportRuntime';
 
 const nativeCommand = 'jmv2gg::render_report("converted.Rmd")';
 
@@ -19,6 +20,11 @@ interface Props {
   onRender: () => void;
   onCancel: () => void;
   onDownload: () => void;
+  /** Figures the converted report draws. */
+  figures: number;
+  /** The chosen limit in minutes; null means the suggestion for this report's size. */
+  limitMinutes: number | null;
+  onLimit: (minutes: number) => void;
 }
 
 export function RenderPanel(props: Props) {
@@ -54,6 +60,19 @@ export function RenderPanel(props: Props) {
           {check.names.map(name => <li key={name}>{name}</li>)}</ul>}
         {!check.ok && <div className="error-inline" role="alert">{check.error}</div>}
       </fieldset>
+      {isLargeReport(state.scan.chunks, props.figures) && <div className="notice" role="status">
+        This is a large report ({state.scan.chunks} code chunks, {props.figures} figures). In the browser a report this
+        size can take much longer than 15 minutes, because every jamovi analysis and every figure runs again in R
+        compiled for the web. Rendering it in native R is faster:
+        <pre className="command"><code>{nativeCommand}</code></pre>
+      </div>}
+      <label className="render-limit">Stop the preview after{' '}
+        <select disabled={state.phase === 'rendering'}
+          value={props.limitMinutes ?? suggestedRenderLimit(state.scan.chunks, props.figures)}
+          onChange={event => props.onLimit(Number(event.target.value))}>
+          {renderLimitChoices.map(minutes => <option key={minutes} value={minutes}>{minutes} minutes</option>)}
+        </select>
+      </label>
       <div className="render-actions">
         {state.phase === 'rendering'
           ? <button onClick={props.onCancel}>Cancel rendering</button>
@@ -62,7 +81,8 @@ export function RenderPanel(props: Props) {
         {state.phase === 'rendering' && <span className="help">Progress is shown above.</span>}
       </div>
       <p className="help">Rendering installs R packages in your browser and can take several minutes. It stops after
-        15 minutes; Cancel stops it at once.</p>
+        the time chosen above, so a document that never finishes cannot keep your computer busy; Cancel stops it at
+        once.</p>
     </>}
     {state.phase === 'failed' && <div className="error-banner" role="alert">
       <strong>The report could not be rendered.</strong>

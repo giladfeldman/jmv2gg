@@ -53,7 +53,7 @@ export function Explainer() {
 
 export function Footer() {
   return <footer>
-    <span>jmv2gg · version 0.2.3</span>
+    <span>jmv2gg · version 0.2.4</span>
     <span>WebR 0.6.0 · R runs locally · no research data uploads</span>
   </footer>;
 }

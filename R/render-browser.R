@@ -140,6 +140,10 @@ render_browser_preview <- function(input, output, confirmed = character(), time_
   # The markdown sits next to the document so its figure files resolve.
   md <- file.path(dirname(input), paste0(tools::file_path_sans_ext(basename(input)), ".preview.md"))
   on.exit(unlink(md), add = TRUE)
+  # The page embeds every figure, so the generated figure_save() writes no export files
+  # here: 120 figures at 600 dpi took several minutes of a browser render and were never used.
+  old_options <- options(jmv2gg.preview = TRUE)
+  on.exit(options(old_options), add = TRUE)
   restore <- guard_jmv_knit_print()
   on.exit(restore(), add = TRUE)
   meta <- rmd_front_matter(text)
@@ -265,6 +269,7 @@ preview_page <- function(body, title) {
     paste0("<title>", gsub("<", "&lt;", title, fixed = TRUE), "</title>"),
     "<style>", style, "</style></head><body>",
     "<p class=\"preview-note\">Browser preview rendered with knitr and markdown in WebR. The reference report is rendered in native R.",
+    " Figures are shown in this page at screen resolution; the figure files (PNG/PDF/TIFF at the chosen dpi) are written only when the report is knitted in R.",
     if (placeholder_loaded()) " The 'websocket' package here is jmv2gg's labelled placeholder (it opens no connections), so session information lists it.",
     "</p>",
     if (length(toc)) c("<nav class=\"toc\"><p>Contents</p><ul>", toc, "</ul></nav>"),

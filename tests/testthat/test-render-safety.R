@@ -131,6 +131,10 @@ test_that("the bundled complex example report renders in the browser previewer",
   out <- render_browser_preview(file.path(work, "report.Rmd"), file.path(work, "report.html"), confirmed = codes(scan))
   html <- paste(readLines(out, warn = FALSE), collapse = "\n")
   expect_gte(length(gregexpr("<img src=\"data:image/png;base64,", html, fixed = TRUE)[[1]]), length(converted$manifest$plots))
+  # The page embeds every figure, so no export files are written (they cost minutes in WebR).
+  expect_length(list.files(file.path(work, "figures")), 0L)
+  expect_match(html, "written only when the report is knitted in R", fixed = TRUE)
+  expect_null(getOption("jmv2gg.preview"))
 })
 
 test_that("the browser preview's websocket placeholder opens no connection and errors on use", {

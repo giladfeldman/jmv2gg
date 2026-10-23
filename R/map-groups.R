@@ -333,6 +333,18 @@ map_within <- function(ctx) {
   cells <- arg_value(a, "rmCells")
   if (!length(rm_defs) || !length(cells)) stop("Repeated-measures conversion needs literal rm and rmCells mappings.")
   rm_names <- vapply(rm_defs, function(x) x$label, character(1))
+  # jamovi ignores a measure mapped to a cell that is not among the declared levels
+  # (tested against jmv::anovaRM); so does the figure, and a note names it.
+  declared <- function(cell) length(cell$cell) == length(rm_names) &&
+    all(vapply(seq_along(rm_names), function(j) cell$cell[j] %in% as.character(rm_defs[[j]]$levels), logical(1)))
+  ignored <- !vapply(cells, declared, logical(1))
+  if (any(ignored) && all(lengths(lapply(cells[ignored], function(x) x$cell)) == length(rm_names))) {
+    add_note(ctx, paste0("The measures ", toString(vapply(cells[ignored], function(x) x$measure, character(1))),
+      " are mapped to cells that are not levels of the within-subject factors, so jamovi does not use them;",
+      " neither does the figure."), code = "unused_measure", severity = "info")
+    cells <- cells[!ignored]
+    if (!length(cells)) stop("No repeated measure is mapped to a declared level.")
+  }
   measures <- vapply(cells, function(x) x$measure, character(1))
   if (anyDuplicated(measures)) stop("Repeated measure columns are duplicated.")
   if (length(rm_names) + length(bs) > 3L) stop("Figures cover designs with up to three factors.")
@@ -383,7 +395,14 @@ map_within <- function(ctx) {
       paste0(name, "_model <- afex::aov_car(", formula, ", data = ", long, ", factorize = FALSE)"),
       paste0("# Estimated marginal means and ", 100 * ctx$level, "% confidence intervals (emmeans on the afex model)."),
       paste0(name, "_means <- as.data.frame(stats::confint(emmeans::emmeans(", name, "_model, specs = ",
-        r_text(factors), "), level = ", ctx$level, "))"))
+        r_text(factors), "), level = ", ctx$level, "))"),
+      "# afex names within-subject levels as R names (\"High Control\" becomes \"High.Control\");",
+      "# the data's own level names are restored.",
+      paste0("for (column in ", r_text(rm_names), ") {"),
+      paste0("  ", name, "_levels <- levels(", long, "[[column]])"),
+      paste0("  if (anyDuplicated(make.names(", name, "_levels))) stop(\"Levels of \", column, \" become identical as R names: \", toString(", name, "_levels))"),
+      paste0("  ", name, "_means[[column]] <- factor(", name, "_levels[match(as.character(", name, "_means[[column]]), make.names(", name, "_levels))], levels = ", name, "_levels)"),
+      "}")
   }
   ctx$describe <- if (one_factor) paste0("each participant's values in each condition of ", rm_names,
     ", their distribution, and the condition means joined by a line.") else

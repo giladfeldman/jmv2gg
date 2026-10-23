@@ -183,12 +183,14 @@ map_categorical <- function(ctx) {
   }
   if (ctx$stats && stats_ok) {
     ctx$differs <- c(ctx$differs, switch(fn,
-      contTables = "the subtitle is Pearson's chi-squared test with Cramer's V (as jamovi's default).",
+      contTables = paste("the subtitle is Pearson's chi-squared test with Cramer's V computed as jamovi does",
+        "(without the bias correction ggbarstats applies, and without an interval)."),
       contTablesPaired = "the subtitle is McNemar's test.",
       propTest2 = "the subtitle is a chi-squared goodness-of-fit test; jamovi's propTest2 uses a binomial test.",
       propTestN = "the subtitle tests equal proportions, as the source does."))
-    add_note(ctx, "With case weights the figure shows weighted percentages and no statistics; see jamovi's table.",
-      code = "statistics_not_shown", severity = "info")
+    add_note(ctx, paste("Only if the data carry jamovi case weights: the figure then shows weighted percentages",
+      "and no statistics (see jamovi's table). Unweighted data get the statistics."),
+      code = "case_weights", severity = "info")
   }
   two_way <- length(cols) == 1L
   for (i in seq_along(rows)) {
@@ -200,7 +202,8 @@ map_categorical <- function(ctx) {
       draw <- function(stats) {
         if (two_way) {
           recipe("recipe_barstats", data = ctx$input, x = r, y = cols, name = fig, counts = if (length(counts)) counts,
-            stats = stats, paired = paired, weights = if (!stats) weight_column, facet = if (length(layers)) layers)
+            stats = stats, paired = paired, weights = if (!stats) weight_column, facet = if (length(layers)) layers,
+            cramers_v = "uncorrected")
         } else {
           recipe("recipe_piestats", data = ctx$input, x = r, name = fig, counts = if (length(counts)) counts,
             stats = stats, weights = if (!stats) weight_column, max_labels = 12)
@@ -229,7 +232,9 @@ map_categorical <- function(ctx) {
   }
   if (wants(ctx, "bettergg") && !length(counts) && !paired) {
     add_note(ctx, paste("BetterGG runs its own unweighted categorical test.",
-      if (length(layers)) "It pools the source layers; the ggplot2 figure keeps them." else ""))
+      if (length(layers)) "It pools the source layers; the ggplot2 figure keeps them." else "",
+      if (stats_ok && two_way) paste("Its Cramer's V is bias-corrected, so it is smaller than the V jamovi",
+        "and the ggplot2 figure report, most visibly in small tables." ) else ""))
   }
 }
 

@@ -153,24 +153,19 @@ assemble_block <- function(ctx) {
 
 # Tidyverse style via 'styler', for all generated code of a document at once.
 # Loading styler also loads R.utils, whose names() method for "Options"
-# objects breaks jmv for the rest of an R session. So in native R styler runs
-# in a separate R process (callr); in the browser it runs in the conversion
-# worker, which never runs jmv analyses. Returns NULL when styler cannot run.
+# objects breaks jmv for the rest of an R session, so styler runs in a separate
+# R process (callr). Returns NULL when styler cannot run.
 style_codes <- function(codes) {
   if (!length(codes)) return(codes)
-  style_one <- function(codes, progress = function(done, total) NULL) {
+  style_one <- function(codes) {
     stats::setNames(lapply(seq_along(codes), function(k) {
-      progress(k, length(codes))
       # A piece may be one string or a vector of lines; style all of it (0.2.1 dropped every line after the first).
-      paste(as.character(suppressMessages(suppressWarnings(styler::style_text(strsplit(paste(codes[[k]], collapse = "\n"), "\n", fixed = TRUE)[[1]])))),
-        collapse = "\n")
+      paste(as.character(suppressMessages(suppressWarnings(styler::style_text(strsplit(paste(codes[[k]], collapse = "
+"), "
+", fixed = TRUE)[[1]])))),
+        collapse = "
+")
     }), names(codes))
-  }
-  if (grepl("emscripten", R.version$platform)) {
-    if (!requireNamespace("styler", quietly = TRUE)) return(NULL)
-    # styler is the slow step of a large conversion in the browser, so it reports each piece.
-    return(tryCatch(style_one(codes, function(done, total) report_progress(done, total, "format")),
-      error = function(e) NULL))
   }
   if (!requireNamespace("callr", quietly = TRUE)) return(NULL)
   tryCatch(callr::r(function(codes, style_one) {
@@ -179,28 +174,20 @@ style_codes <- function(codes) {
   }, args = list(codes = codes, style_one = style_one), libpath = .libPaths()), error = function(e) NULL)
 }
 
-# In the browser styler takes about 30 ms per generated line (WebR 0.6.0, measured on the
-# bundled complex example), so a large document would wait minutes for layout alone; real
-# reports reach 40,000 generated lines. Above this many lines the browser skips styler.
-browser_styler_line_limit <- 2000L
-
-# The note for a browser conversion too large to tidy with styler, or NULL to tidy it.
-styler_skip_note <- function(pieces, limit = browser_styler_line_limit) {
-  lines <- sum(lengths(strsplit(unlist(pieces, use.names = FALSE), "\n", fixed = TRUE)))
-  if (lines <= limit) return(NULL)
-  diag_record("info", "styler_skipped_large", paste0("The generated code has ",
-    format(lines, big.mark = ","), " lines, so the browser kept jmv2gg's own layout instead of tidying it with ",
-    "styler, which would take about ", max(1L, ceiling(lines * 0.03 / 60)), " min more here. ",
-    "To tidy it, convert with the jmv2gg R package, or run styler::style_file() on the downloaded file."))
+# The browser keeps jmv2gg's own layout. In WebR 0.6.0 styler took 36-57 s for each
+# ~100-line figure block of the bundled complex example (about 0.4 s per line), and a
+# conversion of that example stopped after several minutes with "A non-local transfer of
+# control occurred during evaluation".
+styler_browser_note <- function() {
+  diag_record("info", "styler_browser", paste0("The browser keeps jmv2gg's own code layout: tidying it with ",
+    "styler takes about a minute per analysis here. To tidy it, convert with the jmv2gg R package, ",
+    "or run styler::style_file() on the downloaded file."))
 }
 
-# Style the generated pieces in place; a note says when styler was unavailable or skipped.
-style_generated <- function(pieces, options) {
+# Style the generated pieces in place; a note says when styler was unavailable or not run.
+style_generated <- function(pieces, options, browser = grepl("emscripten", R.version$platform)) {
   if (!isTRUE(options$style$styler) || !length(pieces)) return(list(pieces = pieces, diagnostics = list()))
-  if (grepl("emscripten", R.version$platform)) {
-    skipped <- styler_skip_note(pieces)
-    if (!is.null(skipped)) return(list(pieces = pieces, diagnostics = list(skipped)))
-  }
+  if (browser) return(list(pieces = pieces, diagnostics = list(styler_browser_note())))
   styled <- style_codes(pieces)
   if (is.null(styled)) {
     return(list(pieces = pieces, diagnostics = list(diag_record("info", "styler_unavailable",
