@@ -1,4 +1,4 @@
-jmv2gg_version <- "0.2.0"
+jmv2gg_version <- "0.2.1"
 
 # Names the setup code defines. Source code that defines one of them would be
 # overwritten, so conversion refuses it.
@@ -129,4 +129,28 @@ figure_setup_code <- function(options, packages) {
     "}"
   )
   paste(lines, collapse = "\n")
+}
+
+# jmvcore 28.3 (CRAN) prints jamovi results in HTML reports through a knitr method
+# that fails for some results (jmv::reliability: "invalid argument type"), which
+# stops the whole knit, original jamovi reports included. The generated report
+# prints such a result as plain text instead; every other result is unchanged.
+jmv_print_fallback_code <- function() {
+  c(
+    "# ---- jamovi results in the knitted report ----",
+    "# jmvcore 28.3 prints jamovi results in HTML reports with a method that fails",
+    "# for some results (jmv::reliability: \"invalid argument type\") and stops the",
+    "# whole knit. This prints such a result as plain text, as in the R console;",
+    "# results that print correctly are unchanged. It can be removed once jmvcore",
+    "# fixes the method.",
+    "if (requireNamespace(\"jmvcore\", quietly = TRUE) && requireNamespace(\"knitr\", quietly = TRUE)) {",
+    "  jmv_html_print <- utils::getS3method(\"knit_print\", \"ResultsElement\",",
+    "    optional = TRUE, envir = asNamespace(\"knitr\"))",
+    "  if (!is.null(jmv_html_print)) {",
+    "    registerS3method(\"knit_print\", \"ResultsElement\", function(x, ...) {",
+    "      tryCatch(jmv_html_print(x, ...), error = function(e) knitr::normal_print(x))",
+    "    }, envir = asNamespace(\"knitr\"))",
+    "  }",
+    "}"
+  )
 }

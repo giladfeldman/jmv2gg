@@ -1,3 +1,14 @@
+# jmv2gg 0.2.1
+
+- Converted R Markdown reports with jamovi analyses now knit with the current CRAN
+  jmvcore (28.3). Its HTML printer fails on some results (`jmv::reliability`:
+  "invalid argument type") and stopped the whole knit, original jamovi reports
+  included. The generated setup chunk now has a commented fallback that prints such a
+  result as plain text, as in the R console; results that print correctly are
+  unchanged. Checked by knitting the bundled complex report with jmvcore 28.3 and
+  jmv 2.8.0 (reliability printed as text, all 27 figures embedded), and by a test
+  that runs the generated block against a failing printer.
+
 # jmv2gg 0.2.0
 
 Figures

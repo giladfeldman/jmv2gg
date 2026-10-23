@@ -131,8 +131,11 @@ convert_rmd <- function(text, engine = c("both", "ggplot2", "bettergg"),
     analyses <- c(analyses,records)
     i <- end+1L
   }
-  if (length(plots)) {
-    styled <- style_generated(c(list(setup = figure_setup_code(options, packages)), blocks), options)
+  # jamovi results need the print fallback (jmv_print_fallback_code) even without new figures.
+  has_jmv <- any(vapply(analyses, function(a) identical(a$package, "jmv"), logical(1)))
+  if (length(plots) || has_jmv) {
+    setup_code <- c(if (length(plots)) c(figure_setup_code(options, packages), ""), if (has_jmv) jmv_print_fallback_code())
+    styled <- style_generated(c(list(setup = setup_code), blocks), options)
     diagnostics <- c(diagnostics, styled$diagnostics)
     for (key in names(blocks)) output[output == key] <- styled$pieces[[key]]
     setup <- c("", "```{r jmv2gg-setup, include=FALSE}", styled$pieces$setup, "```")

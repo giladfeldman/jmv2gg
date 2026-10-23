@@ -6,12 +6,12 @@ Imports: ragg, systemfonts, beeswarm, dplyr, emmeans, ggdist, rlang,
 Suggests: car, ggrepel, ggside, ggsignif, paletteer, psych,
         statsExpressions, testthat (>= 3.0.0), withr
 License: MIT + file LICENSE
-MD5sum: 56ebb0606c3a20253b9380ce9b5c6242
-Built: R 4.6.0; ; 2026-10-22 22:45:34 UTC; unix
+MD5sum: 3dabbd09fcc61d17790fd136153f8620
+Built: R 4.6.0; ; 2026-10-23 04:34:40 UTC; unix
 File: BetterGG_0.2.0.tgz
 
 Package: jmv2gg
-Version: 0.2.0
+Version: 0.2.1
 Depends: R (>= 4.5.0)
 Imports: jsonlite, yaml, BetterGG (>= 0.2.0)
 Suggests: ggplot2, emmeans, car, afex, haven, ragg, ggdist, ggrepel,
@@ -19,13 +19,13 @@ Suggests: ggplot2, emmeans, car, afex, haven, ragg, ggdist, ggrepel,
         psych, ggstatsplot, rmarkdown, knitr, markdown, jmvcore,
         testthat (>= 3.0.0), withr, png, callr
 License: MIT + file LICENSE
-MD5sum: 3ee5ebb2f151abe180c301b3866e3e4c
-Built: R 4.6.0; ; 2026-10-22 22:47:18 UTC; unix
-File: jmv2gg_0.2.0.tgz
+MD5sum: 6ce4942a674d148c6b1ef0ec013298ee
+Built: R 4.6.0; ; 2026-10-23 04:36:09 UTC; unix
+File: jmv2gg_0.2.1.tgz
 
 Package: websocket
 Version: 1.2.0.9000
 License: MIT + file LICENSE
-MD5sum: 820924e9dd408e681a0b1ae01b665880
-Built: R 4.6.0; ; 2026-10-22 22:47:21 UTC; unix
+MD5sum: c1c9f5a61e2cfc5b30b8b0d384ca2454
+Built: R 4.6.0; ; 2026-10-23 04:36:11 UTC; unix
 File: websocket_1.2.0.9000.tgz

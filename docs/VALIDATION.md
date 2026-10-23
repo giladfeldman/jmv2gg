@@ -27,6 +27,16 @@ applied in descriptives, contingency tables, linear and logistic regression; not
 by jmv's ANOVA and ANCOVA, hence not by these figures; refused for correlations,
 t-tests, repeated measures and reliability.
 
+## Recorded release checks (0.2.1)
+
+- jmvcore 28.3 / jmv 2.8.0 (current CRAN): a document printing `jmv::reliability` failed
+  to knit to HTML ("invalid argument type" in jmvcore's knitr printer), for the original
+  example report as well as the converted one; GitHub CI showed it first (local R had
+  jmvcore 2.7.7). With 0.2.1's setup-chunk fallback the converted complex report knits
+  with jmvcore 28.3: reliability printed as text (Cronbach's alpha 0.7722), the
+  contingency table 5.611, all 27 figures embedded; the unconverted original still fails
+  there (control). Native suite: 518 assertions, zero failures/errors/skips.
+
 ## Recorded release checks (0.2.0)
 
 - Native Windows R 4.6.1: 514 assertions at the final BetterGG pin (see the release

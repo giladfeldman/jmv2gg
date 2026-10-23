@@ -190,3 +190,23 @@ test_that("the example's contingency table (run through the websocket placeholde
   expect_equal(chi[["p[chiSq]"]], 0.06046279, tolerance = 1e-6)
   expect_identical(as.integer(chi[["value[N]"]]), 234L)
 })
+
+test_that("converted reports with jamovi analyses carry the jmvcore print fallback, and it works", {
+  rmd <- function(code) paste("---", "title: t", "---", "", "```{r}", code, "```", sep = "\n")
+  with_jmv <- convert_rmd(rmd('jmv::descriptives(data = d, vars = "y")'), engine = "ggplot2", style = list(styler = FALSE))
+  expect_match(with_jmv$text, "# ---- jamovi results in the knitted report ----", fixed = TRUE)
+  without <- convert_rmd(rmd("ggstatsplot::ggbetweenstats(data = d, x = g, y = y)"), engine = "ggplot2", style = list(styler = FALSE))
+  expect_false(grepl("jamovi results in the knitted report", without$text, fixed = TRUE))
+  # Run the generated block against a failing HTML printer (as jmvcore 28.3's is for reliability).
+  skip_if_not_installed("knitr"); skip_if_not_installed("jmvcore")
+  loadNamespace("jmvcore")
+  knitr_ns <- asNamespace("knitr")
+  before <- utils::getS3method("knit_print", "ResultsElement", optional = TRUE, envir = knitr_ns)
+  on.exit(if (is.null(before)) registerS3method("knit_print", "ResultsElement", function(x, ...) knitr::normal_print(x), envir = knitr_ns)
+    else registerS3method("knit_print", "ResultsElement", before, envir = knitr_ns), add = TRUE)
+  registerS3method("knit_print", "ResultsElement", function(x, ...) stop("invalid argument type"), envir = knitr_ns)
+  fake <- structure(list(), class = "ResultsElement")
+  expect_error(knitr::knit_print(fake), "invalid argument type")
+  eval(parse(text = jmv_print_fallback_code()), envir = new.env())
+  expect_no_error(knitr::knit_print(fake))
+})
