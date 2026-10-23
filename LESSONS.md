@@ -55,6 +55,25 @@
 - Public docs use synthetic examples and generic paths. Keep owner decisions,
   private inputs, backups/history details and handoffs outside public source/archives.
 
+## 0.2.3: long documents in the browser
+
+- Time a release on the largest real documents, not only the bundled examples. A
+  replication report (37 analyses, 158 KB) took minutes to convert; the examples took
+  seconds. In a real corpus of 625 jamovi R Markdown files the generated code reached
+  40,000 lines.
+- styler takes about 30 ms per generated line in WebR 0.6.0 (about 9 ms natively), so
+  it is skipped in the browser above 2,000 lines, with a note; one call for the whole
+  document is no faster than one per piece.
+- regmatches() on one long string not marked UTF-8 cut each match out by walking the
+  text from its start (82 s for one document); for ASCII patterns use useBytes = TRUE.
+- knitr reads a chunk header from one line. deparse() wraps long vectors, so a figure
+  chunk with many captions became plain text and its figures were silently not drawn;
+  build header options as one line, and test that knitr::purl() extracts the chunk.
+- A long silent step needs counted progress from R: write "jmv2gg-progress" lines with
+  message() and stream them (captureStreams = FALSE), as the report render does.
+- Validation scripts that look up generated object names go stale when the generator
+  changes; run them each release, or they stop checking anything.
+
 ## 0.2.1: jmvcore 28.3 report printing
 
 - Verify a generated-code change with the defaults users get (styler on, the web app),

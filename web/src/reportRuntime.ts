@@ -1,7 +1,8 @@
 import type { WebR } from 'webr';
 import { cleanPackages } from './lib/requests';
 import { parseProgressLine, type PhaseSpec, type ProgressTracker } from './lib/progress';
-import { converterDependencies, installConverter, installFromLock, installPlaceholders, startWebR, type Session } from './runtime';
+import { converterDependencies, installConverter, installFromLock, installPlaceholders, startWebR, streamR,
+  type Session } from './runtime';
 
 export const renderTimeLimitMs = 15 * 60 * 1000;
 /** R's own limit inside the document run; the 15-minute browser limit also covers installs. */
@@ -87,21 +88,7 @@ export class ReportRenderer {
         confirmed = jsonlite::fromJSON(${JSON.stringify(JSON.stringify(confirmed))}),
         time_limit = ${rTimeLimitSeconds}, progress = TRUE); ""
     }, error = function(e) conditionMessage(e))`;
-    let finished = false;
-    const result = session.runtime.evalRString(code, { captureStreams: false, captureConditions: false })
-      .finally(() => { finished = true; });
-    const ended = result.then(() => undefined, () => undefined);
-    let pending = '';
-    while (!finished && !this.closed) {
-      const message = await Promise.race([session.runtime.read(), ended]);
-      if (!message) break;
-      if (message.type !== 'stdout' && message.type !== 'stderr') continue;
-      pending += `${String(message.data)}\n`;
-      const lines = pending.split('\n');
-      pending = lines.pop() ?? '';
-      for (const line of lines) applyRenderOutput(line, this.tracker);
-    }
-    return result;
+    return streamR(session.runtime, code, line => applyRenderOutput(line, this.tracker), () => this.closed);
   }
   /** Cancels: the pending render rejects at once and the WebR instance is terminated. */
   close(reason = 'Rendering was cancelled.') {

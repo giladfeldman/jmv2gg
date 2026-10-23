@@ -42,7 +42,8 @@ for(engine in engines) {
   for(a in converted$analyses) {
     if(!a$function_name %in% c("ANOVA","logRegBin") || is.null(a$binding)) next
     original<-get(a$binding,envir=render_env)
-    model<-get(paste0(".jmv2gg_",a$id,"_model"),envir=render_env)
+    # Generated figure blocks keep their model as <analysis name>_model (anova_1_model).
+    model<-get(paste0(a$name,"_model"),envir=render_env)
     if(a$function_name=="ANOVA") {
       reference_table<-original$main$asDF
       reference_table<-reference_table[reference_table$name != "Overall model",,drop=FALSE]

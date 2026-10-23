@@ -1,4 +1,4 @@
-jmv2gg_version <- "0.2.2"
+jmv2gg_version <- "0.2.3"
 
 # Names the setup code defines. Source code that defines one of them would be
 # overwritten, so conversion refuses it.

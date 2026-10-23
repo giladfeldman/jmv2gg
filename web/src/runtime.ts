@@ -2,7 +2,7 @@ import { WebR, type RFunction, type RCharacter } from 'webr';
 import { cleanPackages, normaliseResult, normaliseScan } from './lib/requests';
 import { limits } from './lib/files';
 import { installOrder, packageDb, runtimeDependencies, type PackageDb } from './lib/packages';
-import { ProgressTracker, type PhaseSpec } from './lib/progress';
+import { ProgressTracker, parseProgressLine, type PhaseSpec } from './lib/progress';
 import type { ConversionRequest, ConversionResult, PreviewFile, ScanRequest, ScanResult } from './types';
 
 export const webrBaseUrl = 'https://webr.r-wasm.org/v0.6.0/';
@@ -14,7 +14,8 @@ export const setupPhases: PhaseSpec[] = [
   { id: 'packages', label: 'Install R packages' },
   { id: 'converter', label: 'Install jmv2gg and BetterGG' },
 ];
-export const convertPhases: PhaseSpec[] = [...setupPhases, { id: 'convert', label: 'Convert your analysis' }];
+export const convertPhases: PhaseSpec[] = [...setupPhases, { id: 'convert', label: 'Convert your analysis' },
+  { id: 'style', label: 'Tidy the generated code' }];
 export const scanPhases: PhaseSpec[] = [...setupPhases, { id: 'scan', label: 'Check the report before rendering' }];
 export const previewPhases: PhaseSpec[] = [...setupPhases,
   { id: 'plot-packages', label: 'Install plotting packages' },
@@ -103,6 +104,51 @@ export async function installPlaceholders(session: Session, tracker: ProgressTra
   await session.runtime.installPackages(['websocket'], { repos: `${location.origin}/r-packages`, quiet: true });
 }
 
+/**
+ * Runs R code with its output streamed instead of captured, and passes each line R writes to
+ * `onLine` while R works (the "jmv2gg-progress" lines R writes with message()). Resolves with
+ * the code's string result.
+ */
+export async function streamR(runtime: WebR, code: string, onLine: (line: string) => void, isClosed: () => boolean) {
+  let finished = false;
+  const result = runtime.evalRString(code, { captureStreams: false, captureConditions: false })
+    .finally(() => { finished = true; });
+  const ended = result.then(() => undefined, () => undefined);
+  let pending = '';
+  while (!finished && !isClosed()) {
+    const message = await Promise.race([runtime.read(), ended]);
+    if (!message) break;
+    if (message.type !== 'stdout' && message.type !== 'stderr') continue;
+    pending += `${String(message.data)}\n`;
+    const lines = pending.split('\n');
+    pending = lines.pop() ?? '';
+    for (const line of lines) onLine(line);
+  }
+  return result;
+}
+
+/**
+ * Applies one line of R output during a conversion: chunks of the document as they are read,
+ * then the parts of the generated code as styler tidies them (the slow step for long documents).
+ */
+export function applyConvertOutput(line: string, tracker: ProgressTracker) {
+  const progress = parseProgressLine(line);
+  if (!progress) return false;
+  if (progress.label === 'format') {
+    tracker.phase('style', 'Tidying the generated code with styler…');
+    tracker.count(progress.done, progress.total, '',
+      `Tidying the generated code: part ${progress.done} of ${progress.total}`);
+  } else {
+    tracker.count(progress.done, progress.total, '', `Reading the document: chunk ${progress.done} of ${progress.total}`);
+  }
+  return true;
+}
+
+/** The conversion call: the request is read from a file, so long documents need no escaping in R code. */
+const convertCall = 'tryCatch(as.character(jmv2gg::browser_request(paste(readLines("/workspace/request.json", '
+  + 'warn = FALSE, encoding = "UTF-8"), collapse = "\\n"))), error = function(e) '
+  + 'as.character(jsonlite::toJSON(list(error = conditionMessage(e)), auto_unbox = TRUE)))';
+
 export async function withTimeout<T>(work: Promise<T>, ms: number, message: string): Promise<T> {
   let timer: ReturnType<typeof setTimeout> | undefined;
   const limit = new Promise<never>((_, reject) => { timer = setTimeout(() => reject(new Error(message)), ms); });
@@ -158,7 +204,13 @@ export class RWorkbench {
     await this.initialize(tracker);
     this.tracker.phase('convert', 'Converting with the jmv2gg R package…');
     this.status('Converting with the installed jmv2gg R package…');
-    return normaliseResult(await this.call<ConversionResult>(request));
+    const runtime = this.session!.runtime;
+    await runtime.FS.writeFile('/workspace/request.json',
+      new TextEncoder().encode(JSON.stringify({ ...request, progress: true })));
+    const json = await streamR(runtime, convertCall, line => applyConvertOutput(line, this.tracker), () => this.closed);
+    const response = JSON.parse(json);
+    if (response.error) throw new Error(response.error);
+    return normaliseResult(response as ConversionResult);
   }
   /** Lists what a document would do before it is rendered; nothing in it is executed. */
   async scan(source: string, tracker?: ProgressTracker) {

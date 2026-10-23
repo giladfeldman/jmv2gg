@@ -5,7 +5,7 @@ Conversion runs in native R or in a browser using the same R package through Web
 
 Use the [browser workbench](https://jmv2gg.vercel.app/) without installing R.
 
-This is version 0.2.2. Check the capability notes before using generated
+This is version 0.2.3. Check the capability notes before using generated
 figures in research. Unsupported analyses are preserved and reported; numerical
 equivalence is never inferred from a visually similar plot.
 
@@ -14,7 +14,7 @@ equivalence is never inferred from a visually similar plot.
 ```r
 install.packages("remotes")
 remotes::install_github("giladfeldman/BetterGG@v0.2.0", upgrade = "never")
-remotes::install_github("giladfeldman/jmv2gg@v0.2.2", upgrade = "never")
+remotes::install_github("giladfeldman/jmv2gg@v0.2.3", upgrade = "never")
 
 result <- jmv2gg::convert_code(
   'jmv::ANOVA(data = study, dep = "score", factors = "condition")',
@@ -156,7 +156,7 @@ PowerShell:
 Rscript tools/check.R
 Rscript -e 'roxygen2::roxygenise()'
 R CMD build .
-R CMD check --no-manual jmv2gg_0.2.2.tar.gz
+R CMD check --no-manual jmv2gg_0.2.3.tar.gz
 npm --prefix web ci
 npm --prefix web run build
 npm --prefix web run dev

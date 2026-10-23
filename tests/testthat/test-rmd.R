@@ -23,3 +23,20 @@ test_that("disabled source chunks stay disabled", {
   out <- convert_rmd(text,engine="ggplot2")
   expect_match(out$text,'cache=FALSE, eval=FALSE',fixed=TRUE)
 })
+
+test_that("a figure chunk with many captions keeps its header on one line, so knitr runs it", {
+  vars <- paste0("item_with_a_long_descriptive_name_", 1:14)
+  source <- paste("---", "title: t", "---", "", "```{r}",
+    paste0("jmv::descriptives(data = d, vars = c(", paste0('"', vars, '"', collapse = ", "), "))"), "```", sep = "\n")
+  out <- convert_rmd(source, engine = "both", style = list(styler = FALSE))
+  lines <- strsplit(out$text, "\n", fixed = TRUE)[[1]]
+  header <- grep("^```[{]r jmv2gg-descriptives", lines, value = TRUE)
+  expect_length(header, 1L)
+  expect_match(header, "cache=FALSE}$")
+  expect_gt(nchar(header), 1000L)
+  # knitr extracts the figure code only from a chunk it recognises.
+  rmd <- tempfile(fileext = ".Rmd"); r <- tempfile(fileext = ".R")
+  writeLines(out$text, rmd)
+  knitr::purl(rmd, output = r, quiet = TRUE, documentation = 0L)
+  expect_true(any(grepl("descriptives_1: jmv::descriptives", readLines(r), fixed = TRUE)))
+})

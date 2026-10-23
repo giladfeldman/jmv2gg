@@ -29,7 +29,9 @@ convert_rmd <- function(text, engine = c("both", "ggplot2", "bettergg"),
   header <- tryCatch(merge_html_yaml(lines, html_preset), error=identity)
   if (inherits(header,"error")) return(new_result(text,list(),list(diag_record("error","invalid_yaml",conditionMessage(header))),engine))
   # Every identifier in the document, so generated names never clash with the author's.
-  symbols <- unique(regmatches(text, gregexpr("[A-Za-z.][A-Za-z0-9._]*", text))[[1]])
+  # useBytes: the pattern is ASCII, and without it a long text not marked UTF-8 took minutes
+  # (each match was cut out by walking the text from its start).
+  symbols <- unique(regmatches(text, gregexpr("[A-Za-z.][A-Za-z0-9._]*", text, useBytes = TRUE))[[1]])
   reserved <- reserved_name_clash(symbols)
   if (!is.null(reserved)) return(new_result(text, list(), c(diagnostics, list(reserved)), engine))
   output <- c(header$lines, "<!-- jmv2gg:converted v2 -->")
@@ -44,14 +46,19 @@ convert_rmd <- function(text, engine = c("both", "ggplot2", "bettergg"),
   heading_level <- 1L
   counts <- list()
   blocks <- list()
+  chunk_pattern <- "^([ \t]*)(`{3,}|~{3,})\\{[rR]([ ,}].*)$"
+  chunk_total <- if (i <= length(lines)) sum(grepl(chunk_pattern, lines[i:length(lines)])) else 0L
+  chunk_done <- 0L
   while (i <= length(lines)) {
     line <- lines[i]
     if (grepl("^#{1,6} ",line)) {
       heading <- sub("^#+ +","",line)
       heading_level <- nchar(sub(" .*$", "", line))
     }
-    fence <- regmatches(line,regexec("^([ \t]*)(`{3,}|~{3,})\\{[rR]([ ,}].*)$",line))[[1]]
+    fence <- regmatches(line,regexec(chunk_pattern,line))[[1]]
     if (!length(fence)) {output <- c(output,line); i <- i+1L; next}
+    chunk_done <- chunk_done + 1L
+    report_progress(chunk_done, chunk_total, "chunk")
     chunk_start <- i
     delimiter <- fence[3]
     end <- i+1L
@@ -112,7 +119,7 @@ convert_rmd <- function(text, engine = c("both", "ggplot2", "bettergg"),
       code_key <- paste0("\001jmv2gg-code-", length(blocks) + 1L)
       blocks[[code_key]] <- generated_result$code
       generated <- c(generated, heading_lines, "", statistical_notes, if (length(statistical_notes)) "",
-        paste0(delimiter,"{r jmv2gg-",gsub("_", "-", record$name),", fig.cap=", r_text(captions), ", cache=FALSE",
+        paste0(delimiter,"{r jmv2gg-",gsub("_", "-", record$name),", fig.cap=", chunk_option_text(captions), ", cache=FALSE",
           if(disabled)", eval=FALSE" else "","}"),
         code_key,delimiter)
       plots <- c(plots,generated_result$plots)

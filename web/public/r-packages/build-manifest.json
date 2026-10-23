@@ -1,20 +1,20 @@
 {
   "webR": "0.6.0",
   "sources": {
-    "DESCRIPTION": "8ccaa096af23cf2f2c6b94590ad96be07fc8d5af26b8f6c8cd20e83d5fd6b0f6",
+    "DESCRIPTION": "cb17a29ab7fabb1c55bb57f2c9ece6873349169108ff7bedbd66ff794fc1a230",
     "LICENSE": "b372a87757468731e51fa95c57148b406c2eca27760a9db99f4b797af50cb3c1",
     "NAMESPACE": "b8feb8194d938289bec873d0257a1242a53157359ff9622e88bf240065660c17",
-    "R/browser.R": "ff050360bf125989430aeccc30d1ed202e3fef8a195c3ceb77059b5ee885c8e3",
-    "R/contracts.R": "21e278eb39f2e1a58af2afda8118f8418a9a726c005a9fcc2d81e18cc692f567",
-    "R/generate.R": "e093295ff90653f7c4f6d5377bf98429d77160e2609ae7752476a4ac21d2d1f1",
+    "R/browser.R": "1199c29c5ef90722a242841e97e630f71a9a286e70a836d68180032d9ff676ab",
+    "R/contracts.R": "6d6c5c2e266f3bcc65ac4dfc6094282baac84e0441525f9751534035d4cda442",
+    "R/generate.R": "ac6e30a1e4dce94f1c60ee57441b2763c6e03bd91e88897c7a5b740ec5b9ca5b",
     "R/map-groups.R": "016f775c8c2d499cb8513bbf393e05a240242239d622b7c100a80b0d392b63d2",
     "R/map-other.R": "3eadc749d20f846cce4b9fc92cd928d1a4e4e9ea6b07a9aea3f6362b033f824f",
     "R/names.R": "4ab4d8ffe8c64204f720a2a3526e22d1caee3228177a83b778d0df1a955311aa",
     "R/optimize.R": "c07efeb7dd675cf9b70aa81dd6578f68b7685f7a0b44aa8a21dc7b92f033b38b",
     "R/parser.R": "0abf6f4410a5f083aa1305293f3eb88c443c98dd31000bcb56f8c10bbc38993f",
     "R/render-browser.R": "e37427895734408995b2e32f1745aee4c2f5dbdfbf8ba6744ab11b07b3bd3ded",
-    "R/rmd.R": "d0eea314866fdf26538a119fb48d66f6316497eeb4f8dfec04ca10cb2d0b0322",
-    "R/setup.R": "3e6c5d479769c721020a85d560d643e08ea667d15faebaecb11e7923e958c22c",
+    "R/rmd.R": "5f3290553dc8e325b5af636c66e7925082caa68beb1e872378b7fe839236d3ad",
+    "R/setup.R": "bf0ef7c8aacb2bfaa47dc29d96c4512e77507fc6121008957edee456bfec3434",
     "inst/adversarial/benign.Rmd": "c5795d8d4806d72d5cb02e74b2d53ef67c4c7e4c4d71ba41b7ca0b92b764c5e6",
     "inst/adversarial/child.Rmd": "5e45096e773254aa41f60387305154c0dce8d193ee489c13d7dd56fea7bc8d35",
     "inst/adversarial/cookies.Rmd": "4b4d385c69ca4374b2ef9071b71f4377b43275d1781c3f30f0a9787f6c627e58",
@@ -40,8 +40,8 @@
     "man/runtime_capabilities.Rd": "97c598ab7369af234a470591aa13008d12611422e275f320c5fd0a3dc7581a1e",
     "man/scan_rmd_risks.Rd": "75fb55023996f89cb25329dbf3b2eb46ba91092ba8192cb806572a855d61aa91"
   },
-  "artifact": "bin/emscripten/contrib/4.6/jmv2gg_0.2.2.tgz",
-  "sha256": "dffe2afc3ee03b9e1e40d42cb351790846a7491df428a610677e324db71ee653",
+  "artifact": "bin/emscripten/contrib/4.6/jmv2gg_0.2.3.tgz",
+  "sha256": "0fdb70c4ea354502562b9ef7c142c8b389d9f827d859471dcdff5aeb766e5cd7",
   "dependencies": {
     "BetterGG": {
       "version": "0.2.0",

@@ -5,19 +5,23 @@ import type { ProgressSnapshot } from './lib/progress';
 const initMock = vi.hoisted(() => vi.fn(async () => {}));
 const fake = vi.hoisted(() => ({
   r: [] as string[], install: [] as unknown[][], closed: 0, installed: ['base', 'utils', 'stats'] as string[],
-  output: [] as { type: string; data: string }[], knitResult: '', knitDelay: 20,
+  output: [] as { type: string; data: string }[], knitResult: '', knitDelay: 20, files: {} as Record<string, string>,
 }));
 vi.mock('webr', () => ({ WebR: class {
   init = initMock;
   installPackages = async (...args: unknown[]) => { fake.install.push(args); };
   FS = {
-    mkdir: async () => {}, writeFile: async () => {}, readFile: async () => new TextEncoder().encode('<p>ok</p>'),
+    mkdir: async () => {},
+    writeFile: async (path: string, bytes: Uint8Array) => { fake.files[path] = new TextDecoder().decode(bytes); }, readFile: async () => new TextEncoder().encode('<p>ok</p>'),
   };
   evalRVoid = async (code: string) => { fake.r.push(code); };
   evalRRaw = async () => fake.installed;
   evalRString = async (code: string) => {
     fake.r.push(code);
     await new Promise(resolve => setTimeout(resolve, fake.knitDelay));
+    if (code.includes('browser_request')) {
+      return JSON.stringify({ status: 'complete', analyses: [], diagnostics: [], manifest: { converted: 1 } });
+    }
     return fake.knitResult;
   };
   read = () => {
@@ -55,7 +59,7 @@ function stubNetwork() {
 const installs = () => fake.r.map(code => /webr::install\("([^"]+)"/.exec(code)?.[1]).filter(Boolean);
 
 beforeEach(() => {
-  fake.r.length = 0; fake.install.length = 0; fake.output.length = 0;
+  fake.r.length = 0; fake.install.length = 0; fake.output.length = 0; fake.files = {};
   fake.installed = ['base', 'utils', 'stats']; fake.knitResult = ''; fake.knitDelay = 20;
 });
 
@@ -67,6 +71,25 @@ describe('workbench transport', () => {
     const result = await runtime.convert(request);
     expect(result.status).toBe('complete');
     expect(result.manifest.converted).toBe(1);
+  });
+  it('streams conversion progress: document chunks, then styler parts', async () => {
+    stubNetwork();
+    fake.output.push({ type: 'stderr', data: 'jmv2gg-progress 1 3 chunk' },
+      { type: 'stderr', data: 'jmv2gg-progress 3 3 chunk' },
+      { type: 'stderr', data: 'jmv2gg-progress 2 38 format' });
+    const seen: ProgressSnapshot[] = [];
+    const tracker = new ProgressTracker('t', [{ id: 'convert', label: 'Convert' }, { id: 'style', label: 'Tidy' }],
+      snapshot => seen.push(snapshot), { store: null });
+    const request = { source: 'x <- 1', mode: 'rmd', action: 'convert', engine: 'both' } as ConversionRequest;
+    const result = await new RWorkbench(() => {}).convert(request, tracker);
+    expect(result.manifest.converted).toBe(1);
+    const messages = seen.map(item => item.message);
+    expect(messages).toContain('Reading the document: chunk 3 of 3');
+    expect(messages).toContain('Tidying the generated code: part 2 of 38');
+    expect(seen.at(-1)!.phases.map(phase => phase.status)).toEqual(['done', 'current']);
+    // The request reaches R through a file, with progress switched on.
+    expect(JSON.parse(fake.files['/workspace/request.json'])).toMatchObject({ source: 'x <- 1', progress: true });
+    expect(fake.r.find(code => code.includes('browser_request'))).toContain('/workspace/request.json');
   });
   it('reports a startup timeout instead of waiting indefinitely', async () => {
     vi.useFakeTimers();

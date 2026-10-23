@@ -5,6 +5,10 @@
 browser_request <- function(request_json) {
   request <- jsonlite::fromJSON(request_json,simplifyVector=FALSE)
   source <- request$source %||% ""
+  if (isTRUE(request$progress)) {
+    old <- options(jmv2gg.progress = TRUE)
+    on.exit(options(old), add = TRUE)
+  }
   if(identical(request$action,"scan")) {
     # The risk scan before an in-browser render; nothing is executed.
     scan <- scan_rmd_risks(source)
@@ -84,4 +88,11 @@ simulate_for_analysis <- function(a,n) {
     for(ref in arg_value(a,"refLevels",list())) data[[ref$var]] <- factor(rep(c(ref$ref,"Other"),length.out=n))
   }
   data
+}
+
+# One progress line for the browser, "jmv2gg-progress <done> <total> <label>", written
+# with message() as item <done> starts; only when browser_request() was asked for progress.
+report_progress <- function(done, total, label) {
+  if (isTRUE(getOption("jmv2gg.progress"))) message("jmv2gg-progress ", done, " ", total, " ", label)
+  invisible(NULL)
 }

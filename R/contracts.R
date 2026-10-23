@@ -74,6 +74,12 @@ assert_text <- function(x) {
 `%||%` <- function(x, y) if (is.null(x)) y else x
 r_text <- function(x) paste(deparse(x, width.cutoff = 500L, backtick = TRUE), collapse = "\n")
 r_string <- function(x) encodeString(x, quote = '"')
+# A character vector as R code on ONE line, for a chunk header: knitr reads a header from
+# a single line, and deparse() wraps long vectors (a wrapped fig.cap turned the whole
+# figure chunk into plain text, so its figures were never drawn).
+chunk_option_text <- function(x) {
+  if (length(x) == 1L) r_string(x) else paste0("c(", paste(r_string(x), collapse = ", "), ")")
+}
 r_name <- function(x) vapply(x,encodeString,character(1),quote="`",USE.NAMES=FALSE)
 # A name as readable code: bare when syntactic, backticked otherwise.
 r_sym <- function(x) vapply(x, function(v) if (identical(make.names(v), v)) v else encodeString(v, quote = "`"),

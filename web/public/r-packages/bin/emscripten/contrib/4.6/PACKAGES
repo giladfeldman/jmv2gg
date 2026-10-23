@@ -7,11 +7,11 @@ Suggests: car, ggrepel, ggside, ggsignif, paletteer, psych,
         statsExpressions, testthat (>= 3.0.0), withr
 License: MIT + file LICENSE
 MD5sum: 56ebb0606c3a20253b9380ce9b5c6242
-Built: R 4.6.0; ; 2026-10-23 06:23:01 UTC; unix
+Built: R 4.6.0; ; 2026-10-23 10:18:17 UTC; unix
 File: BetterGG_0.2.0.tgz
 
 Package: jmv2gg
-Version: 0.2.2
+Version: 0.2.3
 Depends: R (>= 4.5.0)
 Imports: jsonlite, yaml, BetterGG (>= 0.2.0)
 Suggests: ggplot2, emmeans, car, afex, haven, ragg, ggdist, ggrepel,
@@ -19,13 +19,13 @@ Suggests: ggplot2, emmeans, car, afex, haven, ragg, ggdist, ggrepel,
         psych, ggstatsplot, rmarkdown, knitr, markdown, jmvcore,
         testthat (>= 3.0.0), withr, png, callr
 License: MIT + file LICENSE
-MD5sum: e98fa52660da4288872a665aed13d6d7
-Built: R 4.6.0; ; 2026-10-23 06:23:45 UTC; unix
-File: jmv2gg_0.2.2.tgz
+MD5sum: 7eded0cea9a56dcfefd4faad99277518
+Built: R 4.6.0; ; 2026-10-23 10:20:35 UTC; unix
+File: jmv2gg_0.2.3.tgz
 
 Package: websocket
 Version: 1.2.0.9000
 License: MIT + file LICENSE
 MD5sum: 820924e9dd408e681a0b1ae01b665880
-Built: R 4.6.0; ; 2026-10-23 06:23:46 UTC; unix
+Built: R 4.6.0; ; 2026-10-23 10:20:38 UTC; unix
 File: websocket_1.2.0.9000.tgz

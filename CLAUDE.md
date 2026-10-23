@@ -2,7 +2,7 @@
 
 Read [AGENTS.md](AGENTS.md), [README.md](README.md), [CONTRIBUTING.md](CONTRIBUTING.md),
 [architecture](docs/ARCHITECTURE.md), [capabilities/validation](docs/VALIDATION.md),
-and [deployment](docs/DEPLOYMENT.md). Package/frontend version: 0.2.2.
+and [deployment](docs/DEPLOYMENT.md). Package/frontend version: 0.2.3.
 
 Keep conversion in R. Never evaluate uploaded source to infer analyses. Preserve
 original analyses, explicit terms, dataset snapshots, weights, factor value mappings,

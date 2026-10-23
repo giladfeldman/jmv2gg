@@ -1,3 +1,17 @@
+# jmv2gg 0.2.3
+
+- Figure chunks with many figures were not run: their header (`fig.cap=c(...)`) was
+  split over two lines, so knitr showed the chunk as text and drew none of its figures,
+  without a warning (a descriptives analysis of 7 variables with both engines). Chunk
+  headers are now always one line.
+- Converting long documents is faster: the name scan that took up to 82 s on one
+  replication report now takes well under a second, with identical output.
+- The web app shows conversion progress: each R chunk as it is read, then each part of
+  the generated code as styler tidies it, with a time estimate.
+- In the browser, generated code over 2,000 lines keeps jmv2gg's own layout instead of
+  being tidied with styler, which would take minutes there; a note says so and how to
+  tidy it in R. Native R is unchanged.
+
 # jmv2gg 0.2.2
 
 - The 0.2.1 fallback for jmvcore 28.3 was missing from converted reports whenever the
