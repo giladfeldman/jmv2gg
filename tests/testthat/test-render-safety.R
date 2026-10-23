@@ -169,7 +169,7 @@ test_that("a jmv result whose knitr HTML printing fails is printed as text, not 
   fake <- structure(list(), class = "ResultsElement")
   expect_error(knitr::knit_print(fake), "invalid argument type")
   restore <- guard_jmv_knit_print()
-  expect_no_error(knitr::knit_print(fake))
+  expect_output(knitr::knit_print(fake), "Note: jmvcore could not print this jamovi result as HTML (invalid argument type); it is printed as text.", fixed = TRUE)
   restore()
   expect_error(knitr::knit_print(fake), "invalid argument type")
 })
@@ -208,5 +208,12 @@ test_that("converted reports with jamovi analyses carry the jmvcore print fallba
   fake <- structure(list(), class = "ResultsElement")
   expect_error(knitr::knit_print(fake), "invalid argument type")
   eval(parse(text = jmv_print_fallback_code()), envir = new.env())
-  expect_no_error(knitr::knit_print(fake))
+  expect_output(knitr::knit_print(fake), "Note: jmvcore could not print this jamovi result as HTML (invalid argument type); it is printed as text.", fixed = TRUE)
+  # Running the chunk twice in the SAME environment (re-running setup in a session) must not make
+  # the wrapper call itself; a working printer must still print as HTML afterwards.
+  registerS3method("knit_print", "ResultsElement", function(x, ...) knitr::asis_output("<b>ok</b>"), envir = knitr_ns)
+  same <- new.env()
+  eval(parse(text = jmv_print_fallback_code()), envir = same)
+  eval(parse(text = jmv_print_fallback_code()), envir = same)
+  expect_match(as.character(knitr::knit_print(fake)), "<b>ok</b>", fixed = TRUE)
 })

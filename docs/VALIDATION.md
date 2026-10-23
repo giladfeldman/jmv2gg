@@ -33,9 +33,12 @@ t-tests, repeated measures and reliability.
   to knit to HTML ("invalid argument type" in jmvcore's knitr printer), for the original
   example report as well as the converted one; GitHub CI showed it first (local R had
   jmvcore 2.7.7). With 0.2.1's setup-chunk fallback the converted complex report knits
-  with jmvcore 28.3: reliability printed as text (Cronbach's alpha 0.7722), the
+  with jmvcore 28.3: reliability printed as text under the note "jmvcore could not
+  print this jamovi result as HTML (invalid argument type)" (Cronbach's alpha 0.7722), the
   contingency table 5.611, all 27 figures embedded; the unconverted original still fails
-  there (control). Native suite: 518 assertions, zero failures/errors/skips.
+  there (control). Review found that re-running the setup chunk in one session made
+  the first version print every jamovi result as text; fixed and tested. Native suite:
+  519 assertions, zero failures/errors/skips.
 
 ## Recorded release checks (0.2.0)
 

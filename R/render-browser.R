@@ -166,7 +166,8 @@ preview_size_limit <- 20 * 1024^2
 # htmlify), which fails for some results (jmv 2.8.0 / jmvcore 28.3: reliability
 # gives "invalid argument type" in WebR). A failure there would stop the whole
 # preview, so such a result is printed as plain text instead, as in the R
-# console. Returns a function that restores the original method.
+# console, under a note saying so (shown whatever the chunk's warning
+# option). Returns a function that restores the original method.
 guard_jmv_knit_print <- function() {
   knitr_ns <- asNamespace("knitr")
   # jmvcore registers its method when it loads, which a document does mid-render.
@@ -174,7 +175,11 @@ guard_jmv_knit_print <- function() {
   original <- utils::getS3method("knit_print", "ResultsElement", optional = TRUE, envir = knitr_ns)
   if (is.null(original)) return(function() invisible())
   registerS3method("knit_print", "ResultsElement", envir = knitr_ns, function(x, ...) {
-    tryCatch(original(x, ...), error = function(e) knitr::normal_print(x))
+    tryCatch(original(x, ...), error = function(e) {
+      cat("Note: jmvcore could not print this jamovi result as HTML (", conditionMessage(e),
+        "); it is printed as text.\n", sep = "")
+      knitr::normal_print(x)
+    })
   })
   function() registerS3method("knit_print", "ResultsElement", original, envir = knitr_ns)
 }
