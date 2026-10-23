@@ -35,6 +35,13 @@ t-tests, repeated measures and reliability.
   styler off. With 0.2.2's default settings the converted complex example knits with
   jmvcore 28.3 / jmv 2.8.0: one note above the reliability text, 27 figures. Native
   suite: 521 assertions, zero failures/errors/skips.
+- Live, https://jmv2gg.vercel.app at revision 1f66376 (footer and build info 0.2.2),
+  2026-10-23: converting the complex R Markdown example with default settings gives
+  code containing the fallback block; the browser render ran 21 of 21 chunks with 27
+  figures, and the reliability chunk shows the note once, then Cronbach's alpha 0.7722
+  as text, the same value as the native jmvcore 28.3 knit. GitHub CI on that revision
+  (jmvcore 28.3): 516 assertions, zero failures/errors, one skip (no oxipng there); the
+  0.2.1 run had failed on this report.
 
 ## Recorded release checks (0.2.1)
 
