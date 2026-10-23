@@ -55,6 +55,18 @@
 - Public docs use synthetic examples and generic paths. Keep owner decisions,
   private inputs, backups/history details and handoffs outside public source/archives.
 
+## 0.2.1: jmvcore 28.3 report printing
+
+- jmvcore 28.3 (CRAN) prints jamovi results in HTML reports with a knitr method that
+  fails for some results (`jmv::reliability`: "invalid argument type"), stopping the
+  whole knit; local R had jmvcore 2.7.7, so only CI showed it. Check against the
+  current CRAN jmvcore/jmv, not only the locally installed versions.
+- A wrapper saved in a global variable in a generated setup chunk recurses when the
+  chunk is run twice in one session (the saved "original" becomes the wrapper). Keep
+  the saved printer inside `local()` and test by evaluating the block twice in one environment.
+- A fallback must be visible: a warning is invisible when the report sets
+  `knitr::opts_chunk$set(warning = FALSE)`; print a note into the output instead.
+
 ## 0.2.0: figures, statistics and the browser
 
 - Loading styler loads R.utils, whose `names()` method for "Options" objects breaks
