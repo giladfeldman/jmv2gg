@@ -47,6 +47,13 @@ t-tests, repeated measures and reliability.
   were checked in a browser on a local production build: 27 figures, the jmvcore note
   once, Cronbach's alpha 0.7722. Native suite: 535 assertions, zero failures/errors/skips;
   web tests 40.
+- Live, https://jmv2gg.vercel.app at revision 415d06b (footer and build info 0.2.3),
+  2026-10-23: `tools/validation/deployment.mjs` passed. Converting the complex R Markdown
+  example (11 of 11 analyses, 26 requested figures) showed "Tidying the generated code:
+  part k of 12" with a whole-job estimate counting down ("about 50 s left" to "about
+  10 s left"). The browser render ran 21 of 21 chunks in about 2 minutes with an
+  estimate, 27 figures, the jmvcore note once and Cronbach's alpha 0.7722; the output
+  frame has `sandbox=""`. The private report itself was not converted in a browser.
 
 ## Recorded release checks (0.2.2)
 
