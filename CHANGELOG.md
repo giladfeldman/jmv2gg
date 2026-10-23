@@ -1,3 +1,12 @@
+# jmv2gg 0.2.2
+
+- The 0.2.1 fallback for jmvcore 28.3 was missing from converted reports whenever the
+  generated code was formatted with styler (the default, including the web app): the
+  formatter kept only the first part of a setup chunk built from several parts. It now
+  formats the whole piece, and the setup chunk is passed as one text. Tested with
+  styler on and off; no earlier generated code was affected (every other piece was
+  already one text).
+
 # jmv2gg 0.2.1
 
 - Converted R Markdown reports with jamovi analyses now knit with the current CRAN

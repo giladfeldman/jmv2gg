@@ -160,7 +160,8 @@ style_codes <- function(codes) {
   if (!length(codes)) return(codes)
   style_one <- function(codes) {
     lapply(codes, function(code) {
-      paste(as.character(suppressMessages(suppressWarnings(styler::style_text(strsplit(code, "\n", fixed = TRUE)[[1]])))),
+      # A piece may be one string or a vector of lines; style all of it (0.2.1 dropped every line after the first).
+      paste(as.character(suppressMessages(suppressWarnings(styler::style_text(strsplit(paste(code, collapse = "\n"), "\n", fixed = TRUE)[[1]])))),
         collapse = "\n")
     })
   }

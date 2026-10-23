@@ -27,6 +27,15 @@ applied in descriptives, contingency tables, linear and logistic regression; not
 by jmv's ANOVA and ANCOVA, hence not by these figures; refused for correlations,
 t-tests, repeated measures and reliability.
 
+## Recorded release checks (0.2.2)
+
+- Live check of 0.2.1 in a real browser showed the converted report without the jmvcore
+  fallback: styler (on by default) kept only the first part of the setup chunk. Fixed in
+  0.2.2 and covered by a test with styler on; 0.2.1's QA and knit checks had run with
+  styler off. With 0.2.2's default settings the converted complex example knits with
+  jmvcore 28.3 / jmv 2.8.0: one note above the reliability text, 27 figures. Native
+  suite: 521 assertions, zero failures/errors/skips.
+
 ## Recorded release checks (0.2.1)
 
 - jmvcore 28.3 / jmv 2.8.0 (current CRAN): a document printing `jmv::reliability` failed

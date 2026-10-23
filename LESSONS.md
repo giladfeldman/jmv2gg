@@ -57,6 +57,10 @@
 
 ## 0.2.1: jmvcore 28.3 report printing
 
+- Verify a generated-code change with the defaults users get (styler on, the web app),
+  not only the fast test settings: 0.2.1 passed every check with styler off and shipped
+  without its fix, because styler kept only the first element of a multi-element piece.
+
 - jmvcore 28.3 (CRAN) prints jamovi results in HTML reports with a knitr method that
   fails for some results (`jmv::reliability`: "invalid argument type"), stopping the
   whole knit; local R had jmvcore 2.7.7, so only CI showed it. Check against the
