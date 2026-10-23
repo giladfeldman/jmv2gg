@@ -205,3 +205,14 @@ describe('progress panel', () => {
     expect(remainingText({ ...base, stepEndsAt: 10 }, 20)).toContain('longer than usual');
   });
 });
+
+describe('optional phases', () => {
+  it('shows an optional phase that never ran as skipped when the job finishes', () => {
+    const seen: ProgressSnapshot[] = [];
+    const tracker = new ProgressTracker('t', [{ id: 'convert', label: 'Convert' },
+      { id: 'style', label: 'Tidy', optional: true }], snapshot => seen.push(snapshot), { store: null });
+    tracker.phase('convert');
+    tracker.finish();
+    expect(seen.at(-1)!.phases.map(phase => phase.status)).toEqual(['done', 'skipped']);
+  });
+});

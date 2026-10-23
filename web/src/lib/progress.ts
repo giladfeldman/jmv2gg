@@ -7,7 +7,8 @@
 export const timingPrefix = 'jmv2gg.timing.';
 const keep = 5;
 
-export interface PhaseSpec { id: string; label: string }
+/** `optional`: a phase that may not run at all (styler off or skipped); it never blocks the whole-job estimate. */
+export interface PhaseSpec { id: string; label: string; optional?: boolean }
 export type PhaseStatus = 'done' | 'skipped' | 'current' | 'pending';
 
 export interface ProgressSnapshot {
@@ -141,7 +142,7 @@ export class ProgressTracker {
     let end = this.state.stepEndsAt;
     for (let i = this.index + 1; i < this.specs.length; i++) {
       const usual = usualMs(this.store, `phase.${this.specs[i].id}`);
-      if (usual === undefined) return undefined;
+      if (usual === undefined) { if (this.specs[i].optional) continue; return undefined; }
       end += usual;
     }
     return end;
@@ -207,7 +208,14 @@ export class ProgressTracker {
     const remaining = countedRemainingMs(this.finishedItems, left);
     return remaining === undefined ? undefined : this.now() + remaining;
   }
-  finish() { if (!this.active) return; this.closePhase('done'); this.active = false; }
+  /** Ends the job; optional phases that never ran (styler off or skipped) show as skipped. */
+  finish() {
+    if (!this.active) return;
+    this.closePhase('done');
+    this.specs.forEach((spec, i) => { if (spec.optional && this.statuses[i] === 'pending') this.statuses[i] = 'skipped'; });
+    this.emit({});
+    this.active = false;
+  }
   cancel() { this.active = false; }
   get snapshot() { return this.state; }
 }

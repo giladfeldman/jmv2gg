@@ -27,6 +27,27 @@ applied in descriptives, contingency tables, linear and logistic regression; not
 by jmv's ANOVA and ANCOVA, hence not by these figures; refused for correlations,
 t-tests, repeated measures and reliability.
 
+## Recorded release checks (0.2.3)
+
+- A private replication report (37 analyses, 158 KB; not in this repository) took
+  minutes to convert in the web app with no estimate. Natively, the identifier scan took
+  82.6 s of it when the text was not marked UTF-8; with `useBytes` the conversion
+  without styler takes 1.2 s, and the converted text is byte-identical (styler off and
+  on). styler took about 28 ms per generated line in WebR (about 9 ms natively).
+- A private corpus of 625 jamovi R Markdown files converted without an error (styler
+  off; slowest 3 s, median 0.2 s); its generated code reached 40,660 lines, so the
+  browser now skips styler above 2,000 lines, with a note (checked in a browser on a
+  local production build: a 4,044-line conversion took 16 s and showed the note).
+- Figure chunk headers: with 0.2.2, 430 of 11,287 figure chunks in 85 of the 625 files
+  had a header split over two lines, which knitr shows as text without drawing the
+  figures; with 0.2.3, 0. The private report then rendered natively with all 120
+  figures, 9 generated models matching the original jamovi inference, and identical
+  original result records (it had drawn 106 of 120).
+- Conversion progress (chunks, then styler parts, with estimates) and the report render
+  were checked in a browser on a local production build: 27 figures, the jmvcore note
+  once, Cronbach's alpha 0.7722. Native suite: 535 assertions, zero failures/errors/skips;
+  web tests 40.
+
 ## Recorded release checks (0.2.2)
 
 - Live check of 0.2.1 in a real browser showed the converted report without the jmvcore

@@ -15,7 +15,7 @@ export const setupPhases: PhaseSpec[] = [
   { id: 'converter', label: 'Install jmv2gg and BetterGG' },
 ];
 export const convertPhases: PhaseSpec[] = [...setupPhases, { id: 'convert', label: 'Convert your analysis' },
-  { id: 'style', label: 'Tidy the generated code' }];
+  { id: 'style', label: 'Tidy the generated code', optional: true }];
 export const scanPhases: PhaseSpec[] = [...setupPhases, { id: 'scan', label: 'Check the report before rendering' }];
 export const previewPhases: PhaseSpec[] = [...setupPhases,
   { id: 'plot-packages', label: 'Install plotting packages' },

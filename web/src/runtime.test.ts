@@ -91,6 +91,18 @@ describe('workbench transport', () => {
     expect(JSON.parse(fake.files['/workspace/request.json'])).toMatchObject({ source: 'x <- 1', progress: true });
     expect(fake.r.find(code => code.includes('browser_request'))).toContain('/workspace/request.json');
   });
+  it('estimates the whole conversion even when the optional styler phase never ran', () => {
+    const data: Record<string, string> = { 'jmv2gg.timing.phase.convert': '[1000]' };
+    const store = { getItem: (k: string) => data[k] ?? null, setItem: (k: string, v: string) => { data[k] = v; } };
+    let last: ProgressSnapshot | undefined;
+    const phases = (optional: boolean) => [{ id: 'convert', label: 'Convert' }, { id: 'style', label: 'Tidy', optional }];
+    const run = (optional: boolean) => {
+      new ProgressTracker('t', phases(optional), snapshot => { last = snapshot; }, { store }).phase('convert');
+      return last!.jobEndsAt;
+    };
+    expect(run(true)).toBeTypeOf('number');
+    expect(run(false)).toBeUndefined();
+  });
   it('reports a startup timeout instead of waiting indefinitely', async () => {
     vi.useFakeTimers();
     initMock.mockImplementationOnce(() => new Promise<void>(() => {}));
