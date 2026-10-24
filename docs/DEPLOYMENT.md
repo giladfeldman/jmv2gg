@@ -51,7 +51,9 @@ Also test in a real browser:
 5. Cancel/reset during a job and convert again. Check keyboard focus, desktop,
    360px/375px layouts, and reduced motion. Keep evidence privately.
 
-Full HTML rendering and BetterGG previews use native R. Never hide this boundary.
+Full rmarkdown/Pandoc HTML rendering uses native R. BetterGG figures render in the browser
+report preview, except ggstatsplot's parametric/nonparametric pairwise tests (Rmpfr has no
+WebR build). Never hide these boundaries.
 Upgrade WebR by rebuilding and repeating native/browser parity tests, not merely
 changing its JavaScript version.
 

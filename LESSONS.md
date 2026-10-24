@@ -49,7 +49,8 @@
 - Separate release evidence from current verification. Optional dependencies and
   platforms change assertion/skip counts; disclose NOT RUN checks explicitly.
 - Explain the shared converter versus execution boundary: WebR runs the actual
-  R package; complete setup/HTML and BetterGG previews remain native-R paths.
+  R package; full rmarkdown/Pandoc HTML is native-R only. BetterGG figures render in the
+  browser report preview, except ggstatsplot's pairwise tests that need Rmpfr.
 - Documentation edits are not a deployment. Record uncommitted files, immutable
   release tags, deployed SHA and the next gate before publishing changes.
 - Public docs use synthetic examples and generic paths. Keep owner decisions,

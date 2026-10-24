@@ -8,7 +8,9 @@ Keep conversion in R. Never evaluate uploaded source to infer analyses. Preserve
 original analyses, explicit terms, dataset snapshots, weights, factor value mappings,
 references and RNG. Unsupported/different analyses require visible diagnostics.
 BetterGG means real BetterGG calls. Its additional tests are not silently equivalent
-to original jamovi inference. Full HTML and BetterGG previews use native R.
+to original jamovi inference. Full HTML (rmarkdown + Pandoc) uses native R; BetterGG figures
+are drawn in the browser report preview too, except ggstatsplot's parametric/nonparametric
+pairwise tests (Rmpfr has no WebR build).
 
 Use synthetic public fixtures. Research files, rendered reports, machine-specific
 paths, history backups and private handoffs must stay outside public source/artifacts.
