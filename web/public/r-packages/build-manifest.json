@@ -1,7 +1,7 @@
 {
   "webR": "0.6.0",
   "sources": {
-    "DESCRIPTION": "a38e9082726025a587484aa25ef66df91e55dd5334eb5d1332540ab24d71d35e",
+    "DESCRIPTION": "ee2b52b59eb73f7d552d80af262b9f3aa78c91a6e4e4fa9b9e1773a72a6d97cb",
     "LICENSE": "b372a87757468731e51fa95c57148b406c2eca27760a9db99f4b797af50cb3c1",
     "NAMESPACE": "b8feb8194d938289bec873d0257a1242a53157359ff9622e88bf240065660c17",
     "R/browser.R": "66001dedf4813eed947bd8e9fbc6739ce8e73795a259b483b253f721920c7b85",
@@ -41,13 +41,13 @@
     "man/scan_rmd_risks.Rd": "75fb55023996f89cb25329dbf3b2eb46ba91092ba8192cb806572a855d61aa91"
   },
   "artifact": "bin/emscripten/contrib/4.6/jmv2gg_0.2.4.tgz",
-  "sha256": "f4820f12f02f55f62da3a64c8cc47c49dd6c909d218f53fba2621bea0f08b866",
+  "sha256": "956923caf069cd1351f1369c1a2546db05b4cde48430cd5c5fa81d82f0d59b41",
   "dependencies": {
     "BetterGG": {
       "version": "0.2.1",
       "artifact": "bin/emscripten/contrib/4.6/BetterGG_0.2.1.tgz",
-      "sha256": "b4f9233908ddb6334b07673513d1b8788bb9e67917ff8fd9d23fcca3e5693c2f",
-      "commit": "ad5f147e79197a5b206f7da2c7e3e49fd47fd0fc"
+      "sha256": "c652adf5ea15289c754aba5a28ba7dfbb76da8d7e7ac38c55bb5e33ec8d89ad5",
+      "commit": "31c5b8f68419764641b46e6de143e0fe1ebba488"
     }
   },
   "placeholders": {

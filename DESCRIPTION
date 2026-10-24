@@ -18,4 +18,4 @@ Roxygen: list(markdown = TRUE)
 URL: https://github.com/giladfeldman/jmv2gg
 BugReports: https://github.com/giladfeldman/jmv2gg/issues
 Config/roxygen2/version: 8.1.1
-Remotes: giladfeldman/BetterGG@ad5f147e79197a5b206f7da2c7e3e49fd47fd0fc
+Remotes: giladfeldman/BetterGG@31c5b8f68419764641b46e6de143e0fe1ebba488
