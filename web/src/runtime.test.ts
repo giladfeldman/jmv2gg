@@ -5,7 +5,7 @@ import type { ProgressSnapshot } from './lib/progress';
 const initMock = vi.hoisted(() => vi.fn(async () => {}));
 const fake = vi.hoisted(() => ({
   r: [] as string[], install: [] as unknown[][], closed: 0, installed: ['base', 'utils', 'stats'] as string[],
-  output: [] as { type: string; data: string }[], knitResult: '', knitDelay: 20, files: {} as Record<string, string>,
+  output: [] as { type: string; data: string }[], knitResult: '', execFail: '', knitDelay: 20, files: {} as Record<string, string>,
 }));
 vi.mock('webr', () => ({ WebR: class {
   init = initMock;
@@ -28,9 +28,12 @@ vi.mock('webr', () => ({ WebR: class {
     const next = fake.output.shift();
     return next ? Promise.resolve(next) : new Promise(() => {});
   };
-  evalR = async () => ({ exec: async () => ({ toString: async () => JSON.stringify({
+  evalR = async () => ({ exec: async () => {
+    if (fake.execFail) { const error = fake.execFail; fake.execFail = ''; throw new Error(error); }
+    return { toString: async () => JSON.stringify({
     status: 'complete', analyses: [], diagnostics: [], manifest: { converted: 1 },
-  }) }) });
+  }) };
+  } });
   destroy() { throw new Error("Can't find object in shelter."); }
   close() { fake.closed++; }
 } }));
@@ -60,7 +63,7 @@ const installs = () => fake.r.map(code => /webr::install\("([^"]+)"/.exec(code)?
 
 beforeEach(() => {
   fake.r.length = 0; fake.install.length = 0; fake.output.length = 0; fake.files = {};
-  fake.installed = ['base', 'utils', 'stats']; fake.knitResult = ''; fake.knitDelay = 20;
+  fake.installed = ['base', 'utils', 'stats']; fake.knitResult = ''; fake.execFail = ''; fake.knitDelay = 20;
 });
 
 describe('workbench transport', () => {
@@ -71,6 +74,23 @@ describe('workbench transport', () => {
     const result = await runtime.convert(request);
     expect(result.status).toBe('complete');
     expect(result.manifest.converted).toBe(1);
+  });
+  it('starts a fresh R session after R itself aborts, so the next request does not hang (d-636774)', async () => {
+    stubNetwork();
+    const runtime = new RWorkbench(() => {});
+    await runtime.scan('x <- 1');
+    const starts = initMock.mock.calls.length;
+    const closed = fake.closed;
+    fake.execFail = 'RuntimeError: unreachable';
+    await expect(runtime.scan('x <- 1')).rejects.toThrow('unreachable');
+    expect(fake.closed).toBe(closed + 1);
+    // the next request starts a new R session and succeeds
+    const scan = await runtime.scan('x <- 1');
+    expect(scan).toBeDefined();
+    expect(initMock.mock.calls.length).toBe(starts + 1);
+    // control: an ordinary request reuses the session
+    await runtime.scan('x <- 1');
+    expect(initMock.mock.calls.length).toBe(starts + 1);
   });
   it('streams conversion progress: document chunks', async () => {
     stubNetwork();
@@ -173,6 +193,17 @@ describe('workbench transport', () => {
     expect(suggestedRenderLimit(21, 26)).toBe(15);
     expect(suggestedRenderLimit(85, 120)).toBe(60);
     expect(isLargeReport(41, 0)).toBe(true);
+  });
+  it('installs jmv only for a report that uses it (d-797897)', async () => {
+    stubNetwork();
+    const render = (rmd: string) => new ReportRenderer(new ProgressTracker('t', [], () => {}, { store: null }))
+      .render({ rmd, files: [], packages: [], needsBetterGG: false, confirmed: [] });
+    await render('x <- 1');
+    expect(installs()).not.toContain('jmv');
+    fake.r.length = 0;
+    // control: a document naming jmv (here through a loader the scan does not read) still gets it
+    await render('pacman::p_load(jmv)');
+    expect(installs()).toContain('jmv');
   });
   it('rejects with the R error text when the document fails', async () => {
     stubNetwork();

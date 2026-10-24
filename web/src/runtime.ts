@@ -173,8 +173,22 @@ export class RWorkbench {
     this.bridge = await session.runtime.evalR('function(x) tryCatch(jmv2gg::browser_request(x), '
       + 'error=function(e) jsonlite::toJSON(list(error=conditionMessage(e)),auto_unbox=TRUE))') as RFunction;
   }
+  /**
+   * Runs work in R. R errors come back as JSON; a rejection means R itself aborted
+   * (a WebR crash), which leaves the session busy, so it is discarded and the next
+   * request starts a fresh one instead of hanging.
+   */
+  private async guarded<T>(work: () => Promise<T>): Promise<T> {
+    try { return await work(); } catch (error) {
+      this.session?.runtime.close();
+      this.session = undefined;
+      this.ready = undefined;
+      this.bridge = undefined;
+      throw error;
+    }
+  }
   private async call<T>(request: ConversionRequest | ScanRequest): Promise<T> {
-    const value = await this.bridge!.exec(JSON.stringify(request)) as RCharacter;
+    const value = await this.guarded(() => this.bridge!.exec(JSON.stringify(request))) as RCharacter;
     const response = JSON.parse(await value.toString());
     // exec() results are not registered in WebR's root shelter. Destroying one
     // there throws and discards an otherwise successful conversion.
@@ -188,7 +202,8 @@ export class RWorkbench {
     const runtime = this.session!.runtime;
     await runtime.FS.writeFile('/workspace/request.json',
       new TextEncoder().encode(JSON.stringify({ ...request, progress: true })));
-    const json = await streamR(runtime, convertCall, line => applyConvertOutput(line, this.tracker), () => this.closed);
+    const json = await this.guarded(() => streamR(runtime, convertCall, line => applyConvertOutput(line, this.tracker),
+      () => this.closed));
     const response = JSON.parse(json);
     if (response.error) throw new Error(response.error);
     return normaliseResult(response as ConversionResult);
