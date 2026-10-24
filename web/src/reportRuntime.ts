@@ -79,7 +79,10 @@ export class ReportRenderer {
     if (this.closed) throw new Error('Rendering was cancelled.');
     this.tracker.phase('packages', 'Finding the R packages the report needs…');
     const own = await converterDependencies(input.needsBetterGG);
-    const roots = cleanPackages(['jsonlite', 'yaml', 'knitr', 'markdown', 'jmv', ...own, ...input.packages,
+    // jmv (with ~125 dependencies of its own) only when the report names it: the scan
+    // reads library()/pkg:: calls, and the word test also catches other loaders.
+    const jmv = /\bjmv\b/.test(input.rmd) ? ['jmv'] : [];
+    const roots = cleanPackages(['jsonlite', 'yaml', 'knitr', 'markdown', ...jmv, ...own, ...input.packages,
       ...(input.needsBetterGG ? ['ggstatsplot'] : [])]);
     await installPlaceholders(session, this.tracker);
     await installFromLock(session, roots, this.tracker, 'Installing R packages for the report');
