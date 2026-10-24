@@ -40,3 +40,22 @@ test_that("a figure chunk with many captions keeps its header on one line, so kn
   knitr::purl(rmd, output = r, quiet = TRUE, documentation = 0L)
   expect_true(any(grepl("descriptives_1: jmv::descriptives", readLines(r), fixed = TRUE)))
 })
+
+test_that("YAML is edited in place and no fixed level-3 headings are inserted (d-38c278)", {
+  text <- paste(c("---", "title: \"My report\" # keep me", "author: A", "# a whole-line comment",
+    "output:", "  html_document:", "    toc_depth: 2 # depth comment", "---",
+    "# Study 1", "```{r a}", "jmv::descriptives(data = d, vars = \"y\")", "```"), collapse = "\n")
+  out <- convert_rmd(text, engine = "ggplot2")
+  lines <- strsplit(out$text, "\n", fixed = TRUE)[[1]]
+  yaml_end <- which(lines == "---")[2]
+  header <- lines[seq_len(yaml_end)]
+  expect_true("title: \"My report\" # keep me" %in% header)
+  expect_true("# a whole-line comment" %in% header)
+  expect_true(any(grepl("toc_depth: 3 # depth comment", header, fixed = TRUE)))
+  expect_false(any(grepl("3.0", header, fixed = TRUE)))
+  # headings: none by default; with headings = TRUE one level below the source's (# -> ##)
+  expect_false(any(grepl("^#{1,6} Figures:", lines)))
+  with_h <- strsplit(convert_rmd(text, engine = "ggplot2", style = list(headings = TRUE))$text, "\n", fixed = TRUE)[[1]]
+  expect_true("## Figures: Study 1" %in% with_h)
+  expect_false(any(grepl("^### ", with_h)))
+})
