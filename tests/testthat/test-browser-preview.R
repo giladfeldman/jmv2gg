@@ -22,6 +22,7 @@ test_that("simulated previews of every bundled example analysis draw complete st
   skip_if_not_installed("ragg"); skip_if_not_installed("emmeans"); skip_if_not_installed("ggdist")
   examples <- system.file("examples", package = "jmv2gg")
   if (!nzchar(examples)) examples <- file.path(testthat::test_path(), "..", "..", "inst", "examples")
+  examples <- normalizePath(examples, mustWork = TRUE) # absolute: the test changes folder below
   work <- tempfile(); dir.create(work); old <- setwd(work); on.exit(setwd(old))
   for (file in c("replication-report.Rmd", "replication-study.R")) {
     source <- paste(readLines(file.path(examples, file), warn = FALSE, encoding = "UTF-8"), collapse = "\n")
