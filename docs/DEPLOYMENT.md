@@ -17,7 +17,12 @@ npm --prefix web run build
 
 Keep exactly the current source archive in the ignored `web/public/r-packages/src/contrib/`
 build directory. Commit the compiled binary, package index, and manifest together.
-The build rejects stale source/artifact checksums. Inspect archive member lists;
+The build rejects stale source/artifact checksums. Mount the BetterGG source at
+`/bettergg` as well (add `--mount "type=bind,source=<BetterGG folder>,target=/bettergg,readonly"`).
+Builds are not byte-reproducible and served binaries are cached as immutable, so the
+build reuses the published BetterGG and websocket binaries while their source
+fingerprint (recorded in the manifest, line endings ignored) is unchanged, and
+rebuilds only jmv2gg. Inspect archive member lists;
 never publish `.env*`, credentials, research data, or private reports.
 
 Before first deployment publish three edge firewall rules: deny scanner paths

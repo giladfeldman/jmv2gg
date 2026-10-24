@@ -47,6 +47,7 @@
       "version": "0.2.1",
       "artifact": "bin/emscripten/contrib/4.6/BetterGG_0.2.1.tgz",
       "sha256": "c652adf5ea15289c754aba5a28ba7dfbb76da8d7e7ac38c55bb5e33ec8d89ad5",
+      "source": "4c6faebe4cd77b728c9ed12436614b28e62aa9011c0aeb49713450728bb5a4b5",
       "commit": "31c5b8f68419764641b46e6de143e0fe1ebba488"
     }
   },
@@ -54,7 +55,8 @@
     "websocket": {
       "version": "1.2.0.9000",
       "artifact": "bin/emscripten/contrib/4.6/websocket_1.2.0.9000.tgz",
-      "sha256": "ee5ad02ed60b39d0f4b213cf4ac297e7f902ccc2d03b511ae3bb63864965b00e"
+      "sha256": "ee5ad02ed60b39d0f4b213cf4ac297e7f902ccc2d03b511ae3bb63864965b00e",
+      "source": "ae4248d5fc90029510f2ef8d973abe8c09b495063724cc47debd9697984f30aa"
     }
   }
 }
