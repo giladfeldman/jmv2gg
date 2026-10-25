@@ -45,6 +45,9 @@ t-tests, repeated measures and reliability.
   converted (26 figures), the generated code carries the BetterGG 0.2.2 changes, a
   simulated reliability preview drew, and the report preview rendered all 21 chunks with
   27 figures and no error or warning output.
+- `R CMD check --no-manual` with the C locales of tools/check.ps1: Status OK after the
+  non-ASCII column-name cases were moved into a test that skips outside a UTF-8 session
+  (tools/check.R runs them); the first run had 6 failures, all from those two cases.
 
 ## Recorded release checks (0.2.4, before release)
 

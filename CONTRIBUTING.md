@@ -37,7 +37,8 @@ npm --prefix web run build
 npm --prefix web run preview -- --port 4176
 ```
 
-The R check script sets process-local C locales. With custom Windows libraries,
+The R check script sets process-local C locales, in which R cannot form non-ASCII names:
+cases that need a UTF-8 session skip there and run under `tools/check.R`. With custom Windows libraries,
 set both R_LIBS and R_LIBS_USER for child R processes. Put optional oxipng on PATH
 to exercise lossless optimization; disclose its skip if absent. Fast unit checks
 source R files, whereas installed-package checks and WebR integration exercise

@@ -14,6 +14,8 @@
   request no longer hangs.
 - The browser build reuses the published BetterGG and websocket binaries while their source
   is unchanged (the manifest records a line-ending-independent source fingerprint).
+- Tests: the non-ASCII column-name cases of the argument matrix run in their own test that
+  skips, with a reason, outside a UTF-8 R session (R in a C locale cannot form such names).
 
 # jmv2gg 0.2.4
 

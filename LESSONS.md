@@ -56,6 +56,15 @@
 - Public docs use synthetic examples and generic paths. Keep owner decisions,
   private inputs, backups/history details and handoffs outside public source/archives.
 
+## 0.2.5: tests that need a UTF-8 session
+
+- `tools/check.ps1` forces C locales, and R in a C locale cannot form non-ASCII names, so a
+  test that builds a non-ASCII column name fails there ("6 failures" in the first
+  `R CMD check --no-manual` run, from two argument-matrix cases that were already in 0.2.4).
+  Keep such cases in their own `test_that()` that skips with a reason outside a UTF-8 session
+  (check `l10n_info()[["UTF-8"]]`), and run them under `tools/check.R`; do not weaken the
+  case or drop it from the matrix.
+
 ## 0.2.4: simulated data and NA statistics
 
 - A simulation that gives every factor the same pattern confounds them: every factorial term

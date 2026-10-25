@@ -99,10 +99,12 @@ test_that("(b) generated code matches its snapshot", {
   }
 })
 
-test_that("(c) every case runs and draws its ggplot2 figures", {
-  skip_if_not_installed("ragg")
-  for (case in names(cases)) {
-    if (identical(cases[[case]][[3]], "failed") || case == "gg_grouped") next
+# Non-ASCII column names ("große Gruppe") can only be used in a UTF-8 R session: in
+# another locale R cannot even form the name (as.name() fails), whatever code is generated.
+# tools/check.ps1 runs R with C locales, so those cases run in their own test below.
+non_ascii_cases <- c("odd_names", "odd_formula")
+
+run_case <- function(case) {
     code <- cases[[case]][[1]]
     data_name <- cases[[case]][[2]]
     a <- assign_analysis_names(inspect_code(code)$analyses, character())[[1]]
@@ -121,7 +123,20 @@ test_that("(c) every case runs and draws its ggplot2 figures", {
     expect_identical(grep("jmv2gg: figure", warnings, value = TRUE), character(), label = case)
     expect_equal(length(files), sum(vapply(generated$plots, function(p) p$engine == "ggplot2", logical(1))), label = case)
     for (p in generated$plots) expect_s3_class(env[[p$object]], "ggplot")
+}
+
+test_that("(c) every case runs and draws its ggplot2 figures", {
+  skip_if_not_installed("ragg")
+  for (case in setdiff(names(cases), non_ascii_cases)) {
+    if (identical(cases[[case]][[3]], "failed") || case == "gg_grouped") next
+    run_case(case)
   }
+})
+
+test_that("(c) cases with non-ASCII column names run and draw in a UTF-8 session", {
+  skip_if_not_installed("ragg")
+  skip_if_not(isTRUE(l10n_info()[["UTF-8"]]), "R is not running in a UTF-8 locale (tools/check.ps1 sets C locales)")
+  for (case in non_ascii_cases) run_case(case)
 })
 
 test_that("(c) the BetterGG engine runs for the main families", {
