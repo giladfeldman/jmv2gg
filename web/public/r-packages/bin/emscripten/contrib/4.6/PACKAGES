@@ -1,27 +1,27 @@
 Package: BetterGG
-Version: 0.2.2
+Version: 0.2.3
 Depends: R (>= 4.5.0), ggstatsplot (>= 1.1.2)
 Imports: ragg, systemfonts, beeswarm, dplyr, emmeans, ggdist, rlang,
         viridisLite, ggplot2, grDevices, tools, utils, patchwork
 Suggests: car, ggrepel, ggside, ggsignif, paletteer, psych,
         statsExpressions, testthat (>= 3.0.0), withr
 License: MIT + file LICENSE
-MD5sum: f4e3aaacf2386e2737bd95e6fa00af0c
-Built: R 4.6.0; ; 2026-10-25 04:41:28 UTC; unix
-File: BetterGG_0.2.2.tgz
+MD5sum: 221d5a7467d23951fb0ed43569a136e2
+Built: R 4.6.0; ; 2026-10-25 14:15:20 UTC; unix
+File: BetterGG_0.2.3.tgz
 
 Package: jmv2gg
-Version: 0.2.5
+Version: 0.2.6
 Depends: R (>= 4.5.0)
-Imports: jsonlite, yaml, BetterGG (>= 0.2.2)
+Imports: jsonlite, yaml, BetterGG (>= 0.2.3)
 Suggests: ggplot2, emmeans, car, afex, haven, ragg, ggdist, ggrepel,
         ggside, ggsignif, patchwork, statsExpressions, styler, jmv,
         psych, ggstatsplot, rmarkdown, knitr, markdown, jmvcore,
         testthat (>= 3.0.0), withr, png, callr
 License: MIT + file LICENSE
-MD5sum: 56ba493a41be2bd8e58e9af80fa2025b
-Built: R 4.6.0; ; 2026-10-25 04:52:31 UTC; unix
-File: jmv2gg_0.2.5.tgz
+MD5sum: 7bebd430971bdfe5ac9403eeb642847f
+Built: R 4.6.0; ; 2026-10-25 14:19:09 UTC; unix
+File: jmv2gg_0.2.6.tgz
 
 Package: websocket
 Version: 1.2.0.9000

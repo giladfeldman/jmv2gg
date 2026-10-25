@@ -56,6 +56,18 @@
 - Public docs use synthetic examples and generic paths. Keep owner decisions,
   private inputs, backups/history details and handoffs outside public source/archives.
 
+## 0.2.6: changing a finished ggplot
+
+- `copy <- ggplot2::ggproto(NULL, layer)` copies a layer or guide; `layer <- ggproto(NULL,
+  layer)` loops forever (the parent is read lazily, after the name points at the child).
+- Renaming categories on a finished figure must also rename everything keyed by category
+  name: a manual scale with named values (`scale_fill_manual(values = c(a = ...))`) maps by
+  name and keeps a limits function built from those names, so both need the new names or
+  the renamed category is drawn grey. Precomputed tick labels keyed by group need a column
+  named after the variable and positional labels (BetterGG 0.2.3 `recipe_proportion`).
+- jamovi labels its plots with column names (`labels <- list(x = term[1], y = dep, ...)` in
+  jmv's emmeans plots), not with variable descriptions; readable labels are jmv2gg's choice.
+
 ## 0.2.5: tests that need a UTF-8 session
 
 - `tools/check.ps1` forces C locales, and R in a C locale cannot form non-ASCII names, so a

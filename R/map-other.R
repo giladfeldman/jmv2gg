@@ -85,8 +85,10 @@ map_descriptives <- function(ctx) {
         paste0(ctx$input, "[[", q(panel), "]] <- interaction(", ctx$input, "[", r_text(split), "], sep = \" / \", drop = TRUE)"))
     }
   }
-  ctx$describe <- paste0("for each variable, a histogram (numeric) or pie chart (categories) of the ",
-    "case-weighted counts", if (length(split)) paste0(", split by ", paste(split, collapse = " and ")) else "", ".")
+  ctx$describe <- paste0("for each variable, the proportion of 1s with Wilson intervals (0/1), a histogram ",
+    "(other numbers), or ", if (length(split)) "stacked percentage bars (categories)" else
+      "a pie chart (up to 8 unordered categories) or percentage bars (more, ordered or long-named categories)",
+    " of the case-weighted counts", if (length(split)) paste0(", split by ", paste(split, collapse = " and ")) else "", ".")
   # jamovi's other plot types are drawn as the histogram/pie of the closest BetterGG plot (decision 6).
   other <- c(dens = "density", box = "box", violin = "violin", dot = "dot", qq = "Q-Q")
   requested <- other[vapply(names(other), function(o) isTRUE(arg_value(a, o, FALSE)), logical(1))]
@@ -98,33 +100,48 @@ map_descriptives <- function(ctx) {
     v <- vars[i]
     fig <- if (length(vars) > 1L) paste0(ctx$name, "_", i) else ctx$name
     suffix <- if (length(vars) > 1L) v
-    numeric_test <- paste0("is.numeric(", ctx$input, "[[", q(v), "]])")
+    column <- paste0(ctx$input, "[[", q(v), "]]")
+    numeric_test <- paste0("is.numeric(", column, ")")
+    binary_test <- paste0(numeric_test, " && any(!is.na(", column, ")) && all(", column, " %in% c(0, 1, NA))")
+    # Bars instead of a pie for an ordered variable, more than 8 categories or a category name over 40 characters.
+    bars_test <- function(prefix) c(paste0(prefix, "_categories <- levels(factor(", column, "))"),
+      paste0("if (is.ordered(", column, ") || length(", prefix, "_categories) > 8L || any(nchar(", prefix,
+        "_categories) > 40L)) {"))
     if (wants(ctx, "ggplot2")) {
+      proportion <- recipe("recipe_proportion", data = ctx$input, x = v, group = panel, name = fig, weights = weight_column)
       histo <- recipe("recipe_histostats", data = ctx$input, x = v, name = fig, weights = weight_column, facet = panel)
       categories <- if (is.null(panel)) {
-        recipe("recipe_piestats", data = ctx$input, x = v, name = fig, weights = weight_column, max_labels = 12)
+        c(bars_test(fig),
+          indent(recipe("recipe_freqbars", data = ctx$input, x = v, name = fig, weights = weight_column)),
+          "} else {",
+          indent(recipe("recipe_piestats", data = ctx$input, x = v, name = fig, weights = weight_column, max_labels = 12)),
+          "}")
       } else {
         recipe("recipe_barstats", data = ctx$input, x = v, y = panel, name = fig, weights = weight_column)
       }
-      code <- c(paste0("if (", numeric_test, ") {"), indent(histo), "} else {", indent(categories), "}")
+      code <- c("# 0/1 values: proportion of 1s; other numbers: histogram; categories: bars or pie.",
+        paste0("if (", binary_test, ") {"), indent(proportion),
+        paste0("} else if (", numeric_test, ") {"), indent(histo), "} else {", indent(categories), "}")
       add_figure(ctx, "ggplot2", code, paste0(fig, "_plot"), paste0("Distribution of ", v, "."), suffix = suffix)
     }
     if (wants(ctx, "bettergg")) {
       bd <- paste0(fig, "_bettergg")
-      code <- c(paste0("if (", numeric_test, ") {"),
+      code <- c("# 0/1 values: proportion of 1s; other numbers: histogram; categories: bars or pie.",
+        paste0("if (", binary_test, ") {"),
+        paste0("  ", bd, " <- BetterGG::ggproportion(data = ", ctx$input, ", x = ", r_sym(v), ")"),
+        paste0("} else if (", numeric_test, ") {"),
         paste0("  ", bd, " <- BetterGG::gghistostats(data = ", ctx$input, ", x = ", r_sym(v),
           ", results.subtitle = FALSE, bf.message = FALSE)"),
         "} else {",
-        paste0("  ", bd, "_levels <- nlevels(factor(", ctx$input, "[[", q(v), "]]))"),
-        paste0("  ", bd, " <- BetterGG::ggpiestats("),
-        paste0("    data = ", ctx$input, ", x = ", r_sym(v), ", results.subtitle = FALSE, bf.message = FALSE,"),
-        paste0("    palette = if (", bd, "_levels <= 8L) \"ggsci::default_nejm\" else \"palettesForR::Named\""),
-        "  ) +",
-        "    ggplot2::guides(fill = ggplot2::guide_legend(ncol = 4, byrow = TRUE)) +",
-        "    ggplot2::theme(legend.position = \"bottom\", legend.text = ggplot2::element_text(size = 6))",
-        "  # Keep every category in the legend; omit overlapping slice labels above 12 categories.",
-        paste0("  if (", bd, "_levels > 12L) {"),
-        paste0("    ", bd, "$layers <- Filter(function(layer) !inherits(layer$geom, c(\"GeomLabel\", \"GeomLabelRepel\")), ", bd, "$layers)"),
+        indent(bars_test(bd)),
+        paste0("    ", bd, " <- BetterGG::ggfreqbars(data = ", ctx$input, ", x = ", r_sym(v), ")"),
+        "  } else {",
+        paste0("    ", bd, " <- BetterGG::ggpiestats("),
+        paste0("      data = ", ctx$input, ", x = ", r_sym(v), ", results.subtitle = FALSE, bf.message = FALSE,"),
+        "      palette = \"ggsci::default_nejm\"",
+        "    ) +",
+        "      ggplot2::guides(fill = ggplot2::guide_legend(ncol = 4, byrow = TRUE)) +",
+        "      ggplot2::theme(legend.position = \"bottom\")",
         "  }",
         "}")
       add_figure(ctx, "bettergg", code, bd, paste0("Distribution of ", v, " (BetterGG)."), suffix = suffix, packages = "BetterGG")

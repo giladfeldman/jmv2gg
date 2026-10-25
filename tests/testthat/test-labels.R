@@ -82,6 +82,30 @@ test_that("figure_relabel puts the labels into titles, legend titles, statistics
   expect_identical(ggplot2::ggplot_build(q2)$layout$panel_params[[1]]$x$get_labels(), c("Gain frame", "Loss"))
   expect_identical(levels(q2$data[["framing / default"]]), c("Gain frame / x", "Loss / x", "Gain frame / y", "Loss / y"))
   expect_identical(ggplot2::ggplot_build(p2)$layout$panel_params[[1]]$x$get_labels(), c("Gain", "Loss"))
+
+  # colours given by category name follow their category when it is renamed
+  p3 <- ggplot2::ggplot(d, ggplot2::aes(framing, y_val, fill = framing)) + ggplot2::geom_col() +
+    ggplot2::scale_fill_manual(values = c(Gain = "#FF0000", Loss = "#0000FF"))
+  fills <- function(p) {
+    built <- ggplot2::ggplot_build(p)$data[[1]]
+    stats::setNames(built$fill, as.character(built$x))
+  }
+  expect_identical(unname(fills(env$figure_relabel(p3))), unname(fills(p3)))
+  expect_false(anyNA(fills(env$figure_relabel(p3))))
+
+  # column names in the tick labels of a discrete axis (correlation matrix, coefficient terms)
+  ticks <- function(p, axis) ggplot2::ggplot_build(p)$layout$panel_params[[1]][[axis]]$get_labels()
+  cm <- data.frame(a = factor(c("framing", "default")), b = factor(c("y_val: Loss vs Gain", "default")), v = 1:2)
+  p4 <- ggplot2::ggplot(cm, ggplot2::aes(a, b, fill = v)) + ggplot2::geom_tile()
+  q4 <- env$figure_relabel(p4)
+  expect_setequal(ticks(q4, "x"), c("Message framing", "Default option"))
+  expect_setequal(ticks(q4, "y"), c("Endorsement: Loss vs Gain", "Default option"))
+  # an axis that already has a labels function keeps it, applied to the relabelled text
+  p5 <- p4 + ggplot2::scale_x_discrete(labels = toupper)
+  expect_setequal(ticks(env$figure_relabel(p5), "x"), c("MESSAGE FRAMING", "DEFAULT OPTION"))
+  expect_setequal(ticks(p5, "x"), c("FRAMING", "DEFAULT"))
+  # numeric axes are untouched
+  expect_identical(ticks(env$figure_relabel(p), "y"), ticks(p, "y"))
 })
 
 test_that("generated figures carry the labels when they are drawn", {

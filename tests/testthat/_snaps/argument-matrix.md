@@ -188,6 +188,12 @@
         anova_1_data$rain_position <- anova_1_data$x_position - 0.2 * anova_1_slot
         anova_1_data$cell <- interaction(anova_1_data[c("g", "h")], drop = TRUE, lex.order = TRUE)
         anova_1_means$x_position <- anova_1_place(anova_1_means)
+        # Rain jitter: sideways; with few distinct outcome values (2 to 15, e.g. a 1-7 scale)
+        # also up and down by at most 0.15 of the smallest gap, so no point reaches the next value.
+        anova_1_values <- sort(unique(anova_1_data[["y"]]))
+        anova_1_few <- length(anova_1_values) >= 2L && length(anova_1_values) <= 15L
+        anova_1_jitter_width <- (if (anova_1_few) 0.1 else 0.06) * anova_1_slot
+        anova_1_jitter_height <- if (anova_1_few) 0.15 * min(diff(anova_1_values)) else 0
       
         # 4. The figure
         anova_1_plot <- ggplot2::ggplot(anova_1_data, ggplot2::aes(x = x_position, y = .data[["y"]])) +
@@ -195,9 +201,9 @@
           ggdist::stat_slab(ggplot2::aes(fill = .data[["h"]], group = cell), orientation = "vertical",
             side = "right", justification = 0, width = anova_1_slot, scale = 0.45, colour = NA, alpha = 0.5,
             normalize = "groups") +
-          # rain: every observation, slightly jittered sideways
+          # rain: every observation, slightly jittered (fixed seed: reproducible)
           ggplot2::geom_point(ggplot2::aes(x = rain_position, colour = .data[["h"]]),
-            position = ggplot2::position_jitter(width = 0.06 * anova_1_slot, height = 0, seed = 1123),
+            position = ggplot2::position_jitter(width = anova_1_jitter_width, height = anova_1_jitter_height, seed = 1123),
             size = 1.4, alpha = 0.5, stroke = 0) +
           # model means of each colour group joined across the x levels
           ggplot2::geom_line(data = anova_1_means,
@@ -312,6 +318,12 @@
           anova_1_data$rain_position <- anova_1_data$x_position - 0.2 * anova_1_slot
           anova_1_data$cell <- interaction(anova_1_data[anova_1_factors[1]], drop = TRUE, lex.order = TRUE)
           anova_1_means$x_position <- anova_1_place(anova_1_means)
+          # Rain jitter: sideways; with few distinct outcome values (2 to 15, e.g. a 1-7 scale)
+          # also up and down by at most 0.15 of the smallest gap, so no point reaches the next value.
+          anova_1_values <- sort(unique(anova_1_data[["y"]]))
+          anova_1_few <- length(anova_1_values) >= 2L && length(anova_1_values) <= 15L
+          anova_1_jitter_width <- (if (anova_1_few) 0.1 else 0.06) * anova_1_slot
+          anova_1_jitter_height <- if (anova_1_few) 0.15 * min(diff(anova_1_values)) else 0
       
           # 4. The figure
           anova_1_plot <- ggplot2::ggplot(anova_1_data, ggplot2::aes(x = x_position, y = .data[["y"]])) +
@@ -319,9 +331,9 @@
             ggdist::stat_slab(ggplot2::aes(fill = .data[[anova_1_factors[1]]], group = cell), orientation = "vertical",
               side = "right", justification = 0, width = anova_1_slot, scale = 0.45, colour = NA, alpha = 0.5,
               normalize = "groups") +
-            # rain: every observation, slightly jittered sideways
+            # rain: every observation, slightly jittered (fixed seed: reproducible)
             ggplot2::geom_point(ggplot2::aes(x = rain_position, colour = .data[[anova_1_factors[1]]]),
-              position = ggplot2::position_jitter(width = 0.06 * anova_1_slot, height = 0, seed = 1123),
+              position = ggplot2::position_jitter(width = anova_1_jitter_width, height = anova_1_jitter_height, seed = 1123),
               size = 1.4, alpha = 0.5, stroke = 0) +
             # estimated marginal means with 95% confidence intervals
             ggplot2::geom_errorbar(data = anova_1_means, ggplot2::aes(x = x_position, ymin = lower.CL, ymax = upper.CL),
@@ -363,6 +375,12 @@
           anova_1_data$rain_position <- anova_1_data$x_position - 0.2 * anova_1_slot
           anova_1_data$cell <- interaction(anova_1_data[c(anova_1_factors[1], anova_1_factors[2])], drop = TRUE, lex.order = TRUE)
           anova_1_means$x_position <- anova_1_place(anova_1_means)
+          # Rain jitter: sideways; with few distinct outcome values (2 to 15, e.g. a 1-7 scale)
+          # also up and down by at most 0.15 of the smallest gap, so no point reaches the next value.
+          anova_1_values <- sort(unique(anova_1_data[["y"]]))
+          anova_1_few <- length(anova_1_values) >= 2L && length(anova_1_values) <= 15L
+          anova_1_jitter_width <- (if (anova_1_few) 0.1 else 0.06) * anova_1_slot
+          anova_1_jitter_height <- if (anova_1_few) 0.15 * min(diff(anova_1_values)) else 0
       
           # 4. The figure
           anova_1_plot <- ggplot2::ggplot(anova_1_data, ggplot2::aes(x = x_position, y = .data[["y"]])) +
@@ -370,9 +388,9 @@
             ggdist::stat_slab(ggplot2::aes(fill = .data[[anova_1_factors[2]]], group = cell), orientation = "vertical",
               side = "right", justification = 0, width = anova_1_slot, scale = 0.45, colour = NA, alpha = 0.5,
               normalize = "groups") +
-            # rain: every observation, slightly jittered sideways
+            # rain: every observation, slightly jittered (fixed seed: reproducible)
             ggplot2::geom_point(ggplot2::aes(x = rain_position, colour = .data[[anova_1_factors[2]]]),
-              position = ggplot2::position_jitter(width = 0.06 * anova_1_slot, height = 0, seed = 1123),
+              position = ggplot2::position_jitter(width = anova_1_jitter_width, height = anova_1_jitter_height, seed = 1123),
               size = 1.4, alpha = 0.5, stroke = 0) +
             # model means of each colour group joined across the x levels
             ggplot2::geom_line(data = anova_1_means,
@@ -417,6 +435,12 @@
           anova_1_data$rain_position <- anova_1_data$x_position - 0.2 * anova_1_slot
           anova_1_data$cell <- interaction(anova_1_data[c(anova_1_factors[1], anova_1_factors[2], anova_1_factors[3])], drop = TRUE, lex.order = TRUE)
           anova_1_means$x_position <- anova_1_place(anova_1_means)
+          # Rain jitter: sideways; with few distinct outcome values (2 to 15, e.g. a 1-7 scale)
+          # also up and down by at most 0.15 of the smallest gap, so no point reaches the next value.
+          anova_1_values <- sort(unique(anova_1_data[["y"]]))
+          anova_1_few <- length(anova_1_values) >= 2L && length(anova_1_values) <= 15L
+          anova_1_jitter_width <- (if (anova_1_few) 0.1 else 0.06) * anova_1_slot
+          anova_1_jitter_height <- if (anova_1_few) 0.15 * min(diff(anova_1_values)) else 0
       
           # 4. The figure
           anova_1_plot <- ggplot2::ggplot(anova_1_data, ggplot2::aes(x = x_position, y = .data[["y"]])) +
@@ -424,9 +448,9 @@
             ggdist::stat_slab(ggplot2::aes(fill = .data[[anova_1_factors[2]]], group = cell), orientation = "vertical",
               side = "right", justification = 0, width = anova_1_slot, scale = 0.45, colour = NA, alpha = 0.5,
               normalize = "groups") +
-            # rain: every observation, slightly jittered sideways
+            # rain: every observation, slightly jittered (fixed seed: reproducible)
             ggplot2::geom_point(ggplot2::aes(x = rain_position, colour = .data[[anova_1_factors[2]]]),
-              position = ggplot2::position_jitter(width = 0.06 * anova_1_slot, height = 0, seed = 1123),
+              position = ggplot2::position_jitter(width = anova_1_jitter_width, height = anova_1_jitter_height, seed = 1123),
               size = 1.4, alpha = 0.5, stroke = 0) +
             # model means of each colour group joined across the x levels
             ggplot2::geom_line(data = anova_1_means,
@@ -781,6 +805,12 @@
         rm_anova_1_data$rain_position <- rm_anova_1_data$x_position - 0.2 * rm_anova_1_slot
         rm_anova_1_data$cell <- interaction(rm_anova_1_data[c("time", "h")], drop = TRUE, lex.order = TRUE)
         rm_anova_1_means$x_position <- rm_anova_1_place(rm_anova_1_means)
+        # Rain jitter: sideways; with few distinct outcome values (2 to 15, e.g. a 1-7 scale)
+        # also up and down by at most 0.15 of the smallest gap, so no point reaches the next value.
+        rm_anova_1_values <- sort(unique(rm_anova_1_data[["value"]]))
+        rm_anova_1_few <- length(rm_anova_1_values) >= 2L && length(rm_anova_1_values) <= 15L
+        rm_anova_1_jitter_width <- (if (rm_anova_1_few) 0.1 else 0.06) * rm_anova_1_slot
+        rm_anova_1_jitter_height <- if (rm_anova_1_few) 0.15 * min(diff(rm_anova_1_values)) else 0
       
         # 4. The figure
         rm_anova_1_plot <- ggplot2::ggplot(rm_anova_1_data, ggplot2::aes(x = x_position, y = .data[["value"]])) +
@@ -788,9 +818,9 @@
           ggdist::stat_slab(ggplot2::aes(fill = .data[["h"]], group = cell), orientation = "vertical",
             side = "right", justification = 0, width = rm_anova_1_slot, scale = 0.45, colour = NA, alpha = 0.5,
             normalize = "groups") +
-          # rain: every observation, slightly jittered sideways
+          # rain: every observation, slightly jittered (fixed seed: reproducible)
           ggplot2::geom_point(ggplot2::aes(x = rain_position, colour = .data[["h"]]),
-            position = ggplot2::position_jitter(width = 0.06 * rm_anova_1_slot, height = 0, seed = 1123),
+            position = ggplot2::position_jitter(width = rm_anova_1_jitter_width, height = rm_anova_1_jitter_height, seed = 1123),
             size = 1.4, alpha = 0.5, stroke = 0) +
           # model means of each colour group joined across the x levels
           ggplot2::geom_line(data = rm_anova_1_means,
@@ -832,8 +862,9 @@
     Output
       # ---- descriptives_1: jmv::descriptives (line 1) ----------------------------
       # Source: jmv::descriptives(data = d, vars = c("y", "c2"), splitBy = "h")
-      # Figure: for each variable, a histogram (numeric) or pie chart (categories)
-      #         of the case-weighted counts, split by h.
+      # Figure: for each variable, the proportion of 1s with Wilson intervals
+      #         (0/1), a histogram (other numbers), or stacked percentage bars
+      #         (categories) of the case-weighted counts, split by h.
       # Differs from jamovi: nothing known.
       descriptives_1_ready <- figure_try("descriptives_1", {
         # Analysis data: a copy of d as it is at this point.
@@ -854,7 +885,51 @@
       
       # ggplot2 figure: Distribution of y.
       if (descriptives_1_ready) figure_try("descriptives_1-ggplot2-y", {
-        if (is.numeric(descriptives_1_input[["y"]])) {
+        # 0/1 values: proportion of 1s; other numbers: histogram; categories: bars or pie.
+        if (is.numeric(descriptives_1_input[["y"]]) && any(!is.na(descriptives_1_input[["y"]])) && all(descriptives_1_input[["y"]] %in% c(0, 1, NA))) {
+          # 1. Data: complete cases; "y" must hold only 0 and 1 (FALSE/TRUE count as 0/1).
+          descriptives_1_1_data <- descriptives_1_input[stats::complete.cases(descriptives_1_input[, c("y", "h", "descriptives_1_case_weight"), drop = FALSE]), c("y", "h", "descriptives_1_case_weight"), drop = FALSE]
+          descriptives_1_1_y <- as.numeric(descriptives_1_1_data[["y"]])
+          if (!all(descriptives_1_1_y %in% c(0, 1))) stop("BetterGG: ", "y", " must contain only 0 and 1 (or FALSE/TRUE).")
+          descriptives_1_1_weight <- descriptives_1_1_data[["descriptives_1_case_weight"]] # frequency weights
+          descriptives_1_1_group <- droplevels(as.factor(descriptives_1_1_data[["h"]]))
+      
+          # 2. Proportion of 1s in each group and its Wilson score interval
+          # (the interval of prop.test() without continuity correction).
+          descriptives_1_1_z <- stats::qnorm(1 - (1 - 0.95) / 2)
+          descriptives_1_1_summary <- do.call(rbind, lapply(levels(descriptives_1_1_group), function(level) {
+            keep <- descriptives_1_1_group == level
+            n <- sum(descriptives_1_1_weight[keep])
+            p <- sum(descriptives_1_1_weight[keep] * descriptives_1_1_y[keep]) / n
+            z <- descriptives_1_1_z
+            centre <- (p + z^2 / (2 * n)) / (1 + z^2 / n)
+            half <- z / (1 + z^2 / n) * sqrt(p * (1 - p) / n + z^2 / (4 * n^2))
+            data.frame(level = level, n = n, proportion = p, lower = max(0, centre - half), upper = min(1, centre + half))
+          }))
+          descriptives_1_1_summary$level <- factor(descriptives_1_1_summary$level, levels = levels(descriptives_1_1_group))
+          descriptives_1_1_summary$label <- paste0(round(100 * descriptives_1_1_summary$proportion), "%")
+          # The groups also sit in a column named after their variable, so code that renames
+          # a variable's categories on a finished figure finds them.
+          descriptives_1_1_summary[["h"]] <- descriptives_1_1_summary$level
+          # Group labels (wrapped at 40 characters) with the number of cases, in group order
+          descriptives_1_1_wrap <- function(labels, width = 40) vapply(as.character(labels), function(label)
+            paste(strwrap(label, width = width), collapse = "\n"), character(1), USE.NAMES = FALSE)
+          descriptives_1_1_n_text <- prettyNum(round(descriptives_1_1_summary$n, 2), big.mark = ",")
+      
+          # 3. The figure
+          descriptives_1_1_plot <- ggplot2::ggplot(descriptives_1_1_summary, ggplot2::aes(x = .data[["h"]], y = proportion)) +
+            ggplot2::geom_col(fill = figure_fills[1], colour = "black", alpha = 0.8, width = 0.6) +
+            # 95% Wilson score confidence intervals
+            ggplot2::geom_errorbar(ggplot2::aes(ymin = lower, ymax = upper), width = 0.12, linewidth = 0.6) +
+            # percentage above each interval
+            ggplot2::geom_text(ggplot2::aes(y = upper, label = label), vjust = -0.7, size = 3.5, family = figure_font) +
+            ggplot2::scale_x_discrete(labels = function(groups) paste0(descriptives_1_1_wrap(groups), "\n(n = ", descriptives_1_1_n_text, ")")) +
+            ggplot2::scale_y_continuous(limits = c(0, 1.1), breaks = seq(0, 1, by = 0.2),
+              labels = function(p) paste0(round(100 * p), "%"), expand = ggplot2::expansion(mult = c(0, 0))) +
+            ggplot2::labs(x = "h", y = "% with y = 1", title = NULL, caption = "Bars: proportion of 1s; error bars: 95% Wilson score confidence intervals (weights as frequencies).") +
+            theme_figure() +
+            ggplot2::theme(panel.grid.major.x = ggplot2::element_blank())
+        } else if (is.numeric(descriptives_1_input[["y"]])) {
           # 1. Data: rows with a value of "y".
           descriptives_1_1_data <- descriptives_1_input[stats::complete.cases(descriptives_1_input[, c("y", "descriptives_1_case_weight", "h"), drop = FALSE]), c("y", "descriptives_1_case_weight", "h"), drop = FALSE]
           descriptives_1_1_data[["h"]] <- droplevels(as.factor(descriptives_1_1_data[["h"]]))
@@ -909,21 +984,36 @@
           names(descriptives_1_1_sizes)[seq_len(1)] <- c("h")
           descriptives_1_1_sizes$N <- paste0("(n = ", prettyNum(round(descriptives_1_1_sizes$counts, 2), big.mark = ","), ")")
           descriptives_1_1_sizes <- descriptives_1_1_sizes[order(descriptives_1_1_sizes[["h"]], decreasing = TRUE), ]
-          descriptives_1_1_cells$label <- ifelse(descriptives_1_1_cells$counts == 0, NA_character_, paste0(round(descriptives_1_1_cells$perc), "%"))
-          # Fill colours: the palette, or a longer qualitative palette for many categories.
-          descriptives_1_1_fills <- if (nlevels(descriptives_1_1_data[["y"]]) <= length(figure_fills)) figure_fills else
+          # Percentage labels; segments below 5% get none (they would overlap; the legend names them).
+          descriptives_1_1_cells$label <- ifelse(descriptives_1_1_cells$counts == 0 | descriptives_1_1_cells$perc < 5, NA_character_,
+            paste0(round(descriptives_1_1_cells$perc), "%"))
+          # Fill colours: an ordered factor in scale order (diverging with a neutral middle for an
+          # odd number of levels, sequential otherwise); else the palette, or a longer qualitative
+          # palette for many categories.
+          descriptives_1_1_ordered_fills <- function(k) if (k %% 2L == 1L) rev(grDevices::hcl.colors(k, "Blue-Red 2")) else
+            grDevices::hcl.colors(k + 1L, "Blues 3", rev = TRUE)[-1]
+          descriptives_1_1_fills <- if (is.ordered(descriptives_1_1_data[["y"]]) && nlevels(descriptives_1_1_data[["y"]]) <= 11L) descriptives_1_1_ordered_fills(nlevels(descriptives_1_1_data[["y"]])) else
+            if (nlevels(descriptives_1_1_data[["y"]]) <= length(figure_fills)) figure_fills else
             grDevices::hcl.colors(nlevels(descriptives_1_1_data[["y"]]), "Dark 3")
+          # Category names wrap at 40 characters; a longer name puts the legend below the plot.
+          descriptives_1_1_wrap <- function(labels, width = 40) vapply(as.character(labels), function(label)
+            paste(strwrap(label, width = width), collapse = "\n"), character(1), USE.NAMES = FALSE)
+          descriptives_1_1_long <- any(nchar(levels(descriptives_1_1_data[["y"]])) > 40)
       
           # 3. The figure
-          # Many or long bar labels are angled; with many bars the group sizes get smaller, so they do not overlap.
+          # Bar labels wrap: up to six bars share about 70 characters (at least 10 each);
+          # more bars are angled and wrap at 40. With many bars the group sizes get smaller.
           descriptives_1_1_ticks <- levels(factor(descriptives_1_1_cells[["h"]]))
-          descriptives_1_1_many <- length(descriptives_1_1_ticks) > 6L || sum(nchar(descriptives_1_1_ticks)) > 60L
+          descriptives_1_1_many <- length(descriptives_1_1_ticks) > 6L
+          descriptives_1_1_axis_width <- if (descriptives_1_1_many) 40 else max(10, min(40, floor(70 / length(descriptives_1_1_ticks))))
           descriptives_1_1_size <- max(2.5, min(4, 24 / length(descriptives_1_1_ticks)))
-          # room on the left for the first angled label (about 4 pt per character)
-          descriptives_1_1_left_room <- max(5.5, 4 * nchar(descriptives_1_1_ticks[1]) - 30)
+          # room on the left for the first angled label (about 4 pt per character of its longest line)
+          descriptives_1_1_first <- strsplit(descriptives_1_1_wrap(descriptives_1_1_ticks[1], descriptives_1_1_axis_width), "\n", fixed = TRUE)[[1]]
+          descriptives_1_1_left_room <- max(5.5, 4 * max(nchar(descriptives_1_1_first)) - 30)
           descriptives_1_1_plot <- ggplot2::ggplot(descriptives_1_1_cells, ggplot2::aes(x = h, y = perc, fill = y)) +
             # 100% stacked bars
             ggplot2::geom_col(position = "fill", colour = "black") +
+            ggplot2::scale_x_discrete(labels = function(labels) descriptives_1_1_wrap(labels, descriptives_1_1_axis_width)) +
             ggplot2::scale_y_continuous(labels = function(p) paste0(round(100 * p), "%"),
               breaks = seq(0, 1, by = 0.1), minor_breaks = seq(0.05, 0.95, by = 0.1)) +
             # percentage labels
@@ -934,7 +1024,10 @@
             (if (descriptives_1_1_many) ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 45, hjust = 1, vjust = 1),
               plot.margin = ggplot2::margin(5.5, 5.5, 5.5, descriptives_1_1_left_room))) +
             ggplot2::guides(fill = ggplot2::guide_legend(title = "y")) +
-            ggplot2::scale_fill_manual(values = descriptives_1_1_fills, name = "", drop = FALSE) +
+            ggplot2::scale_fill_manual(values = descriptives_1_1_fills, name = "", drop = FALSE, labels = descriptives_1_1_wrap) +
+            # a long category name: the legend goes below the plot, one entry per row
+            (if (descriptives_1_1_long) ggplot2::theme(legend.position = "bottom", legend.direction = "vertical",
+              legend.key.spacing.y = ggplot2::unit(6, "pt"))) +
             # group sizes under the bars
             ggplot2::geom_text(data = descriptives_1_1_sizes, ggplot2::aes(x = h, y = -0.05, label = N, fill = NULL),
               size = descriptives_1_1_size, family = figure_font) +
@@ -947,19 +1040,22 @@
       
       # BetterGG figure: Distribution of y (BetterGG).
       if (descriptives_1_ready) figure_try("descriptives_1-bettergg-y", {
-        if (is.numeric(descriptives_1_input[["y"]])) {
+        # 0/1 values: proportion of 1s; other numbers: histogram; categories: bars or pie.
+        if (is.numeric(descriptives_1_input[["y"]]) && any(!is.na(descriptives_1_input[["y"]])) && all(descriptives_1_input[["y"]] %in% c(0, 1, NA))) {
+          descriptives_1_1_bettergg <- BetterGG::ggproportion(data = descriptives_1_input, x = y)
+        } else if (is.numeric(descriptives_1_input[["y"]])) {
           descriptives_1_1_bettergg <- BetterGG::gghistostats(data = descriptives_1_input, x = y, results.subtitle = FALSE, bf.message = FALSE)
         } else {
-          descriptives_1_1_bettergg_levels <- nlevels(factor(descriptives_1_input[["y"]]))
-          descriptives_1_1_bettergg <- BetterGG::ggpiestats(
-            data = descriptives_1_input, x = y, results.subtitle = FALSE, bf.message = FALSE,
-            palette = if (descriptives_1_1_bettergg_levels <= 8L) "ggsci::default_nejm" else "palettesForR::Named"
-          ) +
-            ggplot2::guides(fill = ggplot2::guide_legend(ncol = 4, byrow = TRUE)) +
-            ggplot2::theme(legend.position = "bottom", legend.text = ggplot2::element_text(size = 6))
-          # Keep every category in the legend; omit overlapping slice labels above 12 categories.
-          if (descriptives_1_1_bettergg_levels > 12L) {
-            descriptives_1_1_bettergg$layers <- Filter(function(layer) !inherits(layer$geom, c("GeomLabel", "GeomLabelRepel")), descriptives_1_1_bettergg$layers)
+          descriptives_1_1_bettergg_categories <- levels(factor(descriptives_1_input[["y"]]))
+          if (is.ordered(descriptives_1_input[["y"]]) || length(descriptives_1_1_bettergg_categories) > 8L || any(nchar(descriptives_1_1_bettergg_categories) > 40L)) {
+            descriptives_1_1_bettergg <- BetterGG::ggfreqbars(data = descriptives_1_input, x = y)
+          } else {
+            descriptives_1_1_bettergg <- BetterGG::ggpiestats(
+              data = descriptives_1_input, x = y, results.subtitle = FALSE, bf.message = FALSE,
+              palette = "ggsci::default_nejm"
+            ) +
+              ggplot2::guides(fill = ggplot2::guide_legend(ncol = 4, byrow = TRUE)) +
+              ggplot2::theme(legend.position = "bottom")
           }
         }
         descriptives_1_1_bettergg <- figure_relabel(descriptives_1_1_bettergg)
@@ -969,7 +1065,51 @@
       
       # ggplot2 figure: Distribution of c2.
       if (descriptives_1_ready) figure_try("descriptives_1-ggplot2-c2", {
-        if (is.numeric(descriptives_1_input[["c2"]])) {
+        # 0/1 values: proportion of 1s; other numbers: histogram; categories: bars or pie.
+        if (is.numeric(descriptives_1_input[["c2"]]) && any(!is.na(descriptives_1_input[["c2"]])) && all(descriptives_1_input[["c2"]] %in% c(0, 1, NA))) {
+          # 1. Data: complete cases; "c2" must hold only 0 and 1 (FALSE/TRUE count as 0/1).
+          descriptives_1_2_data <- descriptives_1_input[stats::complete.cases(descriptives_1_input[, c("c2", "h", "descriptives_1_case_weight"), drop = FALSE]), c("c2", "h", "descriptives_1_case_weight"), drop = FALSE]
+          descriptives_1_2_y <- as.numeric(descriptives_1_2_data[["c2"]])
+          if (!all(descriptives_1_2_y %in% c(0, 1))) stop("BetterGG: ", "c2", " must contain only 0 and 1 (or FALSE/TRUE).")
+          descriptives_1_2_weight <- descriptives_1_2_data[["descriptives_1_case_weight"]] # frequency weights
+          descriptives_1_2_group <- droplevels(as.factor(descriptives_1_2_data[["h"]]))
+      
+          # 2. Proportion of 1s in each group and its Wilson score interval
+          # (the interval of prop.test() without continuity correction).
+          descriptives_1_2_z <- stats::qnorm(1 - (1 - 0.95) / 2)
+          descriptives_1_2_summary <- do.call(rbind, lapply(levels(descriptives_1_2_group), function(level) {
+            keep <- descriptives_1_2_group == level
+            n <- sum(descriptives_1_2_weight[keep])
+            p <- sum(descriptives_1_2_weight[keep] * descriptives_1_2_y[keep]) / n
+            z <- descriptives_1_2_z
+            centre <- (p + z^2 / (2 * n)) / (1 + z^2 / n)
+            half <- z / (1 + z^2 / n) * sqrt(p * (1 - p) / n + z^2 / (4 * n^2))
+            data.frame(level = level, n = n, proportion = p, lower = max(0, centre - half), upper = min(1, centre + half))
+          }))
+          descriptives_1_2_summary$level <- factor(descriptives_1_2_summary$level, levels = levels(descriptives_1_2_group))
+          descriptives_1_2_summary$label <- paste0(round(100 * descriptives_1_2_summary$proportion), "%")
+          # The groups also sit in a column named after their variable, so code that renames
+          # a variable's categories on a finished figure finds them.
+          descriptives_1_2_summary[["h"]] <- descriptives_1_2_summary$level
+          # Group labels (wrapped at 40 characters) with the number of cases, in group order
+          descriptives_1_2_wrap <- function(labels, width = 40) vapply(as.character(labels), function(label)
+            paste(strwrap(label, width = width), collapse = "\n"), character(1), USE.NAMES = FALSE)
+          descriptives_1_2_n_text <- prettyNum(round(descriptives_1_2_summary$n, 2), big.mark = ",")
+      
+          # 3. The figure
+          descriptives_1_2_plot <- ggplot2::ggplot(descriptives_1_2_summary, ggplot2::aes(x = .data[["h"]], y = proportion)) +
+            ggplot2::geom_col(fill = figure_fills[1], colour = "black", alpha = 0.8, width = 0.6) +
+            # 95% Wilson score confidence intervals
+            ggplot2::geom_errorbar(ggplot2::aes(ymin = lower, ymax = upper), width = 0.12, linewidth = 0.6) +
+            # percentage above each interval
+            ggplot2::geom_text(ggplot2::aes(y = upper, label = label), vjust = -0.7, size = 3.5, family = figure_font) +
+            ggplot2::scale_x_discrete(labels = function(groups) paste0(descriptives_1_2_wrap(groups), "\n(n = ", descriptives_1_2_n_text, ")")) +
+            ggplot2::scale_y_continuous(limits = c(0, 1.1), breaks = seq(0, 1, by = 0.2),
+              labels = function(p) paste0(round(100 * p), "%"), expand = ggplot2::expansion(mult = c(0, 0))) +
+            ggplot2::labs(x = "h", y = "% with c2 = 1", title = NULL, caption = "Bars: proportion of 1s; error bars: 95% Wilson score confidence intervals (weights as frequencies).") +
+            theme_figure() +
+            ggplot2::theme(panel.grid.major.x = ggplot2::element_blank())
+        } else if (is.numeric(descriptives_1_input[["c2"]])) {
           # 1. Data: rows with a value of "c2".
           descriptives_1_2_data <- descriptives_1_input[stats::complete.cases(descriptives_1_input[, c("c2", "descriptives_1_case_weight", "h"), drop = FALSE]), c("c2", "descriptives_1_case_weight", "h"), drop = FALSE]
           descriptives_1_2_data[["h"]] <- droplevels(as.factor(descriptives_1_2_data[["h"]]))
@@ -1024,21 +1164,36 @@
           names(descriptives_1_2_sizes)[seq_len(1)] <- c("h")
           descriptives_1_2_sizes$N <- paste0("(n = ", prettyNum(round(descriptives_1_2_sizes$counts, 2), big.mark = ","), ")")
           descriptives_1_2_sizes <- descriptives_1_2_sizes[order(descriptives_1_2_sizes[["h"]], decreasing = TRUE), ]
-          descriptives_1_2_cells$label <- ifelse(descriptives_1_2_cells$counts == 0, NA_character_, paste0(round(descriptives_1_2_cells$perc), "%"))
-          # Fill colours: the palette, or a longer qualitative palette for many categories.
-          descriptives_1_2_fills <- if (nlevels(descriptives_1_2_data[["c2"]]) <= length(figure_fills)) figure_fills else
+          # Percentage labels; segments below 5% get none (they would overlap; the legend names them).
+          descriptives_1_2_cells$label <- ifelse(descriptives_1_2_cells$counts == 0 | descriptives_1_2_cells$perc < 5, NA_character_,
+            paste0(round(descriptives_1_2_cells$perc), "%"))
+          # Fill colours: an ordered factor in scale order (diverging with a neutral middle for an
+          # odd number of levels, sequential otherwise); else the palette, or a longer qualitative
+          # palette for many categories.
+          descriptives_1_2_ordered_fills <- function(k) if (k %% 2L == 1L) rev(grDevices::hcl.colors(k, "Blue-Red 2")) else
+            grDevices::hcl.colors(k + 1L, "Blues 3", rev = TRUE)[-1]
+          descriptives_1_2_fills <- if (is.ordered(descriptives_1_2_data[["c2"]]) && nlevels(descriptives_1_2_data[["c2"]]) <= 11L) descriptives_1_2_ordered_fills(nlevels(descriptives_1_2_data[["c2"]])) else
+            if (nlevels(descriptives_1_2_data[["c2"]]) <= length(figure_fills)) figure_fills else
             grDevices::hcl.colors(nlevels(descriptives_1_2_data[["c2"]]), "Dark 3")
+          # Category names wrap at 40 characters; a longer name puts the legend below the plot.
+          descriptives_1_2_wrap <- function(labels, width = 40) vapply(as.character(labels), function(label)
+            paste(strwrap(label, width = width), collapse = "\n"), character(1), USE.NAMES = FALSE)
+          descriptives_1_2_long <- any(nchar(levels(descriptives_1_2_data[["c2"]])) > 40)
       
           # 3. The figure
-          # Many or long bar labels are angled; with many bars the group sizes get smaller, so they do not overlap.
+          # Bar labels wrap: up to six bars share about 70 characters (at least 10 each);
+          # more bars are angled and wrap at 40. With many bars the group sizes get smaller.
           descriptives_1_2_ticks <- levels(factor(descriptives_1_2_cells[["h"]]))
-          descriptives_1_2_many <- length(descriptives_1_2_ticks) > 6L || sum(nchar(descriptives_1_2_ticks)) > 60L
+          descriptives_1_2_many <- length(descriptives_1_2_ticks) > 6L
+          descriptives_1_2_axis_width <- if (descriptives_1_2_many) 40 else max(10, min(40, floor(70 / length(descriptives_1_2_ticks))))
           descriptives_1_2_size <- max(2.5, min(4, 24 / length(descriptives_1_2_ticks)))
-          # room on the left for the first angled label (about 4 pt per character)
-          descriptives_1_2_left_room <- max(5.5, 4 * nchar(descriptives_1_2_ticks[1]) - 30)
+          # room on the left for the first angled label (about 4 pt per character of its longest line)
+          descriptives_1_2_first <- strsplit(descriptives_1_2_wrap(descriptives_1_2_ticks[1], descriptives_1_2_axis_width), "\n", fixed = TRUE)[[1]]
+          descriptives_1_2_left_room <- max(5.5, 4 * max(nchar(descriptives_1_2_first)) - 30)
           descriptives_1_2_plot <- ggplot2::ggplot(descriptives_1_2_cells, ggplot2::aes(x = h, y = perc, fill = c2)) +
             # 100% stacked bars
             ggplot2::geom_col(position = "fill", colour = "black") +
+            ggplot2::scale_x_discrete(labels = function(labels) descriptives_1_2_wrap(labels, descriptives_1_2_axis_width)) +
             ggplot2::scale_y_continuous(labels = function(p) paste0(round(100 * p), "%"),
               breaks = seq(0, 1, by = 0.1), minor_breaks = seq(0.05, 0.95, by = 0.1)) +
             # percentage labels
@@ -1049,7 +1204,10 @@
             (if (descriptives_1_2_many) ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 45, hjust = 1, vjust = 1),
               plot.margin = ggplot2::margin(5.5, 5.5, 5.5, descriptives_1_2_left_room))) +
             ggplot2::guides(fill = ggplot2::guide_legend(title = "c2")) +
-            ggplot2::scale_fill_manual(values = descriptives_1_2_fills, name = "", drop = FALSE) +
+            ggplot2::scale_fill_manual(values = descriptives_1_2_fills, name = "", drop = FALSE, labels = descriptives_1_2_wrap) +
+            # a long category name: the legend goes below the plot, one entry per row
+            (if (descriptives_1_2_long) ggplot2::theme(legend.position = "bottom", legend.direction = "vertical",
+              legend.key.spacing.y = ggplot2::unit(6, "pt"))) +
             # group sizes under the bars
             ggplot2::geom_text(data = descriptives_1_2_sizes, ggplot2::aes(x = h, y = -0.05, label = N, fill = NULL),
               size = descriptives_1_2_size, family = figure_font) +
@@ -1062,19 +1220,22 @@
       
       # BetterGG figure: Distribution of c2 (BetterGG).
       if (descriptives_1_ready) figure_try("descriptives_1-bettergg-c2", {
-        if (is.numeric(descriptives_1_input[["c2"]])) {
+        # 0/1 values: proportion of 1s; other numbers: histogram; categories: bars or pie.
+        if (is.numeric(descriptives_1_input[["c2"]]) && any(!is.na(descriptives_1_input[["c2"]])) && all(descriptives_1_input[["c2"]] %in% c(0, 1, NA))) {
+          descriptives_1_2_bettergg <- BetterGG::ggproportion(data = descriptives_1_input, x = c2)
+        } else if (is.numeric(descriptives_1_input[["c2"]])) {
           descriptives_1_2_bettergg <- BetterGG::gghistostats(data = descriptives_1_input, x = c2, results.subtitle = FALSE, bf.message = FALSE)
         } else {
-          descriptives_1_2_bettergg_levels <- nlevels(factor(descriptives_1_input[["c2"]]))
-          descriptives_1_2_bettergg <- BetterGG::ggpiestats(
-            data = descriptives_1_input, x = c2, results.subtitle = FALSE, bf.message = FALSE,
-            palette = if (descriptives_1_2_bettergg_levels <= 8L) "ggsci::default_nejm" else "palettesForR::Named"
-          ) +
-            ggplot2::guides(fill = ggplot2::guide_legend(ncol = 4, byrow = TRUE)) +
-            ggplot2::theme(legend.position = "bottom", legend.text = ggplot2::element_text(size = 6))
-          # Keep every category in the legend; omit overlapping slice labels above 12 categories.
-          if (descriptives_1_2_bettergg_levels > 12L) {
-            descriptives_1_2_bettergg$layers <- Filter(function(layer) !inherits(layer$geom, c("GeomLabel", "GeomLabelRepel")), descriptives_1_2_bettergg$layers)
+          descriptives_1_2_bettergg_categories <- levels(factor(descriptives_1_input[["c2"]]))
+          if (is.ordered(descriptives_1_input[["c2"]]) || length(descriptives_1_2_bettergg_categories) > 8L || any(nchar(descriptives_1_2_bettergg_categories) > 40L)) {
+            descriptives_1_2_bettergg <- BetterGG::ggfreqbars(data = descriptives_1_input, x = c2)
+          } else {
+            descriptives_1_2_bettergg <- BetterGG::ggpiestats(
+              data = descriptives_1_input, x = c2, results.subtitle = FALSE, bf.message = FALSE,
+              palette = "ggsci::default_nejm"
+            ) +
+              ggplot2::guides(fill = ggplot2::guide_legend(ncol = 4, byrow = TRUE)) +
+              ggplot2::theme(legend.position = "bottom")
           }
         }
         descriptives_1_2_bettergg <- figure_relabel(descriptives_1_2_bettergg)
@@ -1127,21 +1288,36 @@
         names(table_1_sizes)[seq_len(2)] <- c("h", "c2")
         table_1_sizes$N <- paste0("(n = ", prettyNum(round(table_1_sizes$counts, 2), big.mark = ","), ")")
         table_1_sizes <- table_1_sizes[order(table_1_sizes[["c2"]], decreasing = TRUE), ]
-        table_1_cells$label <- ifelse(table_1_cells$counts == 0, NA_character_, paste0(round(table_1_cells$perc), "%"))
-        # Fill colours: the palette, or a longer qualitative palette for many categories.
-        table_1_fills <- if (nlevels(table_1_data[["c1"]]) <= length(figure_fills)) figure_fills else
+        # Percentage labels; segments below 5% get none (they would overlap; the legend names them).
+        table_1_cells$label <- ifelse(table_1_cells$counts == 0 | table_1_cells$perc < 5, NA_character_,
+          paste0(round(table_1_cells$perc), "%"))
+        # Fill colours: an ordered factor in scale order (diverging with a neutral middle for an
+        # odd number of levels, sequential otherwise); else the palette, or a longer qualitative
+        # palette for many categories.
+        table_1_ordered_fills <- function(k) if (k %% 2L == 1L) rev(grDevices::hcl.colors(k, "Blue-Red 2")) else
+          grDevices::hcl.colors(k + 1L, "Blues 3", rev = TRUE)[-1]
+        table_1_fills <- if (is.ordered(table_1_data[["c1"]]) && nlevels(table_1_data[["c1"]]) <= 11L) table_1_ordered_fills(nlevels(table_1_data[["c1"]])) else
+          if (nlevels(table_1_data[["c1"]]) <= length(figure_fills)) figure_fills else
           grDevices::hcl.colors(nlevels(table_1_data[["c1"]]), "Dark 3")
+        # Category names wrap at 40 characters; a longer name puts the legend below the plot.
+        table_1_wrap <- function(labels, width = 40) vapply(as.character(labels), function(label)
+          paste(strwrap(label, width = width), collapse = "\n"), character(1), USE.NAMES = FALSE)
+        table_1_long <- any(nchar(levels(table_1_data[["c1"]])) > 40)
       
         # 3. The figure
-        # Many or long bar labels are angled; with many bars the group sizes get smaller, so they do not overlap.
+        # Bar labels wrap: up to six bars share about 70 characters (at least 10 each);
+        # more bars are angled and wrap at 40. With many bars the group sizes get smaller.
         table_1_ticks <- levels(factor(table_1_cells[["c2"]]))
-        table_1_many <- length(table_1_ticks) > 6L || sum(nchar(table_1_ticks)) > 60L
+        table_1_many <- length(table_1_ticks) > 6L
+        table_1_axis_width <- if (table_1_many) 40 else max(10, min(40, floor(70 / length(table_1_ticks))))
         table_1_size <- max(2.5, min(4, 24 / length(table_1_ticks)))
-        # room on the left for the first angled label (about 4 pt per character)
-        table_1_left_room <- max(5.5, 4 * nchar(table_1_ticks[1]) - 30)
+        # room on the left for the first angled label (about 4 pt per character of its longest line)
+        table_1_first <- strsplit(table_1_wrap(table_1_ticks[1], table_1_axis_width), "\n", fixed = TRUE)[[1]]
+        table_1_left_room <- max(5.5, 4 * max(nchar(table_1_first)) - 30)
         table_1_plot <- ggplot2::ggplot(table_1_cells, ggplot2::aes(x = c2, y = perc, fill = c1)) +
           # 100% stacked bars
           ggplot2::geom_col(position = "fill", colour = "black") +
+          ggplot2::scale_x_discrete(labels = function(labels) table_1_wrap(labels, table_1_axis_width)) +
           ggplot2::scale_y_continuous(labels = function(p) paste0(round(100 * p), "%"),
             breaks = seq(0, 1, by = 0.1), minor_breaks = seq(0.05, 0.95, by = 0.1)) +
           # percentage labels
@@ -1152,7 +1328,10 @@
           (if (table_1_many) ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 45, hjust = 1, vjust = 1),
             plot.margin = ggplot2::margin(5.5, 5.5, 5.5, table_1_left_room))) +
           ggplot2::guides(fill = ggplot2::guide_legend(title = "c1")) +
-          ggplot2::scale_fill_manual(values = table_1_fills, name = "", drop = FALSE) +
+          ggplot2::scale_fill_manual(values = table_1_fills, name = "", drop = FALSE, labels = table_1_wrap) +
+          # a long category name: the legend goes below the plot, one entry per row
+          (if (table_1_long) ggplot2::theme(legend.position = "bottom", legend.direction = "vertical",
+            legend.key.spacing.y = ggplot2::unit(6, "pt"))) +
           ggplot2::facet_wrap(ggplot2::vars(h), labeller = ggplot2::label_wrap_gen(width = 30)) +
           # group sizes under the bars
           ggplot2::geom_text(data = table_1_sizes, ggplot2::aes(x = c2, y = -0.05, label = N, fill = NULL),

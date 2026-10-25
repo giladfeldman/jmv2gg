@@ -16,6 +16,7 @@ generated chunks. Input source is parsed, never executed to guess its meaning.
 | R/map-groups.R | ANOVA/ANCOVA, one-way, Kruskal-Wallis, t-tests, repeated measures, ggbetweenstats/ggwithinstats |
 | R/map-other.R | one-sample t-test, descriptives, tables/proportions, correlations, regression, scatter, reliability |
 | R/setup.R | figure_setup_code(): packages, BetterGG style (recipe_setup), export settings, figure_try/show/save |
+| R/labels.R | tidy_label(), figure_labels_code(): the editable figure_labels / figure_level_labels block and figure_relabel() |
 | R/rmd.R | convert_rmd(), in-place YAML editing, hide_chunk_output(), native render_report() |
 | R/render-browser.R | scan_rmd_risks(), render_browser_preview() (knitr + markdown in WebR), HTML sanitising |
 | R/browser.R | browser_request() JSON bridge (convert, preview, scan) |

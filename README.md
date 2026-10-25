@@ -5,7 +5,7 @@ Conversion runs in native R or in a browser using the same R package through Web
 
 Use the [browser workbench](https://jmv2gg.vercel.app/) without installing R.
 
-This is version 0.2.5. Check the capability notes before using generated
+This is version 0.2.6. Check the capability notes before using generated
 figures in research. Unsupported analyses are preserved and reported; numerical
 equivalence is never inferred from a visually similar plot.
 
@@ -14,7 +14,7 @@ equivalence is never inferred from a visually similar plot.
 ```r
 install.packages("remotes")
 remotes::install_github("giladfeldman/BetterGG@v0.2.0", upgrade = "never")
-remotes::install_github("giladfeldman/jmv2gg@v0.2.5", upgrade = "never")
+remotes::install_github("giladfeldman/jmv2gg@v0.2.6", upgrade = "never")
 
 result <- jmv2gg::convert_code(
   'jmv::ANOVA(data = study, dep = "score", factors = "condition")',
@@ -54,6 +54,11 @@ report is rendered in native R.
   generated with), the figure style written out in full, the export settings and
   four small helpers (`figure_try()`, `figure_show()`, `figure_save()`, and the
   APA p-value helper when statistics are on).
+- A figure label block: `figure_labels` (column = the label readers see in titles,
+  legends and statistics lines; by default the tidied column name, `trust_score` ->
+  "Trust score") and `figure_level_labels` (category names). Edit it and re-run;
+  `figure_relabel()` changes only the drawn text. jamovi's own plots use the column
+  names; `style = list(labels = "names")` keeps them.
 - For each analysis, a commented block with readable names (`anova_1_input`,
   `anova_1_model`, `anova_1_plot`): what it mirrors, what is plotted and from which
   model, and how it differs from jamovi; then the data preparation, the
@@ -72,7 +77,7 @@ report is rendered in native R.
 | Paired t-test, repeated measures | `ggwithinrain`; factorial repeated measures: `ggfactorialrain` with emmeans on the afex model |
 | Correlations, partial correlations | `ggcorrmat` lower triangle, crosses on coefficients with p >= .05 (unadjusted, as jamovi flags them) |
 | Contingency tables, proportion tests | `ggbarstats` / `ggpiestats` |
-| Descriptives | `gghistostats` (numeric) or `ggpiestats` / `ggbarstats` (categories) |
+| Descriptives | `ggproportion` (0/1: proportion of 1s, Wilson intervals), `gghistostats` (other numbers), `ggpiestats` (up to 8 unordered categories), `ggfreqbars` (ordered, more or long-named categories), `ggbarstats` (categories with a split) |
 | Linear and logistic regression | `ggcoefstats` (logistic: odds ratios with jamovi's Wald intervals, log axis) |
 | Reliability | `ggreliability` (item responses, item-rest correlations) |
 | ggstatsplot calls | the same plot as editable code, and the BetterGG call |
@@ -83,6 +88,8 @@ report is rendered in native R.
 - `style = list(stats = TRUE)` prints the test statistics on the figures (off by
   default). They are recomputed in the code and tested to equal jmv's own tables;
   where they could not match, no statistics are printed and a note says why.
+- `style = list(labels = "tidy")` (default) or `"names"`; `label_text = list(col = "Label")`
+  and `level_text = list(col = list(code = "Label"))` fill the label block.
 - `style = list(palette = "okabe_ito")` (also `"nejm"`, default, `"grey"`,
   `"viridis"`); `headings = TRUE` adds a heading before each figure chunk, one
   level below the document's own heading.
@@ -158,7 +165,7 @@ PowerShell:
 Rscript tools/check.R
 Rscript -e 'roxygen2::roxygenise()'
 R CMD build .
-R CMD check --no-manual jmv2gg_0.2.5.tar.gz
+R CMD check --no-manual jmv2gg_0.2.6.tar.gz
 npm --prefix web ci
 npm --prefix web run build
 npm --prefix web run dev

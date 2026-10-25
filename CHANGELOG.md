@@ -1,3 +1,32 @@
+# jmv2gg 0.2.6
+
+- Figure labels. Titles, axis and legend titles, statistics lines and category names show
+  readable labels instead of column names: by default a tidied name (`trust_score` becomes
+  "Trust score"). The generated code starts with one editable block, `figure_labels` (column
+  = label) and `figure_level_labels` (column = c(category = label)); `figure_relabel()` puts
+  them into each finished figure just before it is shown and saved, and changes only drawn
+  text, never the data or results; this includes column names in the tick labels of a
+  category axis (correlation matrices, coefficient terms such as "group: b vs a"). Option `style$labels = "names"` keeps the column names;
+  `style$label_text` and `style$level_text` supply labels. In the web app, a "Titles and
+  legends" option and a Figure labels view edit the block without converting again. jamovi
+  itself labels its plots with the column names, so this is a change from the jamovi output.
+  Not relabelled: BetterGG-engine statistics subtitles (drawn as R expressions) and combined
+  multi-panel (patchwork) figures.
+- Uses BetterGG 0.2.3. Descriptives figures choose a chart by the data: a 0/1 variable is
+  drawn as the proportion of 1s with Wilson score 95% intervals (one bar per split group)
+  instead of a two-spike histogram; a categorical variable that is ordered, has more than 8
+  categories or a category name over 40 characters is drawn as percentage bars (horizontal
+  and sorted by count when unordered) instead of a pie; other variables keep the histogram,
+  pie or stacked bars. Factorial rainclouds of outcomes with few values (e.g. 1-7 ratings)
+  jitter their points vertically too, instead of drawing flat lines. Stacked bar and pie
+  segments under 5% have no percentage label (the legend names them); long category names
+  wrap at 40 characters; ordered categories with up to 11 levels (rating scales) are
+  coloured in scale order, while a longer ordered variable (e.g. 51 states stored as
+  ordinal) is drawn as unordered. The BetterGG engine's bar and pie charts with more than
+  8 unordered categories no longer stop with a palette error.
+- Category labels keep a figure's colours: a colour given by category name follows its
+  renamed category (before, the renamed category was drawn grey).
+
 # jmv2gg 0.2.5
 
 - Uses BetterGG 0.2.2. Generated figure code changes accordingly (statistics unchanged):
