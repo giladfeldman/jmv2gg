@@ -6,8 +6,8 @@ Imports: ragg, systemfonts, beeswarm, dplyr, emmeans, ggdist, rlang,
 Suggests: car, ggrepel, ggside, ggsignif, paletteer, psych,
         statsExpressions, testthat (>= 3.0.0), withr
 License: MIT + file LICENSE
-MD5sum: 221d5a7467d23951fb0ed43569a136e2
-Built: R 4.6.0; ; 2026-10-25 14:15:20 UTC; unix
+MD5sum: 1ae9b934cbc1841a86903a728f39daf5
+Built: R 4.6.0; ; 2026-10-25 20:03:13 UTC; unix
 File: BetterGG_0.2.3.tgz
 
 Package: jmv2gg
@@ -19,8 +19,8 @@ Suggests: ggplot2, emmeans, car, afex, haven, ragg, ggdist, ggrepel,
         psych, ggstatsplot, rmarkdown, knitr, markdown, jmvcore,
         testthat (>= 3.0.0), withr, png, callr
 License: MIT + file LICENSE
-MD5sum: 63d03352dbf74ac3b8bb91d97536ad0e
-Built: R 4.6.0; ; 2026-10-25 17:05:52 UTC; unix
+MD5sum: 3dd3f662f9dd1907a5315a64367f2ba9
+Built: R 4.6.0; ; 2026-10-25 20:05:24 UTC; unix
 File: jmv2gg_0.2.6.tgz
 
 Package: websocket

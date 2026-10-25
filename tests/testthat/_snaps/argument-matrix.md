@@ -892,6 +892,7 @@
           descriptives_1_1_y <- as.numeric(descriptives_1_1_data[["y"]])
           if (!all(descriptives_1_1_y %in% c(0, 1))) stop("BetterGG: ", "y", " must contain only 0 and 1 (or FALSE/TRUE).")
           descriptives_1_1_weight <- descriptives_1_1_data[["descriptives_1_case_weight"]] # frequency weights
+          if (any(descriptives_1_1_weight < 0)) stop("BetterGG: weights must not be negative.")
           descriptives_1_1_group <- droplevels(as.factor(descriptives_1_1_data[["h"]]))
       
           # 2. Proportion of 1s in each group and its Wilson score interval
@@ -900,6 +901,7 @@
           descriptives_1_1_summary <- do.call(rbind, lapply(levels(descriptives_1_1_group), function(level) {
             keep <- descriptives_1_1_group == level
             n <- sum(descriptives_1_1_weight[keep])
+            if (n <= 0) stop("BetterGG: group \"", level, "\" has no weighted cases.")
             p <- sum(descriptives_1_1_weight[keep] * descriptives_1_1_y[keep]) / n
             z <- descriptives_1_1_z
             centre <- (p + z^2 / (2 * n)) / (1 + z^2 / n)
@@ -1072,6 +1074,7 @@
           descriptives_1_2_y <- as.numeric(descriptives_1_2_data[["c2"]])
           if (!all(descriptives_1_2_y %in% c(0, 1))) stop("BetterGG: ", "c2", " must contain only 0 and 1 (or FALSE/TRUE).")
           descriptives_1_2_weight <- descriptives_1_2_data[["descriptives_1_case_weight"]] # frequency weights
+          if (any(descriptives_1_2_weight < 0)) stop("BetterGG: weights must not be negative.")
           descriptives_1_2_group <- droplevels(as.factor(descriptives_1_2_data[["h"]]))
       
           # 2. Proportion of 1s in each group and its Wilson score interval
@@ -1080,6 +1083,7 @@
           descriptives_1_2_summary <- do.call(rbind, lapply(levels(descriptives_1_2_group), function(level) {
             keep <- descriptives_1_2_group == level
             n <- sum(descriptives_1_2_weight[keep])
+            if (n <= 0) stop("BetterGG: group \"", level, "\" has no weighted cases.")
             p <- sum(descriptives_1_2_weight[keep] * descriptives_1_2_y[keep]) / n
             z <- descriptives_1_2_z
             centre <- (p + z^2 / (2 * n)) / (1 + z^2 / n)
