@@ -69,7 +69,10 @@ rwasm::write_packages(repo)
 files<-sort(c(list.files("/src/R",full.names=TRUE,recursive=TRUE),list.files("/src/man",full.names=TRUE,recursive=TRUE),
   list.files("/src/inst",full.names=TRUE,recursive=TRUE),file.path("/src",c("DESCRIPTION","NAMESPACE","LICENSE"))))
 sources<-stats::setNames(lapply(files,hash),substring(files,6L))
-commit <- tryCatch(system2("git", c("-C", "/bettergg", "rev-parse", "HEAD"), stdout=TRUE), error=function(e) NA_character_)
+commit <- tryCatch(suppressWarnings(system2("git", c("-C", "/bettergg", "rev-parse", "HEAD"), stdout=TRUE)), error=function(e) NA_character_)
+# The manifest names the BetterGG commit it was built from; never record an unknown one.
+if (is.null(bettergg$commit) && (!is.null(attr(commit, "status")) || !grepl("^[0-9a-f]{40}$", commit[1])))
+  stop("Mount a git checkout of BetterGG at /bettergg: its commit could not be read.")
 jsonlite::write_json(list(webR="0.6.0",sources=sources,artifact=jmv2gg$artifact,sha256=jmv2gg$sha256,
   dependencies=list(BetterGG=c(bettergg[setdiff(names(bettergg), "commit")], list(commit=bettergg$commit %||% commit[1]))), placeholders=list(websocket=websocket)),
   file.path(repo,"build-manifest.json"),auto_unbox=TRUE,pretty=TRUE)

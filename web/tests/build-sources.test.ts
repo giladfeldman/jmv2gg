@@ -34,4 +34,10 @@ describe('published dependency binaries', () => {
     expect(manifest.placeholders.websocket.source)
       .toBe(fingerprint(resolve(root, 'tools', 'webr', 'placeholders', 'websocket')));
   });
+
+  it('name the BetterGG commit that DESCRIPTION pins (a copy without git history recorded none)', () => {
+    const pinned = readFileSync(resolve(root, 'DESCRIPTION'), 'utf8').match(/BetterGG@([0-9a-f]{40})/)?.[1];
+    expect(pinned).toMatch(/^[0-9a-f]{40}$/);
+    expect(manifest.dependencies.BetterGG.commit).toBe(pinned);
+  });
 });
