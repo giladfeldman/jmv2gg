@@ -96,6 +96,7 @@
           ggplot2::labs(x = "g", y = "y", colour = "g", title = NULL, subtitle = NULL, caption = NULL) +
           theme_figure() +
           ggplot2::theme(legend.position = "none", panel.grid.major.x = ggplot2::element_blank())
+        anova_1_plot <- figure_relabel(anova_1_plot)
         figure_show(anova_1_plot)
         figure_save(anova_1_plot, "figures/anova_1-ggplot2")
       })
@@ -108,6 +109,7 @@
           data = anova_1_input, x = g, y = y, type = "parametric",
           conf.level = 0.95, results.subtitle = FALSE, pairwise.display = "none", bf.message = FALSE
         )
+        anova_1_bettergg <- figure_relabel(anova_1_bettergg)
         figure_show(anova_1_bettergg)
         figure_save(anova_1_bettergg, "figures/anova_1-bettergg")
       })
@@ -214,6 +216,7 @@
           # many or long level names are angled so they do not overlap
           (if (nlevels(anova_1_data[["g"]]) > 6L || sum(nchar(levels(anova_1_data[["g"]]))) > 60L)
             ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 45, hjust = 1, vjust = 1)))
+        anova_1_plot <- figure_relabel(anova_1_plot)
         figure_show(anova_1_plot)
         figure_save(anova_1_plot, "figures/anova_1-ggplot2")
       })
@@ -226,6 +229,7 @@
           data = anova_1_input, x = "g", y = "y", colour = "h",
           covariates = NULL, conf.level = 0.95, stats = FALSE
         )
+        anova_1_bettergg <- figure_relabel(anova_1_bettergg)
         figure_show(anova_1_bettergg)
         figure_save(anova_1_bettergg, "figures/anova_1-bettergg")
       })
@@ -443,6 +447,7 @@
               ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 45, hjust = 1, vjust = 1))) +
             ggplot2::facet_wrap(ggplot2::vars(.data[[anova_1_factors[3]]]), labeller = ggplot2::label_wrap_gen(width = 30))
         }
+        anova_1_plot <- figure_relabel(anova_1_plot)
         figure_show(anova_1_plot)
         figure_save(anova_1_plot, "figures/anova_1-ggplot2")
       })
@@ -456,6 +461,7 @@
           colour = if (length(anova_1_factors) > 1L) anova_1_factors[2], facet = if (length(anova_1_factors) > 2L) anova_1_factors[3],
           covariates = if (length(anova_1_covariates)) anova_1_covariates, conf.level = 0.95, stats = FALSE
         )
+        anova_1_bettergg <- figure_relabel(anova_1_bettergg)
         figure_show(anova_1_bettergg)
         figure_save(anova_1_bettergg, "figures/anova_1-bettergg")
       })
@@ -582,6 +588,7 @@
           ggplot2::labs(x = "measure", y = "value", colour = "measure", title = NULL, subtitle = NULL, caption = NULL) +
           theme_figure() +
           ggplot2::theme(legend.position = "none", panel.grid.major.x = ggplot2::element_blank())
+        ttest_1_1_plot <- figure_relabel(ttest_1_1_plot)
         figure_show(ttest_1_1_plot)
         figure_save(ttest_1_1_plot, "figures/ttest_1-ggplot2-pre-post")
       })
@@ -592,6 +599,7 @@
           data = ttest_1_1_long, x = measure, y = value, subject.id = subject, type = "parametric",
           alternative = "two.sided", conf.level = 0.95, results.subtitle = FALSE, pairwise.display = "none", bf.message = FALSE
         )
+        ttest_1_1_bettergg <- figure_relabel(ttest_1_1_bettergg)
         figure_show(ttest_1_1_bettergg)
         figure_save(ttest_1_1_bettergg, "figures/ttest_1-bettergg-pre-post")
       })
@@ -674,6 +682,7 @@
           ggplot2::labs(x = "measure", y = "value", colour = "measure", title = NULL, subtitle = NULL, caption = NULL) +
           theme_figure() +
           ggplot2::theme(legend.position = "none", panel.grid.major.x = ggplot2::element_blank())
+        ttest_1_2_plot <- figure_relabel(ttest_1_2_plot)
         figure_show(ttest_1_2_plot)
         figure_save(ttest_1_2_plot, "figures/ttest_1-ggplot2-pre-mid")
       })
@@ -684,6 +693,7 @@
           data = ttest_1_2_long, x = measure, y = value, subject.id = subject, type = "parametric",
           alternative = "two.sided", conf.level = 0.95, results.subtitle = FALSE, pairwise.display = "none", bf.message = FALSE
         )
+        ttest_1_2_bettergg <- figure_relabel(ttest_1_2_bettergg)
         figure_show(ttest_1_2_bettergg)
         figure_save(ttest_1_2_bettergg, "figures/ttest_1-bettergg-pre-mid")
       })
@@ -799,6 +809,7 @@
           # many or long level names are angled so they do not overlap
           (if (nlevels(rm_anova_1_data[["time"]]) > 6L || sum(nchar(levels(rm_anova_1_data[["time"]]))) > 60L)
             ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 45, hjust = 1, vjust = 1)))
+        rm_anova_1_plot <- figure_relabel(rm_anova_1_plot)
         figure_show(rm_anova_1_plot)
         figure_save(rm_anova_1_plot, "figures/rm_anova_1-ggplot2")
       })
@@ -809,6 +820,7 @@
           data = rm_anova_1_long, x = "time", y = "value", colour = "h",
           covariates = NULL, means = rm_anova_1_means, conf.level = 0.95
         )
+        rm_anova_1_bettergg <- figure_relabel(rm_anova_1_bettergg)
         figure_show(rm_anova_1_bettergg)
         figure_save(rm_anova_1_bettergg, "figures/rm_anova_1-bettergg")
       })
@@ -928,6 +940,7 @@
               size = descriptives_1_1_size, family = figure_font) +
             ggplot2::labs(x = "h", y = NULL, subtitle = NULL, title = NULL, caption = NULL)
         }
+        descriptives_1_1_plot <- figure_relabel(descriptives_1_1_plot)
         figure_show(descriptives_1_1_plot)
         figure_save(descriptives_1_1_plot, "figures/descriptives_1-ggplot2-y")
       })
@@ -949,6 +962,7 @@
             descriptives_1_1_bettergg$layers <- Filter(function(layer) !inherits(layer$geom, c("GeomLabel", "GeomLabelRepel")), descriptives_1_1_bettergg$layers)
           }
         }
+        descriptives_1_1_bettergg <- figure_relabel(descriptives_1_1_bettergg)
         figure_show(descriptives_1_1_bettergg)
         figure_save(descriptives_1_1_bettergg, "figures/descriptives_1-bettergg-y")
       })
@@ -1041,6 +1055,7 @@
               size = descriptives_1_2_size, family = figure_font) +
             ggplot2::labs(x = "h", y = NULL, subtitle = NULL, title = NULL, caption = NULL)
         }
+        descriptives_1_2_plot <- figure_relabel(descriptives_1_2_plot)
         figure_show(descriptives_1_2_plot)
         figure_save(descriptives_1_2_plot, "figures/descriptives_1-ggplot2-c2")
       })
@@ -1062,6 +1077,7 @@
             descriptives_1_2_bettergg$layers <- Filter(function(layer) !inherits(layer$geom, c("GeomLabel", "GeomLabelRepel")), descriptives_1_2_bettergg$layers)
           }
         }
+        descriptives_1_2_bettergg <- figure_relabel(descriptives_1_2_bettergg)
         figure_show(descriptives_1_2_bettergg)
         figure_save(descriptives_1_2_bettergg, "figures/descriptives_1-bettergg-c2")
       })
@@ -1142,6 +1158,7 @@
           ggplot2::geom_text(data = table_1_sizes, ggplot2::aes(x = c2, y = -0.05, label = N, fill = NULL),
             size = table_1_size, family = figure_font) +
           ggplot2::labs(x = "c2", y = NULL, subtitle = NULL, title = NULL, caption = NULL)
+        table_1_plot <- figure_relabel(table_1_plot)
         figure_show(table_1_plot)
         figure_save(table_1_plot, "figures/table_1-ggplot2")
       })
@@ -1153,6 +1170,7 @@
           results.subtitle = FALSE, bf.message = FALSE,
           palette = if (nlevels(factor(table_1_input[["c1"]])) <= 8L) "ggsci::default_nejm" else "palettesForR::Named"
         )
+        table_1_bettergg <- figure_relabel(table_1_bettergg)
         figure_show(table_1_bettergg)
         figure_save(table_1_bettergg, "figures/table_1-bettergg")
       })
@@ -1242,6 +1260,7 @@
             axis.text.y = ggplot2::element_text(size = 12), panel.grid.major = ggplot2::element_blank(),
             panel.grid.minor = ggplot2::element_blank(), legend.title = ggplot2::element_text(size = 15)) +
           ggplot2::coord_fixed()
+        correlation_1_plot <- figure_relabel(correlation_1_plot)
         figure_show(correlation_1_plot)
         figure_save(correlation_1_plot, "figures/correlation_1-ggplot2")
       })
@@ -1335,6 +1354,7 @@
           ggplot2::labs(x = "odds ratio", y = "term", caption = NULL, subtitle = NULL, title = NULL) +
           theme_figure() +
           ggplot2::theme(plot.caption = ggplot2::element_text(size = 10))
+        logistic_1_plot <- figure_relabel(logistic_1_plot)
         figure_show(logistic_1_plot)
         figure_save(logistic_1_plot, "figures/logistic_1-ggplot2")
       })
@@ -1345,6 +1365,7 @@
           x = logistic_1_model, conf.level = 0.95, exclude.intercept = TRUE,
           stats.labels = FALSE, bf.message = FALSE
         )
+        logistic_1_bettergg <- figure_relabel(logistic_1_bettergg)
         figure_show(logistic_1_bettergg)
         figure_save(logistic_1_bettergg, "figures/logistic_1-bettergg")
       })
@@ -1462,6 +1483,7 @@
           ggplot2::theme(axis.text.y = ggplot2::element_blank())
         reliability_1_plot <- patchwork::wrap_plots(reliability_1_responses, reliability_1_rest_plot, widths = c(2, 1)) +
           patchwork::plot_annotation(title = NULL, subtitle = NULL, theme = theme_figure())
+        reliability_1_plot <- figure_relabel(reliability_1_plot)
         figure_show(reliability_1_plot)
         figure_save(reliability_1_plot, "figures/reliability_1-ggplot2")
       })
@@ -1472,6 +1494,7 @@
           data = reliability_1_input, items = c("q1", "q2", "q3"), reverse = "q2",
           stats = FALSE
         )
+        reliability_1_bettergg <- figure_relabel(reliability_1_bettergg)
         figure_show(reliability_1_bettergg)
         figure_save(reliability_1_bettergg, "figures/reliability_1-bettergg")
       })
@@ -1575,6 +1598,7 @@
           ggplot2::labs(x = "cond", y = "score", colour = "cond", title = NULL, subtitle = NULL, caption = NULL) +
           theme_figure() +
           ggplot2::theme(legend.position = "none", panel.grid.major.x = ggplot2::element_blank())
+        withinstats_1_plot <- figure_relabel(withinstats_1_plot)
         figure_show(withinstats_1_plot)
         figure_save(withinstats_1_plot, "figures/withinstats_1-ggplot2")
       })
@@ -1582,6 +1606,7 @@
       # BetterGG figure: BetterGG version of the source ggwithinstats() call.
       if (withinstats_1_ready) figure_try("withinstats_1-bettergg-source", {
         withinstats_1_bettergg <- BetterGG::ggwithinstats(data = withinstats_1_input, x = cond, y = score, subject.id = id)
+        withinstats_1_bettergg <- figure_relabel(withinstats_1_bettergg)
         figure_show(withinstats_1_bettergg)
         figure_save(withinstats_1_bettergg, "figures/withinstats_1-bettergg-source")
       })

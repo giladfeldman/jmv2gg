@@ -43,9 +43,10 @@ describe('conversion requests', () => {
   it('sends the new style and figure shapes without retired options', () => {
     const request = buildConversionRequest(base);
     expect(Object.keys(request.style).sort())
-      .toEqual(['grayscale', 'headings', 'palette', 'stats', 'styler', 'verbose']);
+      .toEqual(['grayscale', 'headings', 'label_text', 'labels', 'level_text', 'palette', 'stats', 'styler', 'verbose']);
     expect(request.style)
-      .toEqual({ stats: false, palette: 'nejm', grayscale: false, verbose: true, headings: false, styler: true });
+      .toEqual({ stats: false, palette: 'nejm', grayscale: false, verbose: true, headings: false, styler: true,
+        labels: 'tidy', label_text: {}, level_text: {} });
     expect(Object.keys(request.figures).sort())
       .toEqual(['background', 'dpi', 'formats', 'height', 'optimize_png', 'size', 'width']);
     expect(request.figures).toMatchObject({ size: 'double', width: 7.2, formats: ['png'], background: 'white' });

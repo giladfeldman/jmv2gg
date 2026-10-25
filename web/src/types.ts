@@ -3,6 +3,7 @@ export type Mode = 'code' | 'rmd';
 export type Palette = 'nejm' | 'okabe_ito' | 'grey' | 'viridis';
 export type FigureSize = 'double' | 'single' | 'custom';
 export type FigureFormat = 'png' | 'pdf' | 'tiff';
+export type LabelMode = 'tidy' | 'names';
 
 export interface StyleOptions {
   stats: boolean;
@@ -11,6 +12,10 @@ export interface StyleOptions {
   verbose: boolean;
   headings: boolean;
   styler: boolean;
+  /** Figure text: tidied column names (default) or the names as they are. */
+  labels: LabelMode;
+  label_text: Record<string, string>;
+  level_text: Record<string, Record<string, string>>;
 }
 
 export interface FigureOptions {
@@ -64,6 +69,8 @@ export interface ConversionResult {
   diagnostics: Diagnostic[];
   manifest: {
     version: string; engine: Engine; detected: number; converted: number; plots: PlotInfo[]; packages: string[];
+    /** Each figure column and the label the generated code gives it. */
+    labels: Record<string, string>;
   };
 }
 export interface PreviewFile { path: string; url: string; bytes: Uint8Array; simulated: boolean }

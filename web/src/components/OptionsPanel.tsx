@@ -1,6 +1,6 @@
 import type { ConversionSettings } from '../lib/requests';
 import { sizeWidths } from '../lib/requests';
-import type { Engine, FigureFormat, FigureSize, Palette } from '../types';
+import type { Engine, FigureFormat, FigureSize, LabelMode, Palette } from '../types';
 
 type Options = Omit<ConversionSettings, 'mode' | 'source'>;
 interface Props {
@@ -88,6 +88,14 @@ export function OptionsPanel({ mode, options, busy, onChange }: Props) {
             onChange={event => onChange({ palette: event.target.value as Palette })}>
             {palettes.map(item => <option key={item.value} value={item.value}>{item.label}</option>)}
           </select>
+        </label>
+        <label>Titles and legends
+          <select disabled={busy} value={options.labels}
+            onChange={event => onChange({ labels: event.target.value as LabelMode })}>
+            <option value="tidy">Readable labels (default)</option>
+            <option value="names">Column names as in the data</option>
+          </select>
+          <small>Edit each label after converting, under Figure labels.</small>
         </label>
         <label>Figure size
           <select disabled={busy} value={options.size} onChange={event => setSize(event.target.value as FigureSize)}>

@@ -9,7 +9,10 @@
 #' @param style Named presentation options: `stats` (statistics on the
 #'   figures, default `FALSE`), `palette` (`"nejm"`, `"okabe_ito"`, `"grey"`,
 #'   `"viridis"`), `grayscale`, `verbose` (full plain-language comments),
-#'   `headings` (R Markdown only), `styler`.
+#'   `headings` (R Markdown only), `styler`, `labels` (`"tidy"`, the default:
+#'   column names tidied into figure text; `"names"`: the column names as they
+#'   are), `label_text` (`list(column = "label")`) and `level_text`
+#'   (`list(column = list(category = "label"))`).
 #' @param figures Named publication export options: `size` (`"double"` 7.2 in,
 #'   `"single"` 3.5 in, or `"custom"` with `width`/`height`), `dpi`, `formats`
 #'   (any of `"png"`, `"pdf"`, `"tiff"`), `background`, `optimize_png`.
@@ -30,6 +33,7 @@ convert_code <- function(code, engine = c("both", "ggplot2", "bettergg"),
   if (!is.null(reserved)) return(new_result(code, list(), c(diagnostics, list(reserved)), engine))
   records <- assign_analysis_names(records, all.names(parsed$expressions))
   insertions <- list()
+  labels <- character()
   plots <- list()
   packages <- character()
   for (i in seq_along(records)) {
@@ -46,10 +50,11 @@ convert_code <- function(code, engine = c("both", "ggplot2", "bettergg"),
       insertions[[key]] <- paste(c(insertions[[key]], "", out$code), collapse = "\n")
       plots <- c(plots, out$plots)
       packages <- c(packages, out$packages)
+      labels <- c(labels, out$labels[setdiff(names(out$labels), names(labels))])
       diagnostics <- c(diagnostics, out$diagnostics)
     }
   }
-  setup <- if (length(plots)) figure_setup_code(options, packages) else character()
+  setup <- if (length(plots)) figure_setup_code(options, packages, labels) else character()
   if (length(setup)) {
     styled <- style_generated(c(list(setup = setup), insertions), options)
     diagnostics <- c(diagnostics, styled$diagnostics)
@@ -63,7 +68,7 @@ convert_code <- function(code, engine = c("both", "ggplot2", "bettergg"),
     "# Keep a copy of your source analysis and review the notes on each figure.")
   if (length(setup)) setup <- c(setup, "")
   output <- paste(c(header, "", setup, transformed), collapse = "\n")
-  new_result(output, records, diagnostics, engine, plots)
+  new_result(output, records, diagnostics, engine, plots, labels)
 }
 
 assert_text <- function(x) {
@@ -101,7 +106,7 @@ reserved_name_clash <- function(symbols) {
     ", which the figure setup defines. Rename it before conversion."))
 }
 
-new_result <- function(text, analyses, diagnostics, engine, plots = list()) {
+new_result <- function(text, analyses, diagnostics, engine, plots = list(), labels = character()) {
   converted <- sum(vapply(analyses, function(a) identical(a$status, "converted"), logical(1)))
   errors <- any(vapply(diagnostics, function(d) d$severity == "error", logical(1)))
   if (!length(analyses) && !errors) diagnostics <- c(diagnostics, list(diag_record(
@@ -112,7 +117,7 @@ new_result <- function(text, analyses, diagnostics, engine, plots = list()) {
   structure(list(status = status, text = text, analyses = analyses,
     diagnostics = diagnostics, manifest = list(converter = "jmv2gg",
       version = jmv2gg_version, engine = engine, detected = length(analyses),
-      converted = converted, plots = plots, packages = packages)), class = "jmv2gg_result")
+      converted = converted, plots = plots, packages = packages, labels = as.list(labels))), class = "jmv2gg_result")
 }
 
 #' @export
@@ -142,7 +147,8 @@ conversion_options <- function(style, figures) {
     style <- style[setdiff(names(style), retired)]
   }
   s <- merge(list(stats = FALSE, palette = "nejm", grayscale = FALSE, theme = "apa7", verbose = TRUE,
-    headings = FALSE, styler = TRUE), style, "style")
+    headings = FALSE, styler = TRUE, labels = "tidy", label_text = list(), level_text = list()), style, "style")
+  s <- check_label_options(s, style)
   for (n in c("stats", "grayscale", "verbose", "headings", "styler"))
     if (!is.logical(s[[n]]) || length(s[[n]]) != 1L || is.na(s[[n]])) stop("Invalid style option: ", n)
   if (!identical(s$theme, "apa7")) stop("The supported theme is apa7.")

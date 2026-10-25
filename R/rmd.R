@@ -25,7 +25,7 @@ convert_rmd <- function(text, engine = c("both", "ggplot2", "bettergg"),
   }
   lines <- strsplit(gsub("\r\n", "\n", text, fixed=TRUE), "\n", fixed=TRUE)[[1]]
   if (!length(lines)) lines <- ""
-  diagnostics <- options$diagnostics; analyses <- list(); plots <- list(); packages <- character()
+  diagnostics <- options$diagnostics; analyses <- list(); plots <- list(); packages <- character(); labels <- character()
   header <- tryCatch(merge_html_yaml(lines, html_preset), error=identity)
   if (inherits(header,"error")) return(new_result(text,list(),list(diag_record("error","invalid_yaml",conditionMessage(header))),engine))
   # Every identifier in the document, so generated names never clash with the author's.
@@ -124,6 +124,7 @@ convert_rmd <- function(text, engine = c("both", "ggplot2", "bettergg"),
         code_key,delimiter)
       plots <- c(plots,generated_result$plots)
       packages <- c(packages, generated_result$packages)
+      labels <- c(labels, generated_result$labels[setdiff(names(generated_result$labels), names(labels))])
       diagnostics <- c(diagnostics,lapply(generated_result$diagnostics,function(dg){dg$line<-(dg$line %||% 1L)+chunk_start;dg$chunk<-label;dg}))
     }
     if(original_output=="hide" && length(records)) {
@@ -141,7 +142,7 @@ convert_rmd <- function(text, engine = c("both", "ggplot2", "bettergg"),
   # jamovi results need the print fallback (jmv_print_fallback_code) even without new figures.
   has_jmv <- any(vapply(analyses, function(a) identical(a$package, "jmv"), logical(1)))
   if (length(plots) || has_jmv) {
-    setup_code <- paste(c(if (length(plots)) c(figure_setup_code(options, packages), ""), if (has_jmv) jmv_print_fallback_code()),
+    setup_code <- paste(c(if (length(plots)) c(figure_setup_code(options, packages, labels), ""), if (has_jmv) jmv_print_fallback_code()),
       collapse = "\n")
     styled <- style_generated(c(list(setup = setup_code), blocks), options)
     diagnostics <- c(diagnostics, styled$diagnostics)

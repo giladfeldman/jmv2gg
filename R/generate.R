@@ -48,6 +48,7 @@ new_context <- function(a, engine, options) {
   ctx$differs <- character()
   ctx$mapping <- "visualization_only"
   ctx$packages <- character()
+  ctx$vars <- character()
   data_expr <- a$args$data
   if (a$package %in% c("jmv", "ggstatsplot", "BetterGG") && !identical(ctx$fn, "ggcoefstats")) {
     if (is.null(data_expr) || !is.symbol(data_expr)) {
@@ -133,6 +134,7 @@ assemble_block <- function(ctx) {
       if (!is.null(f$note)) comment_wrap("Note: ", f$note),
       paste0("if (", name, "_ready) figure_try(", q(f$stem), ", {"),
       indent(f$code),
+      indent(paste0(f$object, " <- figure_relabel(", f$object, ")")),
       indent(paste0("figure_show(", f$object, ")")),
       indent(paste0("figure_save(", f$object, ", ", q(file), ")")),
       "})"
@@ -148,7 +150,7 @@ assemble_block <- function(ctx) {
     preview = if (f$engine == "bettergg") "local_only" else "requires_runtime_test",
     statistical_note = f$note))
   list(code = code, plots = plots, diagnostics = ctx$diagnostics, mapping = ctx$mapping,
-    packages = unique(ctx$packages), name = name)
+    packages = unique(ctx$packages), name = name, labels = figure_label_values(ctx$vars, ctx$options$style))
 }
 
 # Tidyverse style via 'styler', for all generated code of a document at once.
@@ -211,6 +213,7 @@ prep_input <- function(ctx) {
 
 prep_columns <- function(ctx, vars) {
   vars <- unique(vars)
+  ctx$vars <- unique(c(ctx$vars, vars))
   add_prep(ctx,
     paste0(ctx$name, "_missing <- setdiff(", r_text(vars), ", names(", ctx$input, "))"),
     paste0("if (length(", ctx$name, "_missing)) stop(\"Column(s) not found: \", toString(", ctx$name, "_missing))"))

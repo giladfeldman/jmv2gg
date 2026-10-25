@@ -53,7 +53,7 @@ browser_request <- function(request_json) {
     # the figure setup and this analysis's figure block.
     # Generated blocks report an undrawn figure as a warning so reports keep knitting;
     # a preview has nothing to show in that case, so it fails with the same message.
-    code <- c(figure_setup_code(preview_options, generated$packages), generated$code)
+    code <- c(figure_setup_code(preview_options, generated$packages, generated$labels), generated$code)
     withCallingHandlers(eval(parse(text=code),envir=env),warning=function(w)
       if(startsWith(conditionMessage(w),"jmv2gg: figure")) stop(conditionMessage(w),call.=FALSE))
     return(jsonlite::toJSON(list(kind="preview",simulated=identical(request$data_kind,"simulate"),

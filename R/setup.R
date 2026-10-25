@@ -1,4 +1,4 @@
-jmv2gg_version <- "0.2.4"
+jmv2gg_version <- "0.2.5"
 
 # Names the setup code defines. Source code that defines one of them would be
 # overwritten, so conversion refuses it.
@@ -6,7 +6,8 @@ figure_setup_names <- c(
   "figure_font", "figure_colours", "figure_fills", "theme_figure", "figure_apa_p",
   "figure_dpi", "figure_width", "figure_height", "figure_formats", "figure_background",
   "figure_optimize", "figure_seed", "figure_packages", "figure_package", "figure_try",
-  "figure_show", "figure_save"
+  "figure_show", "figure_save", "figure_labels", "figure_level_labels", "figure_relabel_text",
+  "figure_relabel"
 )
 
 # The packages a figure engine needs when the generated code runs.
@@ -35,7 +36,7 @@ locked_versions <- function(path = "/workspace/packages.dcf") {
 # (from BetterGG's recipe_setup(), written out in full), export settings and
 # the small helpers every figure block uses. It runs without jmv2gg or
 # BetterGG installed.
-figure_setup_code <- function(options, packages) {
+figure_setup_code <- function(options, packages, labels = character()) {
   style <- options$style
   figures <- options$figures
   packages <- sort(unique(packages))
@@ -128,7 +129,9 @@ figure_setup_code <- function(options, packages) {
     "    }",
     "  }",
     "  invisible(file)",
-    "}"
+    "}",
+    "",
+    figure_labels_code(labels, options$style)
   )
   paste(lines, collapse = "\n")
 }

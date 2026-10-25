@@ -1504,3 +1504,37 @@ footer {
 .render-limit select {
   margin-left: 4px;
 }
+
+.labels-view .help code {
+  font-size: 11px;
+}
+
+.labels-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 10px 0 14px;
+  font-size: 12px;
+}
+
+.labels-table th,
+.labels-table td {
+  border-bottom: 1px solid var(--line);
+  padding: 4px 6px;
+  text-align: left;
+  vertical-align: middle;
+}
+
+.labels-table thead th {
+  color: var(--muted);
+  font-weight: 600;
+}
+
+.labels-table tbody th {
+  font-weight: 400;
+  overflow-wrap: anywhere;
+  width: 28%;
+}
+
+.labels-table input:not([type]) {
+  margin-top: 0;
+}

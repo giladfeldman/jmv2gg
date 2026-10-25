@@ -10,6 +10,8 @@ import { OptionsPanel } from './components/OptionsPanel';
 import { CodeView, Downloads, EmptyOutput, NotesView, StatusNotice } from './components/ResultViews';
 import { FiguresView, type DataKind } from './components/FiguresView';
 import { RenderPanel } from './components/RenderPanel';
+import { LabelsView } from './components/LabelsView';
+import { replaceLabelBlock, type LabelText, type LevelText } from './lib/labels';
 import { buildConversionRequest, defaultSettings, previewPackages, type ConversionSettings } from './lib/requests';
 import { buildBundle, convertedName } from './lib/bundle';
 import { checkDataFiles, download, limits } from './lib/files';
@@ -18,7 +20,7 @@ import { confirmedCodes, idle, renderReducer } from './lib/renderState';
 import type { ConversionRequest, ConversionResult, Mode, PreviewFile } from './types';
 
 type Options = Omit<ConversionSettings, 'mode' | 'source'>;
-type View = 'code' | 'figures' | 'notes' | 'report';
+type View = 'code' | 'labels' | 'figures' | 'notes' | 'report';
 
 const message = (error: unknown, fallback: string) => error instanceof Error ? error.message : fallback;
 
@@ -262,6 +264,18 @@ export function App() {
     catch { setError('Clipboard access failed. Download the code instead.'); }
   }
 
+  /** New figure labels: rewrite the label block in the code; previews use them through the request. */
+  function applyLabels(labels: LabelText, levels: LevelText) {
+    if (!result || !snapshot) return;
+    const text = replaceLabelBlock(result.text, labels, levels, options.labels === 'names');
+    if (text === null) { setError('The label block was not found in the generated code. Convert again.'); return; }
+    resetRender(); setPreviews([]);
+    setResult({ ...result, text, manifest: { ...result.manifest, labels } });
+    setSnapshot({ ...snapshot, style: { ...snapshot.style, label_text: labels, level_text: levels } });
+    setOptions(current => ({ ...current, labelText: labels, levelText: levels }));
+    setNotice('Labels applied to the generated code and to the figure previews.');
+  }
+
   function downloadReport() {
     if (render.phase !== 'done') return;
     download(new Blob([render.html], { type: 'text/html;charset=utf-8' }), 'report-preview.html');
@@ -269,8 +283,9 @@ export function App() {
 
   const ready = result && snapshot;
   const views: View[] = snapshot?.mode === 'rmd'
-    ? ['code', 'figures', 'report', 'notes'] : ['code', 'figures', 'notes'];
-  const viewLabel = (value: View) => value === 'code' ? 'Generated code' : value === 'figures' ? 'Preview figures'
+    ? ['code', 'labels', 'figures', 'report', 'notes'] : ['code', 'labels', 'figures', 'notes'];
+  const viewLabel = (value: View) => value === 'code' ? 'Generated code' : value === 'labels' ? 'Figure labels'
+    : value === 'figures' ? 'Preview figures'
     : value === 'report' ? 'Render report'
     : `Notes${result?.diagnostics.length ? ` (${result.diagnostics.length})` : ''}`;
   const shownView = views.includes(view) ? view : 'code';
@@ -324,6 +339,8 @@ export function App() {
           {!ready ? <EmptyOutput/> : <>
             <StatusNotice status={result.status}/>
             {shownView === 'code' && <CodeView mode={snapshot.mode} text={result.text} onCopy={copyCode}/>}
+            {shownView === 'labels' && <LabelsView key={result.text.length + JSON.stringify(result.manifest.labels)}
+              labels={result.manifest.labels} levels={options.levelText} busy={busy} onApply={applyLabels}/>}
             {shownView === 'notes' && <NotesView result={result}/>}
             {shownView === 'figures' && <FiguresView busy={busy || scanning || render.phase === 'rendering'} analyses={result.analyses} analysis={analysis}
               dataKind={dataKind} bundledAvailable={Boolean(snapshotExample?.bundledData)} simulationN={simulationN}

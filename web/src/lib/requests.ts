@@ -1,5 +1,5 @@
 import type {
-  ConversionRequest, ConversionResult, Engine, FigureFormat, FigureOptions, FigureSize, Mode, Palette, PlotInfo,
+  ConversionRequest, ConversionResult, Engine, FigureFormat, FigureOptions, FigureSize, LabelMode, Mode, Palette, PlotInfo,
   ScanFinding, ScanResult, StyleOptions,
 } from '../types';
 
@@ -19,6 +19,9 @@ export interface ConversionSettings {
   height: number;
   dpi: number;
   formats: FigureFormat[];
+  labels: LabelMode;
+  labelText: Record<string, string>;
+  levelText: Record<string, Record<string, string>>;
 }
 
 export const sizeWidths: Record<Exclude<FigureSize, 'custom'>, number> = { double: 7.2, single: 3.5 };
@@ -26,6 +29,7 @@ export const sizeWidths: Record<Exclude<FigureSize, 'custom'>, number> = { doubl
 export const defaultSettings: Omit<ConversionSettings, 'mode' | 'source'> = {
   engine: 'both', original: 'include', html: 'enhanced', stats: false, palette: 'nejm', verbose: true,
   headings: false, size: 'double', width: 7.2, height: 5.4, dpi: 600, formats: ['png'],
+  labels: 'tidy', labelText: {}, levelText: {},
 };
 
 /** Width sent to R: fixed for the journal column sizes, the user's value for custom. */
@@ -47,6 +51,9 @@ export function buildConversionRequest(settings: ConversionSettings): Conversion
     verbose: settings.verbose,
     headings: settings.mode === 'rmd' && settings.headings,
     styler: true,
+    labels: settings.labels,
+    label_text: settings.labelText,
+    level_text: settings.levelText,
   };
   const figures: FigureOptions = {
     size: settings.size,
@@ -78,7 +85,9 @@ export function normaliseResult(raw: ConversionResult): ConversionResult {
     ...raw,
     analyses: asArray(raw.analyses),
     diagnostics: asArray(raw.diagnostics),
-    manifest: { ...manifest, plots, packages: asArray(manifest.packages) },
+    // jsonlite writes an empty named list as [], not {}.
+    manifest: { ...manifest, plots, packages: asArray(manifest.packages),
+      labels: Array.isArray(manifest.labels) || !manifest.labels ? {} : manifest.labels },
   };
 }
 
