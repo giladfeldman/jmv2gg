@@ -27,6 +27,25 @@ applied in descriptives, contingency tables, linear and logistic regression; not
 by jmv's ANOVA and ANCOVA, hence not by these figures; refused for correlations,
 t-tests, repeated measures and reliability.
 
+## Recorded release checks (0.2.5, before release)
+
+- Pinned BetterGG 0.2.2 (tag v0.2.2, commit 3ac5fe0). Its own checks: 409 tests passed,
+  R CMD check with one deliberate note; the owner approved a side-by-side gallery of its
+  visual changes (same data, statistics unchanged).
+- R suite (tools/check.R) against BetterGG 0.2.2: 715 checks, 0 failures, 1 skip (no
+  native oxipng). The 8 changed code snapshots (argument matrix) were read line by line:
+  every change is BetterGG 0.2.2 figure code (angled labels, histogram label headroom and
+  whole-number counts, reliability constant-item guard and unclipped labels, grey
+  correlation crosses, raincloud dot fill); Cronbach's alpha and item-rest formulas are
+  unchanged apart from the constant-item guard.
+- Browser package rebuilt in the pinned WebR 0.6.0 container; the manifest names BetterGG
+  commit 3ac5fe0 (a test now requires it to equal the DESCRIPTION pin) and websocket was
+  reused unchanged. Hash guard passed; vitest 45 passed; production build passed.
+- Local production build in a real browser, complex R Markdown example: 11 of 11 analyses
+  converted (26 figures), the generated code carries the BetterGG 0.2.2 changes, a
+  simulated reliability preview drew, and the report preview rendered all 21 chunks with
+  27 figures and no error or warning output.
+
 ## Recorded release checks (0.2.4, before release)
 
 - Owner report: the browser render of a private report took about 15 minutes and stopped;

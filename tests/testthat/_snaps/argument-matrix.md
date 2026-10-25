@@ -74,9 +74,10 @@
           # cloud: the distribution of each group (half density)
           ggdist::stat_slab(ggplot2::aes(fill = g, group = g), colour = NA, adjust = 1,
             width = 0.5, justification = -0.25, alpha = 0.5, normalize = "groups") +
-          # rain: every observation as a dot at its exact value
-          ggdist::stat_dots(ggplot2::aes(fill = g, colour = g, group = g), side = "left",
-            justification = 1.2, scale = 0.45, alpha = 0.7, layout = "swarm", family = figure_font) +
+          # rain: every observation as a dot at its exact value, filled with its outline colour
+          ggdist::stat_dots(ggplot2::aes(colour = g, group = g, fill = ggplot2::after_scale(colour)),
+            side = "left", justification = 1.2, scale = 0.45, alpha = 0.7, layout = "swarm", family = figure_font,
+            show.legend = c(fill = FALSE)) +
           # box: median and quartiles
           ggplot2::geom_boxplot(ggplot2::aes(group = g), width = 0.12, alpha = 0.6, outlier.shape = NA, na.rm = TRUE) +
           # model-based confidence intervals
@@ -209,7 +210,10 @@
           ggplot2::scale_fill_manual(values = figure_fills) +
           ggplot2::labs(x = "g", y = "y", title = NULL, colour = "h", fill = "h", subtitle = NULL) +
           theme_figure() +
-          ggplot2::theme(legend.position = "bottom", panel.grid.major.x = ggplot2::element_blank())
+          ggplot2::theme(legend.position = "bottom", panel.grid.major.x = ggplot2::element_blank()) +
+          # many or long level names are angled so they do not overlap
+          (if (nlevels(anova_1_data[["g"]]) > 6L || sum(nchar(levels(anova_1_data[["g"]]))) > 60L)
+            ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 45, hjust = 1, vjust = 1)))
         figure_show(anova_1_plot)
         figure_save(anova_1_plot, "figures/anova_1-ggplot2")
       })
@@ -325,7 +329,10 @@
             ggplot2::scale_fill_manual(values = figure_fills) +
             ggplot2::labs(x = anova_1_factors[1], y = "y", title = NULL, colour = anova_1_factors[1], fill = anova_1_factors[1], subtitle = NULL) +
             theme_figure() +
-            ggplot2::theme(legend.position = "none", panel.grid.major.x = ggplot2::element_blank())
+            ggplot2::theme(legend.position = "none", panel.grid.major.x = ggplot2::element_blank()) +
+            # many or long level names are angled so they do not overlap
+            (if (nlevels(anova_1_data[[anova_1_factors[1]]]) > 6L || sum(nchar(levels(anova_1_data[[anova_1_factors[1]]]))) > 60L)
+              ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 45, hjust = 1, vjust = 1)))
         } else if (length(anova_1_factors) == 2L) {
           # 1. Data: complete cases of the outcome, factors and covariates.
           anova_1_data <- anova_1_input[stats::complete.cases(anova_1_input[, c("y", anova_1_factors[1], anova_1_factors[2], anova_1_covariates), drop = FALSE]), c("y", anova_1_factors[1], anova_1_factors[2], anova_1_covariates), drop = FALSE]
@@ -376,7 +383,10 @@
             ggplot2::scale_fill_manual(values = figure_fills) +
             ggplot2::labs(x = anova_1_factors[1], y = "y", title = NULL, colour = anova_1_factors[2], fill = anova_1_factors[2], subtitle = NULL) +
             theme_figure() +
-            ggplot2::theme(legend.position = "bottom", panel.grid.major.x = ggplot2::element_blank())
+            ggplot2::theme(legend.position = "bottom", panel.grid.major.x = ggplot2::element_blank()) +
+            # many or long level names are angled so they do not overlap
+            (if (nlevels(anova_1_data[[anova_1_factors[1]]]) > 6L || sum(nchar(levels(anova_1_data[[anova_1_factors[1]]]))) > 60L)
+              ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 45, hjust = 1, vjust = 1)))
         } else {
           # 1. Data: complete cases of the outcome, factors and covariates.
           anova_1_data <- anova_1_input[stats::complete.cases(anova_1_input[, c("y", anova_1_factors[1], anova_1_factors[2], anova_1_factors[3], anova_1_covariates), drop = FALSE]), c("y", anova_1_factors[1], anova_1_factors[2], anova_1_factors[3], anova_1_covariates), drop = FALSE]
@@ -428,6 +438,9 @@
             ggplot2::labs(x = anova_1_factors[1], y = "y", title = NULL, colour = anova_1_factors[2], fill = anova_1_factors[2], subtitle = NULL) +
             theme_figure() +
             ggplot2::theme(legend.position = "bottom", panel.grid.major.x = ggplot2::element_blank()) +
+            # many or long level names are angled so they do not overlap
+            (if (nlevels(anova_1_data[[anova_1_factors[1]]]) > 6L || sum(nchar(levels(anova_1_data[[anova_1_factors[1]]]))) > 60L)
+              ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 45, hjust = 1, vjust = 1))) +
             ggplot2::facet_wrap(ggplot2::vars(.data[[anova_1_factors[3]]]), labeller = ggplot2::label_wrap_gen(width = 30))
         }
         figure_show(anova_1_plot)
@@ -782,7 +795,10 @@
           ggplot2::scale_fill_manual(values = figure_fills) +
           ggplot2::labs(x = "time", y = "value", title = NULL, colour = "h", fill = "h", subtitle = NULL) +
           theme_figure() +
-          ggplot2::theme(legend.position = "bottom", panel.grid.major.x = ggplot2::element_blank())
+          ggplot2::theme(legend.position = "bottom", panel.grid.major.x = ggplot2::element_blank()) +
+          # many or long level names are angled so they do not overlap
+          (if (nlevels(rm_anova_1_data[["time"]]) > 6L || sum(nchar(levels(rm_anova_1_data[["time"]]))) > 60L)
+            ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 45, hjust = 1, vjust = 1)))
         figure_show(rm_anova_1_plot)
         figure_save(rm_anova_1_plot, "figures/rm_anova_1-ggplot2")
       })
@@ -838,6 +854,8 @@
           }))
           names(descriptives_1_1_centres)[1] <- "h"
           descriptives_1_1_centres$label <- paste0("list(widehat(mu)[mean]=='", formatC(descriptives_1_1_centres$value, format = "f", digits = 2), "')")
+          # each label beside its line, on the side with more room, so it stays inside the panel
+          descriptives_1_1_centres$hjust <- ifelse(descriptives_1_1_centres$value < mean(range(descriptives_1_1_data[["y"]])), -0.05, 1.05)
           # Bin width: the ggstatsplot rule, range / square root of n.
           descriptives_1_1_binwidth <- diff(range(descriptives_1_1_data[["y"]])) / sqrt(nrow(descriptives_1_1_data))
           descriptives_1_1_total <- sum(descriptives_1_1_data[["descriptives_1_case_weight"]])
@@ -848,13 +866,16 @@
             ggplot2::stat_bin(ggplot2::aes(y = ggplot2::after_stat(count), fill = ggplot2::after_stat(count)),
               binwidth = descriptives_1_1_binwidth, colour = "black", fill = "grey50", alpha = 0.7) +
             # right axis: the same counts as proportions
-            ggplot2::scale_y_continuous(sec.axis = ggplot2::sec_axis(transform = ~ . / descriptives_1_1_total,
-              labels = function(p) paste0(round(100 * p), "%"), name = "proportion")) +
+            # headroom above the tallest bar for the labels; counts are whole numbers
+            ggplot2::scale_y_continuous(breaks = function(l) { b <- pretty(l); b[b == round(b)] },
+              sec.axis = ggplot2::sec_axis(transform = ~ . / descriptives_1_1_total,
+              labels = function(p) paste0(round(100 * p), "%"), name = "proportion"),
+              expand = ggplot2::expansion(mult = c(0.05, 0.3))) +
             ggplot2::guides(fill = "none") +
             # the mean
             ggplot2::geom_vline(data = descriptives_1_1_centres, ggplot2::aes(xintercept = value), colour = "blue",
               linewidth = 1, linetype = "dashed") +
-            ggplot2::geom_label(data = descriptives_1_1_centres, ggplot2::aes(x = value, y = Inf, label = label),
+            ggplot2::geom_label(data = descriptives_1_1_centres, ggplot2::aes(x = value, y = Inf, label = label, hjust = hjust),
               inherit.aes = FALSE, parse = TRUE, vjust = 1.2, size = 3, family = figure_font) +
             ggplot2::facet_wrap(ggplot2::vars(.data[["h"]]), labeller = ggplot2::label_wrap_gen(width = 30)) +
             ggplot2::labs(x = "y", y = "count", title = NULL, subtitle = NULL, caption = NULL) +
@@ -882,6 +903,12 @@
             grDevices::hcl.colors(nlevels(descriptives_1_1_data[["y"]]), "Dark 3")
       
           # 3. The figure
+          # Many or long bar labels are angled; with many bars the group sizes get smaller, so they do not overlap.
+          descriptives_1_1_ticks <- levels(factor(descriptives_1_1_cells[["h"]]))
+          descriptives_1_1_many <- length(descriptives_1_1_ticks) > 6L || sum(nchar(descriptives_1_1_ticks)) > 60L
+          descriptives_1_1_size <- max(2.5, min(4, 24 / length(descriptives_1_1_ticks)))
+          # room on the left for the first angled label (about 4 pt per character)
+          descriptives_1_1_left_room <- max(5.5, 4 * nchar(descriptives_1_1_ticks[1]) - 30)
           descriptives_1_1_plot <- ggplot2::ggplot(descriptives_1_1_cells, ggplot2::aes(x = h, y = perc, fill = y)) +
             # 100% stacked bars
             ggplot2::geom_col(position = "fill", colour = "black") +
@@ -892,11 +919,13 @@
               na.rm = TRUE, show.legend = FALSE, alpha = 1, fill = "white", family = figure_font) +
             theme_figure() +
             ggplot2::theme(panel.grid.major.x = ggplot2::element_blank()) +
+            (if (descriptives_1_1_many) ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 45, hjust = 1, vjust = 1),
+              plot.margin = ggplot2::margin(5.5, 5.5, 5.5, descriptives_1_1_left_room))) +
             ggplot2::guides(fill = ggplot2::guide_legend(title = "y")) +
             ggplot2::scale_fill_manual(values = descriptives_1_1_fills, name = "", drop = FALSE) +
             # group sizes under the bars
             ggplot2::geom_text(data = descriptives_1_1_sizes, ggplot2::aes(x = h, y = -0.05, label = N, fill = NULL),
-              size = 4, family = figure_font) +
+              size = descriptives_1_1_size, family = figure_font) +
             ggplot2::labs(x = "h", y = NULL, subtitle = NULL, title = NULL, caption = NULL)
         }
         figure_show(descriptives_1_1_plot)
@@ -938,6 +967,8 @@
           }))
           names(descriptives_1_2_centres)[1] <- "h"
           descriptives_1_2_centres$label <- paste0("list(widehat(mu)[mean]=='", formatC(descriptives_1_2_centres$value, format = "f", digits = 2), "')")
+          # each label beside its line, on the side with more room, so it stays inside the panel
+          descriptives_1_2_centres$hjust <- ifelse(descriptives_1_2_centres$value < mean(range(descriptives_1_2_data[["c2"]])), -0.05, 1.05)
           # Bin width: the ggstatsplot rule, range / square root of n.
           descriptives_1_2_binwidth <- diff(range(descriptives_1_2_data[["c2"]])) / sqrt(nrow(descriptives_1_2_data))
           descriptives_1_2_total <- sum(descriptives_1_2_data[["descriptives_1_case_weight"]])
@@ -948,13 +979,16 @@
             ggplot2::stat_bin(ggplot2::aes(y = ggplot2::after_stat(count), fill = ggplot2::after_stat(count)),
               binwidth = descriptives_1_2_binwidth, colour = "black", fill = "grey50", alpha = 0.7) +
             # right axis: the same counts as proportions
-            ggplot2::scale_y_continuous(sec.axis = ggplot2::sec_axis(transform = ~ . / descriptives_1_2_total,
-              labels = function(p) paste0(round(100 * p), "%"), name = "proportion")) +
+            # headroom above the tallest bar for the labels; counts are whole numbers
+            ggplot2::scale_y_continuous(breaks = function(l) { b <- pretty(l); b[b == round(b)] },
+              sec.axis = ggplot2::sec_axis(transform = ~ . / descriptives_1_2_total,
+              labels = function(p) paste0(round(100 * p), "%"), name = "proportion"),
+              expand = ggplot2::expansion(mult = c(0.05, 0.3))) +
             ggplot2::guides(fill = "none") +
             # the mean
             ggplot2::geom_vline(data = descriptives_1_2_centres, ggplot2::aes(xintercept = value), colour = "blue",
               linewidth = 1, linetype = "dashed") +
-            ggplot2::geom_label(data = descriptives_1_2_centres, ggplot2::aes(x = value, y = Inf, label = label),
+            ggplot2::geom_label(data = descriptives_1_2_centres, ggplot2::aes(x = value, y = Inf, label = label, hjust = hjust),
               inherit.aes = FALSE, parse = TRUE, vjust = 1.2, size = 3, family = figure_font) +
             ggplot2::facet_wrap(ggplot2::vars(.data[["h"]]), labeller = ggplot2::label_wrap_gen(width = 30)) +
             ggplot2::labs(x = "c2", y = "count", title = NULL, subtitle = NULL, caption = NULL) +
@@ -982,6 +1016,12 @@
             grDevices::hcl.colors(nlevels(descriptives_1_2_data[["c2"]]), "Dark 3")
       
           # 3. The figure
+          # Many or long bar labels are angled; with many bars the group sizes get smaller, so they do not overlap.
+          descriptives_1_2_ticks <- levels(factor(descriptives_1_2_cells[["h"]]))
+          descriptives_1_2_many <- length(descriptives_1_2_ticks) > 6L || sum(nchar(descriptives_1_2_ticks)) > 60L
+          descriptives_1_2_size <- max(2.5, min(4, 24 / length(descriptives_1_2_ticks)))
+          # room on the left for the first angled label (about 4 pt per character)
+          descriptives_1_2_left_room <- max(5.5, 4 * nchar(descriptives_1_2_ticks[1]) - 30)
           descriptives_1_2_plot <- ggplot2::ggplot(descriptives_1_2_cells, ggplot2::aes(x = h, y = perc, fill = c2)) +
             # 100% stacked bars
             ggplot2::geom_col(position = "fill", colour = "black") +
@@ -992,11 +1032,13 @@
               na.rm = TRUE, show.legend = FALSE, alpha = 1, fill = "white", family = figure_font) +
             theme_figure() +
             ggplot2::theme(panel.grid.major.x = ggplot2::element_blank()) +
+            (if (descriptives_1_2_many) ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 45, hjust = 1, vjust = 1),
+              plot.margin = ggplot2::margin(5.5, 5.5, 5.5, descriptives_1_2_left_room))) +
             ggplot2::guides(fill = ggplot2::guide_legend(title = "c2")) +
             ggplot2::scale_fill_manual(values = descriptives_1_2_fills, name = "", drop = FALSE) +
             # group sizes under the bars
             ggplot2::geom_text(data = descriptives_1_2_sizes, ggplot2::aes(x = h, y = -0.05, label = N, fill = NULL),
-              size = 4, family = figure_font) +
+              size = descriptives_1_2_size, family = figure_font) +
             ggplot2::labs(x = "h", y = NULL, subtitle = NULL, title = NULL, caption = NULL)
         }
         figure_show(descriptives_1_2_plot)
@@ -1075,6 +1117,12 @@
           grDevices::hcl.colors(nlevels(table_1_data[["c1"]]), "Dark 3")
       
         # 3. The figure
+        # Many or long bar labels are angled; with many bars the group sizes get smaller, so they do not overlap.
+        table_1_ticks <- levels(factor(table_1_cells[["c2"]]))
+        table_1_many <- length(table_1_ticks) > 6L || sum(nchar(table_1_ticks)) > 60L
+        table_1_size <- max(2.5, min(4, 24 / length(table_1_ticks)))
+        # room on the left for the first angled label (about 4 pt per character)
+        table_1_left_room <- max(5.5, 4 * nchar(table_1_ticks[1]) - 30)
         table_1_plot <- ggplot2::ggplot(table_1_cells, ggplot2::aes(x = c2, y = perc, fill = c1)) +
           # 100% stacked bars
           ggplot2::geom_col(position = "fill", colour = "black") +
@@ -1085,12 +1133,14 @@
             na.rm = TRUE, show.legend = FALSE, alpha = 1, fill = "white", family = figure_font) +
           theme_figure() +
           ggplot2::theme(panel.grid.major.x = ggplot2::element_blank()) +
+          (if (table_1_many) ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 45, hjust = 1, vjust = 1),
+            plot.margin = ggplot2::margin(5.5, 5.5, 5.5, table_1_left_room))) +
           ggplot2::guides(fill = ggplot2::guide_legend(title = "c1")) +
           ggplot2::scale_fill_manual(values = table_1_fills, name = "", drop = FALSE) +
           ggplot2::facet_wrap(ggplot2::vars(h), labeller = ggplot2::label_wrap_gen(width = 30)) +
           # group sizes under the bars
           ggplot2::geom_text(data = table_1_sizes, ggplot2::aes(x = c2, y = -0.05, label = N, fill = NULL),
-            size = 4, family = figure_font) +
+            size = table_1_size, family = figure_font) +
           ggplot2::labs(x = "c2", y = NULL, subtitle = NULL, title = NULL, caption = NULL)
         figure_show(table_1_plot)
         figure_save(table_1_plot, "figures/table_1-ggplot2")
@@ -1176,13 +1226,13 @@
         correlation_1_plot <- ggplot2::ggplot(correlation_1_cells, ggplot2::aes(x = Var1, y = Var2, fill = value)) +
           # tiles coloured by the correlation
           ggplot2::geom_tile(colour = "black") +
+          # crosses: not significant after correction (grey, under the numbers so they stay readable)
+          ggplot2::geom_point(data = correlation_1_crossed, ggplot2::aes(x = Var1, y = Var2), inherit.aes = FALSE,
+            shape = "cross", size = 14, colour = "grey60") +
           # the coefficient in each cell
           ggplot2::geom_text(ggplot2::aes(x = Var1, y = Var2), label = ifelse(is.na(correlation_1_cells$value), "", correlation_1_cells$value),
             colour = "black",
             size = 4, fontface = "plain", family = figure_font) +
-          # crosses: not significant after correction
-          ggplot2::geom_point(data = correlation_1_crossed, ggplot2::aes(x = Var1, y = Var2), inherit.aes = FALSE,
-            shape = "cross", size = 14, colour = "black") +
           ggplot2::scale_fill_gradient2(low = "#EA4335", mid = "white", high = "#4285F4", midpoint = 0,
             limits = c(-1, 1), space = "Lab", na.value = "grey85", name = correlation_1_legend) +
           ggplot2::labs(x = NULL, y = NULL, title = NULL, subtitle = NULL,
@@ -1347,14 +1397,30 @@
         reliability_1_labels <- ifelse(reliability_1_items %in% reliability_1_reverse, paste0(reliability_1_items, " (R)"), reliability_1_items)
       
         # 2. Item-rest correlations and Cronbach's alpha.
+        # A correlation with a constant (an item, or the sum of the other items) is not
+        # estimable: it is labelled so and named in a warning, never shown as NA.
         reliability_1_rest <- vapply(reliability_1_items, function(item) {
-          stats::cor(reliability_1_data[[item]], rowSums(reliability_1_data[setdiff(reliability_1_items, item)]))
+          rest_sum <- rowSums(reliability_1_data[setdiff(reliability_1_items, item)])
+          if (stats::sd(reliability_1_data[[item]]) == 0 || stats::sd(rest_sum) == 0) return(NA_real_)
+          stats::cor(reliability_1_data[[item]], rest_sum)
         }, numeric(1))
+        if (anyNA(reliability_1_rest)) {
+          warning("BetterGG: item-rest correlation not estimable for ", paste(reliability_1_items[is.na(reliability_1_rest)], collapse = ", "),
+            " (the item, or the sum of the other items, has the same value in every row).", call. = FALSE)
+        }
         reliability_1_k <- length(reliability_1_items)
-        reliability_1_alpha <- reliability_1_k / (reliability_1_k - 1) *
-          (1 - sum(vapply(reliability_1_data, stats::var, numeric(1))) / stats::var(rowSums(reliability_1_data)))
+        reliability_1_total_var <- stats::var(rowSums(reliability_1_data))
+        reliability_1_alpha <- if (reliability_1_total_var > 0) reliability_1_k / (reliability_1_k - 1) *
+          (1 - sum(vapply(reliability_1_data, stats::var, numeric(1))) / reliability_1_total_var) else NA_real_
+        if (is.na(reliability_1_alpha)) {
+          warning("BetterGG: Cronbach's alpha not estimable (the total score has the same value in every row).",
+            call. = FALSE)
+        }
         reliability_1_correlations <- data.frame(item = factor(reliability_1_labels, levels = rev(reliability_1_labels)), r = unname(reliability_1_rest))
-        reliability_1_correlations$label <- sub("^(-?)0[.]", "\\1.", formatC(reliability_1_correlations$r, format = "f", digits = 2))
+        reliability_1_correlations$label <- ifelse(is.na(reliability_1_correlations$r), "not estimable",
+          sub("^(-?)0[.]", "\\1.", formatC(reliability_1_correlations$r, format = "f", digits = 2)))
+        reliability_1_correlations$label_x <- ifelse(is.na(reliability_1_correlations$r), 0, reliability_1_correlations$r)
+        reliability_1_correlations$label_hjust <- ifelse(is.na(reliability_1_correlations$r), 0, 0.5) # "not estimable" runs right from 0
       
         # 3. Responses in long format (one row per person and item).
         reliability_1_values <- sort(unique(unlist(reliability_1_data, use.names = FALSE)))
@@ -1384,10 +1450,13 @@
         }
         reliability_1_rest_plot <- ggplot2::ggplot(reliability_1_correlations, ggplot2::aes(x = r, y = item)) +
           ggplot2::geom_vline(xintercept = 0, colour = "grey60", linetype = "dashed") +
-          ggplot2::geom_segment(ggplot2::aes(x = 0, xend = r, yend = item), colour = "grey40") +
-          ggplot2::geom_point(size = 3, colour = "black") +
-          ggplot2::geom_text(ggplot2::aes(label = label), nudge_y = 0.3, size = 3, family = figure_font) +
-          ggplot2::scale_x_continuous(limits = c(min(0, reliability_1_correlations$r), 1), breaks = c(0, 0.5, 1)) +
+          ggplot2::geom_segment(ggplot2::aes(x = 0, xend = r, yend = item), colour = "grey40", na.rm = TRUE) +
+          ggplot2::geom_point(size = 3, colour = "black", na.rm = TRUE) +
+          ggplot2::geom_text(ggplot2::aes(x = label_x, label = label, hjust = label_hjust), nudge_y = 0.3, size = 3,
+            family = figure_font) +
+          ggplot2::scale_x_continuous(limits = c(min(0, reliability_1_correlations$r, na.rm = TRUE), 1), breaks = c(0, 0.5, 1)) +
+          # labels near the panel edge (a negative r, "not estimable") are drawn, not cut off
+          ggplot2::coord_cartesian(clip = "off") +
           ggplot2::labs(x = "item-rest correlation", y = NULL) +
           theme_figure() +
           ggplot2::theme(axis.text.y = ggplot2::element_blank())

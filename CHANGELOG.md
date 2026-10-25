@@ -1,3 +1,20 @@
+# jmv2gg 0.2.5
+
+- Uses BetterGG 0.2.2. Generated figure code changes accordingly (statistics unchanged):
+  many or long category names are angled instead of overlapping; faceted histograms put the
+  mean label beside its line with whole-number count axes; reliability figures keep a
+  constant item and label it "not estimable" (0.2.1 dropped it without a word), with
+  labels near the panel edge no longer cut off; non-significant correlation crosses are grey
+  and drawn under the coefficient; raincloud dots are filled with their outline colour;
+  pie charts have no empty axes. Bayesian rainclouds with three or more groups draw a bar
+  per pair with its Bayes factor, and a grouping column named `g` no longer stops them.
+- The report preview installs jmv only when the report uses it (49 instead of about 175
+  packages for a report without jmv).
+- The workbench starts a fresh R session after the browser R engine aborts, so the next
+  request no longer hangs.
+- The browser build reuses the published BetterGG and websocket binaries while their source
+  is unchanged (the manifest records a line-ending-independent source fingerprint).
+
 # jmv2gg 0.2.4
 
 - Figure previews on simulated data printed "F(0, 98) = NA, p NA" for factorial designs:
