@@ -24,6 +24,9 @@
   coloured in scale order, while a longer ordered variable (e.g. 51 states stored as
   ordinal) is drawn as unordered. The BetterGG engine's bar and pie charts with more than
   8 unordered categories no longer stop with a palette error.
+- A saved horizontal bar chart with more than 20 categories is taller: 0.15 in per bar, at most
+  9 in (a journal page), so the category names do not overlap. `figure_save()` takes
+  `height = NULL` (automatic) by default; give a height to fix it.
 - Category labels keep a figure's colours: a colour given by category name follows its
   renamed category (before, the renamed category was drawn grey).
 

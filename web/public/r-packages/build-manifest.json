@@ -15,7 +15,7 @@
     "R/parser.R": "0abf6f4410a5f083aa1305293f3eb88c443c98dd31000bcb56f8c10bbc38993f",
     "R/render-browser.R": "b7882b0938b6a95f0f72d011f3a1ca4e83331d435749198897b059d7a1b862f6",
     "R/rmd.R": "2ffb6e7e69e63b8fd9e479e82ae2609f07821f01cc282c4635e96badbfaf9b31",
-    "R/setup.R": "1abf75b05870eb957ecad1775099d6171bf70e0b910e0497af1830d2072a6884",
+    "R/setup.R": "f36058a8de9a6e1826522dc583fe989a9365b6f48586da5861f30847c5dd2ba2",
     "inst/adversarial/benign.Rmd": "c5795d8d4806d72d5cb02e74b2d53ef67c4c7e4c4d71ba41b7ca0b92b764c5e6",
     "inst/adversarial/child.Rmd": "5e45096e773254aa41f60387305154c0dce8d193ee489c13d7dd56fea7bc8d35",
     "inst/adversarial/cookies.Rmd": "4b4d385c69ca4374b2ef9071b71f4377b43275d1781c3f30f0a9787f6c627e58",
@@ -42,7 +42,7 @@
     "man/scan_rmd_risks.Rd": "75fb55023996f89cb25329dbf3b2eb46ba91092ba8192cb806572a855d61aa91"
   },
   "artifact": "bin/emscripten/contrib/4.6/jmv2gg_0.2.6.tgz",
-  "sha256": "ec354847462cceb833e3a98b138ba2ce072a040e571888fe3a5392724720f429",
+  "sha256": "e537db4dc2c89ad03f0b5f12bb1deb66f88c1f629ed2c59e14541be8ad47160a",
   "dependencies": {
     "BetterGG": {
       "version": "0.2.3",
