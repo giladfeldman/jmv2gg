@@ -27,6 +27,26 @@ applied in descriptives, contingency tables, linear and logistic regression; not
 by jmv's ANOVA and ANCOVA, hence not by these figures; refused for correlations,
 t-tests, repeated measures and reliability.
 
+## Recorded release checks (0.2.6, before release)
+
+- Pinned BetterGG 0.2.3 (tag v0.2.3, commit 90228b1). Its own checks: 508 tests passed,
+  R CMD check with one deliberate note; a second-model check (Sonnet) confirmed the Wilson
+  score interval of the new proportion chart.
+- R suite (tools/check.R): 808 checks, 0 failures, 1 skip (no native oxipng). The changed
+  code snapshot (argument matrix) adds only BetterGG 0.2.3's two weight checks.
+- `R CMD check --no-manual`: Status OK. vitest 50 passed; typecheck and production build
+  passed; browser package rebuilt in the pinned WebR 0.6.0 container, manifest names BetterGG
+  commit 90228b1, hash guard passed.
+- Found during release and fixed with tests: a column named like a statistic symbol (p, t,
+  F) rewrote statistics text ("p = .041" became "Price = .041"); now statistical notation is
+  left alone (a second-model check confirmed the pattern; its realistic cases are tests).
+  A PNG height test that passed for any size now checks the real size (7.65 in for 51 bars).
+- Local production build in a real browser (WebR): an ANOVA on columns p and t with labels
+  drew "Pain score" and "Time point" as axis titles and left the statistics subtitle
+  ("F(2, 33) = 25.47, p < .001, ...") and pairwise labels unchanged, with no error.
+- The owner reviewed before/after sheets of a 60-figure R Markdown re-render (labels, 0/1
+  proportions, percentage bars, ordered palettes, tall bar charts) and approved them.
+
 ## Recorded release checks (0.2.5, before release)
 
 - Pinned BetterGG 0.2.2 (tag v0.2.2, commit 3ac5fe0). Its own checks: 409 tests passed,

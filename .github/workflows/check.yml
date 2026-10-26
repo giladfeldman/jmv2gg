@@ -37,7 +37,7 @@ jobs:
             "ggplot2", "emmeans", "car", "afex", "ragg", "png", "callr", "knitr",
             "rmarkdown", "haven", "ggstatsplot", "ggdist", "ggrepel", "ggside", "ggsignif", "patchwork",
             "statsExpressions", "styler", "jmv", "psych", "markdown"))
-          remotes::install_github("giladfeldman/BetterGG@d9db9cf62178a22eb0d2bd031fb6ffa1a53618f3", upgrade="never")
+          remotes::install_github("giladfeldman/BetterGG@90228b11e60d78c0a30c4f5768062cdf29b2a213", upgrade="never")
       - run: Rscript tools/check.R
       - name: Check package
         shell: Rscript {0}

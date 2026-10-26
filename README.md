@@ -13,7 +13,7 @@ equivalence is never inferred from a visually similar plot.
 
 ```r
 install.packages("remotes")
-remotes::install_github("giladfeldman/BetterGG@v0.2.0", upgrade = "never")
+remotes::install_github("giladfeldman/BetterGG@v0.2.3", upgrade = "never")
 remotes::install_github("giladfeldman/jmv2gg@v0.2.6", upgrade = "never")
 
 result <- jmv2gg::convert_code(

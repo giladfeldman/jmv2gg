@@ -19,7 +19,10 @@ convert_code(
 \item{style}{Named presentation options: \code{stats} (statistics on the
 figures, default \code{FALSE}), \code{palette} (\code{"nejm"}, \code{"okabe_ito"}, \code{"grey"},
 \code{"viridis"}), \code{grayscale}, \code{verbose} (full plain-language comments),
-\code{headings} (R Markdown only), \code{styler}.}
+\code{headings} (R Markdown only), \code{styler}, \code{labels} (\code{"tidy"}, the default:
+column names tidied into figure text; \code{"names"}: the column names as they
+are), \code{label_text} (\code{list(column = "label")}) and \code{level_text}
+(\code{list(column = list(category = "label"))}).}
 
 \item{figures}{Named publication export options: \code{size} (\code{"double"} 7.2 in,
 \code{"single"} 3.5 in, or \code{"custom"} with \code{width}/\code{height}), \code{dpi}, \code{formats}

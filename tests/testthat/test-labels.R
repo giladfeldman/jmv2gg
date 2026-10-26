@@ -108,6 +108,37 @@ test_that("figure_relabel puts the labels into titles, legend titles, statistics
   expect_identical(ticks(env$figure_relabel(p), "y"), ticks(p, "y"))
 })
 
+test_that("a column named like a statistic symbol leaves the statistics text alone", {
+  skip_if_not_installed("ggplot2")
+  env <- new.env(parent = globalenv())
+  eval(parse(text = figure_setup_code(conversion_options(list(), list()), "ggplot2",
+    labels = c(p = "Price", t = "Time", F = "Female", d = "Dose", n = "Count", df = "Data frame"))), envir = env)
+  relabel <- env$figure_relabel_text
+  expect_identical(relabel("p"), "Price")
+  expect_identical(relabel("p: F(1, 20) = 4.10, p = .041, t(19) = 2.1, d = 0.5, n = 22, df = 19, p < .001, p ≤ .05"),
+    "Price: F(1, 20) = 4.10, p = .041, t(19) = 2.1, d = 0.5, n = 22, df = 19, p < .001, p ≤ .05")
+  expect_identical(relabel("Welch t-test; p-values adjusted (Holm)"), "Welch t-test; p-values adjusted (Holm)")
+  expect_identical(relabel("p × t: F[2, 30] = 1.2"), "Price × Time: F[2, 30] = 1.2")
+  expect_identical(relabel("p / t"), "Price / Time")
+  expect_identical(relabel("t × p"), "Time × Price")
+  # statistic symbols followed by words, brackets after a space, Pr(>F), n/a, other operators
+  for (text in c("Cohen's d = 0.4", "Welch t test", "F test", "p value", "d [0.10, 0.90]", "p (adj.)",
+    "Pr(>F)", "n/a", "p ≠ .05", "p ≈ 0", "p ~ .05", "t–test", "df (Welch)"))
+    expect_identical(relabel(text), text)
+})
+
+test_that("a longer column name that is statistical notation does not fall back to a shorter one", {
+  skip_if_not_installed("ggplot2")
+  env <- new.env(parent = globalenv())
+  eval(parse(text = figure_setup_code(conversion_options(list(), list()), "ggplot2",
+    labels = c(Age = "Age (years)", `Age group` = "Age band", Group = "Condition"))), envir = env)
+  relabel <- env$figure_relabel_text
+  expect_identical(relabel("Age group = old"), "Age group = old")
+  expect_identical(relabel("Age group × Group: F(1, 20) = 3.1"), "Age band × Condition: F(1, 20) = 3.1")
+  expect_identical(relabel("Age / Group"), "Age (years) / Condition")
+  expect_identical(relabel("Öl Group"), "Öl Condition")
+})
+
 test_that("generated figures carry the labels when they are drawn", {
   skip_if_not_installed("ggplot2")
   skip_if_not_installed("emmeans")

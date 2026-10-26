@@ -65,6 +65,17 @@
   name and keeps a limits function built from those names, so both need the new names or
   the renamed category is drawn grey. Precomputed tick labels keyed by group need a column
   named after the variable and positional labels (BetterGG 0.2.3 `recipe_proportion`).
+- Whole-word replacement of column names in figure text also hits statistical notation
+  when a column is named like a symbol: with `p = "Price"`, "p = .041" became "Price = .041"
+  and "t-test" "Time-test", with no test failing. An operator lookahead was not enough ("Cohen's d",
+  "Pr(>F)", "n/a" still broke): a symbol-named column is relabelled only before ":", "×",
+  " / " or at the end. Match the names in an atomic group, or a longer name that fails the
+  lookahead backtracks to a shorter one ("Age group = 1" -> "<Age label> group = 1"). PCRE
+  rejects code-point escapes above 255 outside UTF mode: paste the characters in with
+  `intToUtf8()`, and add `(*UCP)` so letters such as Ö count as word characters.
+- A BetterGG re-pin leaves other copies of the pin behind: README's install line stayed at v0.2.0 and the
+  CI workflow at the 0.2.0 commit while DESCRIPTION required 0.2.3. After a re-pin, grep README, `.github/` and
+  docs for `BetterGG@`.
 - jamovi labels its plots with column names (`labels <- list(x = term[1], y = dep, ...)` in
   jmv's emmeans plots), not with variable descriptions; readable labels are jmv2gg's choice.
 

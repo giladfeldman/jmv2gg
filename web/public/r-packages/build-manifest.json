@@ -7,7 +7,7 @@
     "R/browser.R": "f2bea0ec7e380fc8e3539d8044427f71bedce932b5b35beb5f43fea9df430d79",
     "R/contracts.R": "e811b7fc8d9d4994b5c7a4b6bf2719ddbf74e3b537b0e02cceb05165b0a6d2d1",
     "R/generate.R": "069aeea5fa1bc6d7fec15912fac7036f5312cfee481251a19e95f61e089f8504",
-    "R/labels.R": "12fa247176a39049e9f4d6fecb7cb7af564e9879238536679821f27744af9e0a",
+    "R/labels.R": "1c0d5138ca94ec93b640d9432fc2c6ef22307c95658b6330f84e49abb6a32e92",
     "R/map-groups.R": "ae3025bbd50f093667a612d2393ca2dc98f1bbb3d4515d61f2be74be3aee66b6",
     "R/map-other.R": "50fd7d26287793c1bf575b5d6b76a7322ddf3c63ff5e6766c4fb4cb99ccd5f8a",
     "R/names.R": "4ab4d8ffe8c64204f720a2a3526e22d1caee3228177a83b778d0df1a955311aa",
@@ -33,7 +33,7 @@
     "inst/report/preview.css": "d850942a04881b8cdae97b3f860625f67cf9dd23a4939bc9ed77126068763883",
     "inst/report/report.css": "4cc7e9880cbd507b08043a99c464f6dc6391108398f3b484b93fc5fd11649f04",
     "man/browser_request.Rd": "50086a790f909a1cd94123dc805463776e06bb3d3a8e92ee77e1ce909eb2efc3",
-    "man/convert_code.Rd": "a3b901382b440d4876e5bbe127bc38fd496c0f9c67354b4bba7e3c5e265ec3a8",
+    "man/convert_code.Rd": "ec117c3b5b51f497517c2dda93de41ced523493822eb85bfc1237e93e37dccb5",
     "man/convert_rmd.Rd": "4433dad0df7c4a286b3f2787ec127db86c7b867fd07de2d6b271e57f4df14e1c",
     "man/optimize_png.Rd": "79f5e8c4ad71d56910722a1a1a3883a577a7a11bcdf546b1e598d40bee0d771c",
     "man/render_browser_preview.Rd": "296de0319d7a327bb7b45c4eefe9056d480531715693d3bc689a2d649b6db349",
@@ -42,7 +42,7 @@
     "man/scan_rmd_risks.Rd": "75fb55023996f89cb25329dbf3b2eb46ba91092ba8192cb806572a855d61aa91"
   },
   "artifact": "bin/emscripten/contrib/4.6/jmv2gg_0.2.6.tgz",
-  "sha256": "7197ca6615de51ab2365a377d55c7b3fefa169b327c55ff931c350b1ca501d7c",
+  "sha256": "be3ca7354e842f1eb16cb8d5fb62181f0f2198b072a363c1eae37d90c8523f1f",
   "dependencies": {
     "BetterGG": {
       "version": "0.2.3",

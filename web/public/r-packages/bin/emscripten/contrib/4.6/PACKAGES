@@ -19,8 +19,8 @@ Suggests: ggplot2, emmeans, car, afex, haven, ragg, ggdist, ggrepel,
         psych, ggstatsplot, rmarkdown, knitr, markdown, jmvcore,
         testthat (>= 3.0.0), withr, png, callr
 License: MIT + file LICENSE
-MD5sum: 3dd3f662f9dd1907a5315a64367f2ba9
-Built: R 4.6.0; ; 2026-10-25 20:05:24 UTC; unix
+MD5sum: 27ea20deb0179f3e210bec1d3ec45422
+Built: R 4.6.0; ; 2026-10-26 08:18:02 UTC; unix
 File: jmv2gg_0.2.6.tgz
 
 Package: websocket

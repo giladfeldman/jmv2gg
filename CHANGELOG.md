@@ -10,6 +10,10 @@
   `style$label_text` and `style$level_text` supply labels. In the web app, a "Titles and
   legends" option and a Figure labels view edit the block without converting again. jamovi
   itself labels its plots with the column names, so this is a change from the jamovi output.
+  Statistical notation is never relabelled: a column named like a statistic symbol (p, t, F,
+  d, n, df, ...) is replaced only before ":", "×" or " / " or at the end of the text, so
+  "p = .04", "F(1, 20)", "Cohen's d" and "t-test" stay as they are; any other column name
+  followed by an operator, a bracket or a dash is left alone too.
   Not relabelled: BetterGG-engine statistics subtitles (drawn as R expressions) and combined
   multi-panel (patchwork) figures.
 - Uses BetterGG 0.2.3. Descriptives figures choose a chart by the data: a 0/1 variable is
